@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.binf.springBootJpa</groupId>
-    <artifactId>springBootJpa</artifactId>
+    <groupId>com.ryel</groupId>
+    <artifactId>zaja</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -23,7 +23,7 @@
         <jackson>2.6.5</jackson>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <start-class>me.binf.springBootJpa.Application</start-class>
+        <start-class>com.ryel.zaja.Application</start-class>
         <m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
 
         <druid.version>0.2.23</druid.version>
@@ -34,34 +34,12 @@
         <profile>
             <id>dev-wb</id>
             <properties>
-                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/ivf_db?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
                 <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>123456</spring.dataSource.password>
-                <doc.base.url>http://localhost:8080/ivf</doc.base.url>
+                <spring.dataSource.password>1234</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
                 <pro.upload.path>D:/developer/apache-tomcat-8.0.36/webapps/files/upload/</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev-ppc</id>
-            <properties>
-                <spring.dataSource.url>jdbc:mysql://14.17.81.101:3306/ivf_db?characterEncoding=utf-8</spring.dataSource.url>
-                <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>123456</spring.dataSource.password>
-                <doc.base.url>http://127.0.0.1:9080/ivf</doc.base.url>
-                <pro.upload.path>/Software/JAVAEE/apache-tomcat-8.0.23/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>http://127.0.0.1:9080/files/upload/</pro.upload.url>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <spring.dataSource.url>jdbc:mysql://14.17.81.101:3306/ivf_db?characterEncoding=utf-8</spring.dataSource.url>
-                <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>123456</spring.dataSource.password>
-                <doc.base.url>http://14.17.81.101:8080/ivf</doc.base.url>
-                <pro.upload.path>/var/tomcat/apache-tomcat-8.5.4/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>http://14.17.81.101:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>
     </profiles>
