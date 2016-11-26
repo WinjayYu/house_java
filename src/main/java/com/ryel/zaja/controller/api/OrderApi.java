@@ -26,6 +26,7 @@ public class OrderApi {
     public Result create(@RequestBody HouseOrder houseOrder) {
         try {
             houseOrder.setAddTime(new Date());
+            houseOrder.setStatus("20");
             houseOrder.setStatus("10");
             orderService.create(houseOrder);
         } catch (UserException e) {
