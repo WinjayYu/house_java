@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "user")
-public class User implements Serializable {
+public class House implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,7 +16,7 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String nickname;
+    private String address;
 
     public Integer getId() {
         return id;
@@ -26,11 +26,11 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getAddress() {
+        return address;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
