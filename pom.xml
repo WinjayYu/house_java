@@ -32,11 +32,22 @@
 
     <profiles>
         <profile>
-            <id>dev-wb</id>
+            <id>gaoll</id>
             <properties>
                 <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
                 <spring.dataSource.username>root</spring.dataSource.username>
                 <spring.dataSource.password>1234</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
+                <pro.upload.path>D:/developer/apache-tomcat-8.0.36/webapps/files/upload/</pro.upload.path>
+                <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
+            </properties>
+        </profile>
+        <profile>
+            <id>ywj</id>
+            <properties>
+                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.username>root</spring.dataSource.username>
+                <spring.dataSource.password>123456</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/zaja</doc.base.url>
                 <pro.upload.path>D:/developer/apache-tomcat-8.0.36/webapps/files/upload/</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
