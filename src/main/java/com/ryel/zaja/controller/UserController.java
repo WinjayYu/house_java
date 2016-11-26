@@ -56,7 +56,6 @@ public class UserController  extends BaseController{
     public Result save(HttpServletRequest request,
                        HttpServletResponse response,
                        User user){
-        user.setType(9);
         if(user.getId()==null){
             userService.create(user);
         }else{

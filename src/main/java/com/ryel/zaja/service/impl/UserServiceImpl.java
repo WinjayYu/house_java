@@ -41,9 +41,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Transactional
     public User create(User user){
-        if (userDao.check(user.getEmail(), user.getTel()) != null){
-            throw new UserException("手机或者邮箱已经存在");
-        }
+
         userDao.save(user);
         return user;
     }
@@ -52,7 +50,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Override
     public User login(String username, String password) {
-        User user = userDao.findByEmailOrMobileAndPassword(username, password);
+        User user = null;
         return user;
     }
 
@@ -87,7 +85,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
      */
     @Override
     public List<User> registUser() {
-        return userDao.registUser();
+        return null;
     }
 
     @Override

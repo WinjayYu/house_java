@@ -13,8 +13,8 @@ import java.util.Date;
  * APP 注册用户
  */
 @Entity
-@Table(name = "order")
-public class Order implements Serializable {
+@Table(name = "house_order")
+public class HouseOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

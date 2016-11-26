@@ -1,10 +1,10 @@
 package com.ryel.zaja.service;
 
-import com.ryel.zaja.entity.Order;
+import com.ryel.zaja.entity.HouseOrder;
 
-public interface OrderService extends ICommonService<Order> {
+public interface OrderService extends ICommonService<HouseOrder> {
 
-    public Order create(Order order);
+    public HouseOrder create(HouseOrder houseOrder);
 
 
 }
