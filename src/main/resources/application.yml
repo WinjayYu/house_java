@@ -10,9 +10,11 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
 
     hibernate:
-      dialect: org.hibernate.dialect.MySQLDialect
-#      hbm2ddl.auto: create
-      show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+#       hbm2ddl.auto: create
+        show_sql: true
+        format_sql: true
+
 
 
 pro:

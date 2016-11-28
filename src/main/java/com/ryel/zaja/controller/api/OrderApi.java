@@ -1,15 +1,15 @@
 package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.dao.OrderDao;
 import com.ryel.zaja.entity.HouseOrder;
 import com.ryel.zaja.exception.UserException;
 import com.ryel.zaja.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @RestController
@@ -22,19 +22,33 @@ public class OrderApi {
     @Autowired
     private OrderService orderService;
 
-    @RequestMapping(value = "create")
-    public Result create(@RequestBody HouseOrder houseOrder) {
+    @Autowired
+    private OrderDao orderDao;
+
+    //创建订单
+    @RequestMapping(value = "createorder")
+    public Result createOrder(@RequestBody HouseOrder houseOrder) {
         try {
             houseOrder.setAddTime(new Date());
-            houseOrder.setStatus("20");
-            houseOrder.setStatus("10");
             orderService.create(houseOrder);
-        } catch (UserException e) {
-            return Result.error().msg("邮箱或者手机已经存在!");
+        } catch (Exception e) {
+            return Result.error().msg("");
         }
         return Result.success().msg("successs!");
     }
 
+    //获取某一个订单的详情
+    @RequestMapping(value = "getorder")
+    public Result getOrder(@RequestBody HouseOrder houseOrder){
+        HouseOrder houseOrder1;
+        try{
+            houseOrder1 = orderService.findById(houseOrder.getId());
+        } catch(Exception e){
+            return Result.error().msg("error_4");
+        }
+        return Result.success().msg("").data(houseOrder1);
+
+    }
 
 
 }

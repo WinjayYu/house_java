@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @RestController(value = "userApi")
 @RequestMapping("/api/user/")
-public class UserController {
+public class UserApi {
 
     @Value("${pro.upload.url}")
     private String uploadUrl;
@@ -102,18 +102,18 @@ public class UserController {
      * @apiName user.login
      * @apiGroup user
      * @apiDescription 用户登录
-     * @apiParam {STRING} username 邮箱/手机号
+     * @apiParam {STRING} mobile 手机
      * @apiParam {STRING} password 密码
      * @apiSuccess {Result} Result 返回结果
      * @apiUse UserInfo
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public Result login(String username, String password) {
-        User user = userService.login(username, password);
+    public Result login(String mobile, String password) {
+        User user = userService.login(mobile, password);
         if (user == null) {
-            return Result.error().msg("用户名密码错误!");
+            return Result.error().msg("error_0");
         } else {
-            return Result.success().msg("登录成功!").data(user2map(user));
+            return Result.success().msg("").data(user2map(user));
         }
 
     }
@@ -124,18 +124,9 @@ public class UserController {
      * @apiName user.update
      * @apiGroup user
      * @apiDescription 修改用户信息
-     * @apiParam {STRING} email 邮箱
      * @apiParam {STRING} password 密码
      * @apiParam {STRING} name 名称
-     * @apiParam {STRING} ename 英文名
-     * @apiParam {STRING} nationality 国籍
-     * @apiParam {STRING} sex 性别
-     * @apiParam {STRING} tel 手机
-     * @apiParam {STRING} hospital 医院
-     * @apiParam {STRING} post 职务
-     * @apiParam {STRING} titles 职称
-     * @apiParam {STRING} department 科室
-     * @apiParam {STRING} remark 备注
+     * @apiParam {STRING} mobile 手机
      * @apiSuccess {Result} Result 返回结果
      * @apiUse UserInfo
      */
@@ -147,9 +138,9 @@ public class UserController {
 
 
     /**
-     * @api {post} /api/user/head/upload 4.上传头像
+     * @api {post} /api/user/uploadhead 4.上传头像
      * @apiVersion 0.0.1
-     * @apiName user.head.upload
+     * @apiName user.uploadhead
      * @apiGroup user
      * @apiDescription 上传头像
      * @apiParam {STRING} userId 用户ID
