@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50520
+Source Server         : mysql
+Source Server Version : 50716
 Source Host           : localhost:3306
 Source Database       : zaja
 
 Target Server Type    : MYSQL
-Target Server Version : 50520
+Target Server Version : 50716
 File Encoding         : 65001
 
-Date: 2016-11-28 15:17:56
+Date: 2016-11-28 17:58:28
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -21,18 +21,16 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `area`;
 CREATE TABLE `area` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `add_time` datetime DEFAULT NULL,
-  `add_by` int(11) DEFAULT NULL,
-  `last_modified_time` datetime DEFAULT NULL,
-  `last_modified_by` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `address` varchar(255) NOT NULL DEFAULT '',
+  `add_time` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `add_by` int(11) NOT NULL DEFAULT '0',
+  `last_modified_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `last_modified_by` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `FK_1er6390ptqf875066kb85edx5` (`add_by`),
+  CONSTRAINT `FK_1er6390ptqf875066kb85edx5` FOREIGN KEY (`add_by`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小区';
-
--- ----------------------------
--- Records of area
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for buy_house_demand
@@ -43,14 +41,11 @@ CREATE TABLE `buy_house_demand` (
   `user_id` int(11) NOT NULL,
   `min_price` decimal(11,2) NOT NULL DEFAULT '0.00' COMMENT '要求价格最小值',
   `max_price` decimal(11,2) NOT NULL DEFAULT '0.00' COMMENT '要求价格最大值',
-  `house_type` varchar(50) NOT NULL,
-  `fitment_level_id` int(11) NOT NULL DEFAULT '0',
+  `house_type` varchar(50) NOT NULL DEFAULT '' COMMENT '户型',
+  `fitment_level_id` int(11) NOT NULL DEFAULT '0' COMMENT '装修程度',
+  `area_id` int(11) NOT NULL DEFAULT '0' COMMENT '小区id',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='买方需求表';
-
--- ----------------------------
--- Records of buy_house_demand
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for fitment_level
@@ -61,10 +56,6 @@ CREATE TABLE `fitment_level` (
   `name` varchar(255) NOT NULL COMMENT '装修程度名称',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='装修程度';
-
--- ----------------------------
--- Records of fitment_level
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for house
@@ -89,10 +80,6 @@ CREATE TABLE `house` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='房屋';
 
 -- ----------------------------
--- Records of house
--- ----------------------------
-
--- ----------------------------
 -- Table structure for house_feature
 -- ----------------------------
 DROP TABLE IF EXISTS `house_feature`;
@@ -105,12 +92,6 @@ CREATE TABLE `house_feature` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='房屋特色';
 
 -- ----------------------------
--- Records of house_feature
--- ----------------------------
-INSERT INTO `house_feature` VALUES ('1', '1', '核心卖点', 'xx');
-INSERT INTO `house_feature` VALUES ('2', '1', '交通出行', 'ss');
-
--- ----------------------------
 -- Table structure for house_image
 -- ----------------------------
 DROP TABLE IF EXISTS `house_image`;
@@ -120,10 +101,6 @@ CREATE TABLE `house_image` (
   `path` varchar(500) NOT NULL COMMENT '七牛路径',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='房屋图片';
-
--- ----------------------------
--- Records of house_image
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for house_order
@@ -151,11 +128,6 @@ CREATE TABLE `house_order` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='订单';
 
 -- ----------------------------
--- Records of house_order
--- ----------------------------
-INSERT INTO `house_order` VALUES ('1', 'xxxx', null, null, null, null, '2016-11-26 16:03:56', null, null);
-
--- ----------------------------
 -- Table structure for middleman
 -- ----------------------------
 DROP TABLE IF EXISTS `middleman`;
@@ -169,30 +141,6 @@ CREATE TABLE `middleman` (
   `head` varchar(500) NOT NULL DEFAULT '' COMMENT '头像',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='经济人';
-
--- ----------------------------
--- Records of middleman
--- ----------------------------
-
--- ----------------------------
--- Table structure for middleman_house
--- ----------------------------
-DROP TABLE IF EXISTS `middleman_house`;
-CREATE TABLE `middleman_house` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `house_id` int(11) NOT NULL,
-  `status` varchar(10) NOT NULL DEFAULT '10' COMMENT '房屋状态：10=保存、20=待审核、30=上架、40=下架',
-  `add_time` datetime DEFAULT NULL,
-  `add_by` int(11) DEFAULT NULL,
-  `last_modified_time` datetime DEFAULT NULL,
-  `last_modified_by` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='经济人发布房屋信息';
-
--- ----------------------------
--- Records of middleman_house
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for sell_house_demand
@@ -213,10 +161,6 @@ CREATE TABLE `sell_house_demand` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='卖方需求表';
 
 -- ----------------------------
--- Records of sell_house_demand
--- ----------------------------
-
--- ----------------------------
 -- Table structure for send_order
 -- ----------------------------
 DROP TABLE IF EXISTS `send_order`;
@@ -229,10 +173,6 @@ CREATE TABLE `send_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='派单';
 
 -- ----------------------------
--- Records of send_order
--- ----------------------------
-
--- ----------------------------
 -- Table structure for third_user
 -- ----------------------------
 DROP TABLE IF EXISTS `third_user`;
@@ -241,12 +181,10 @@ CREATE TABLE `third_user` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `openid` varchar(50) NOT NULL,
   `type` varchar(10) NOT NULL DEFAULT '' COMMENT '10=QQ、20=微信、30=微博',
+  `head` varchar(500) NOT NULL DEFAULT '' COMMENT '头像',
+  `nickname` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='第三方登录';
-
--- ----------------------------
--- Records of third_user
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for user
@@ -262,7 +200,4 @@ CREATE TABLE `user` (
   `head` varchar(500) NOT NULL DEFAULT '' COMMENT '头像',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
-
--- ----------------------------
--- Records of user
--- ----------------------------
+SET FOREIGN_KEY_CHECKS=1;
