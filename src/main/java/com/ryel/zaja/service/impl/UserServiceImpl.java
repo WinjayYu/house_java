@@ -42,14 +42,14 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     @Transactional
     public User create(User user){
 
-        userDao.save(user);
+        this.save(user);
         return user;
     }
 
 
 
     @Override
-    public User login(String username, String password) {
+    public User login(String mobile, String password) {
         User user = null;
         return user;
     }
@@ -63,39 +63,11 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         return save(origUser);
     }
 
-    @Override
-    public void watch(Integer userId, Integer fllowUserId) {
-
-    }
-
-    @Override
-    public void unwatch(Integer userId, Integer fllowUserId) {
-
-    }
 
 
     @Override
     public List<User> list() {
         return userDao.findAll();
-    }
-
-    /**
-     * 获取普通注册用户列表(非主席和讲师)
-     * @return
-     */
-    @Override
-    public List<User> registUser() {
-        return null;
-    }
-
-    @Override
-    public List<User> watchlist(Integer userId) {
-        return null;
-    }
-
-    @Override
-    public List<User> fllowlist(Integer userId) {
-        return null;
     }
 
 

@@ -12,8 +12,8 @@ import java.util.Date;
  * Created by billyu on 2016/11/28.
  */
 @Entity
-@Table(name = "area")
-public class Area {
+@Table(name = "community")
+public class community {
 
     private static final long serialVersionUID = 1L;
 
@@ -22,6 +22,7 @@ public class Area {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @Column(name = "name")
     private String name;
 
     private String address;
@@ -43,6 +44,8 @@ public class Area {
 
     @Column(name = "last_modified_by")
     private Integer lastModifiedBy;
+
+    public community(){}
 
 
     public Integer getId() {

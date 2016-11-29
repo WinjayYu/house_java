@@ -50,6 +50,8 @@ public class HouseOrder implements Serializable {
     @Column(name = "buyer_mobile")
     private String buyerMobile;
 
+    public HouseOrder(){}
+
     public Integer getId() {
         return id;
     }

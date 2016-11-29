@@ -68,7 +68,7 @@ CREATE TABLE `house` (
   `user_id` int(11) DEFAULT NULL COMMENT '经纪人id',
   `house_type` varchar(50) DEFAULT '' COMMENT '房屋类型',
   `address` varchar(255) DEFAULT '' COMMENT '位置',
-  `area` decimal(10,2) DEFAULT '0.00' COMMENT '房屋面积',
+  `community` decimal(10,2) DEFAULT '0.00' COMMENT '房屋面积',
   `sell_price` decimal(10,2) DEFAULT '0.00' COMMENT '售价',
   `status` varchar(255) DEFAULT '' COMMENT '10=待审核、20=上架、30=下架',
   `longitude` varchar(50) DEFAULT '' COMMENT '经度',
@@ -126,7 +126,7 @@ CREATE TABLE `sell_house` (
   `sell_price` decimal(10,2) DEFAULT NULL COMMENT '售价',
   `model` varchar(255) DEFAULT NULL COMMENT '房屋类型',
   `fitment_level` varchar(255) DEFAULT NULL COMMENT '装修程度',
-  `area` double(255,0) DEFAULT NULL,
+  `community` double(255,0) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='卖方需求表';
 

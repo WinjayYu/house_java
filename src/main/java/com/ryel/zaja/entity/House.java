@@ -9,7 +9,7 @@ import java.util.Date;
  * APP 注册用户
  */
 @Entity
-@Table(name = "user")
+@Table(name = "house")
 public class House implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -18,6 +18,11 @@ public class House implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    //经纪人id
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userId;
+
     @Column(name = "house_type")
     private String houseType;
 
@@ -25,30 +30,45 @@ public class House implements Serializable {
 
     private BigDecimal area;
 
-    @Column(name = "sale_price")
-    private BigDecimal salePrice;
+    @Column(name = "sell")
+    private BigDecimal sellPrice;
 
-    @Column(name = "source_house_status")
+    //10=待审核、20=上架、30=下架
     private String sourceHouseStatus;
 
-    @Column(name = "middleman_house_status")
-    private String middlemanHouseStatus;
 
     private String longitude;
 
     private String latitude;
 
+    //10=经济人二次发布、20=经济人一手发布
     private String type;
 
-    @JoinColumn(name = "source_house_id")
-    private House sourceHouseId;
+    @JoinColumn(name = "sell_house_id")
+    private House sellHouseId;
 
     @Column(name = "publish_date")
     private Date publishDate;
 
+    //标签，如(近地铁|交通方便)，中间以|隔开
     private String tags;
 
+    //年代
     private String year;
+
+    private String feature;
+
+    private String imgs;
+
+    @Column(name = "fitment_level")
+    private String fitmentLevel;
+
+    //佣金
+    private BigDecimal commission;
+
+    private String direction;
+
+    public House(){}
 
     public Integer getId() {
         return id;
@@ -58,12 +78,12 @@ public class House implements Serializable {
         this.id = id;
     }
 
-    public String getAddress() {
-        return address;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public String getHouseType() {
@@ -74,6 +94,14 @@ public class House implements Serializable {
         this.houseType = houseType;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public BigDecimal getArea() {
         return area;
     }
@@ -82,12 +110,12 @@ public class House implements Serializable {
         this.area = area;
     }
 
-    public BigDecimal getSalePrice() {
-        return salePrice;
+    public BigDecimal getSellPrice() {
+        return sellPrice;
     }
 
-    public void setSalePrice(BigDecimal salePrice) {
-        this.salePrice = salePrice;
+    public void setSellPrice(BigDecimal sellPrice) {
+        this.sellPrice = sellPrice;
     }
 
     public String getSourceHouseStatus() {
@@ -96,14 +124,6 @@ public class House implements Serializable {
 
     public void setSourceHouseStatus(String sourceHouseStatus) {
         this.sourceHouseStatus = sourceHouseStatus;
-    }
-
-    public String getMiddlemanHouseStatus() {
-        return middlemanHouseStatus;
-    }
-
-    public void setMiddlemanHouseStatus(String middlemanHouseStatus) {
-        this.middlemanHouseStatus = middlemanHouseStatus;
     }
 
     public String getLongitude() {
@@ -130,12 +150,12 @@ public class House implements Serializable {
         this.type = type;
     }
 
-    public House getSourceHouseId() {
-        return sourceHouseId;
+    public House getSellHouseId() {
+        return sellHouseId;
     }
 
-    public void setSourceHouseId(House sourceHouseId) {
-        this.sourceHouseId = sourceHouseId;
+    public void setSellHouseId(House sellHouseId) {
+        this.sellHouseId = sellHouseId;
     }
 
     public Date getPublishDate() {
@@ -160,5 +180,45 @@ public class House implements Serializable {
 
     public void setYear(String year) {
         this.year = year;
+    }
+
+    public String getFeature() {
+        return feature;
+    }
+
+    public void setFeature(String feature) {
+        this.feature = feature;
+    }
+
+    public String getImgs() {
+        return imgs;
+    }
+
+    public void setImgs(String imgs) {
+        this.imgs = imgs;
+    }
+
+    public String getFitmentLevel() {
+        return fitmentLevel;
+    }
+
+    public void setFitmentLevel(String fitmentLevel) {
+        this.fitmentLevel = fitmentLevel;
+    }
+
+    public BigDecimal getCommission() {
+        return commission;
+    }
+
+    public void setCommission(BigDecimal commission) {
+        this.commission = commission;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }

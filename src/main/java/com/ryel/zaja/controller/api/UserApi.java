@@ -25,38 +25,6 @@ public class UserApi {
     @Value("${pro.upload.url}")
     private String uploadUrl;
 
-
-    /**
-     * @apiDefine UserInfo
-     * @apiVersion 0.0.1
-     *
-     * @apiSuccessExample {json} Success-Response:
-     * {
-     * "status": 200,
-     * "msg": "",
-     * "data": {
-      "user": {
-      "id": 3,
-      "name": "王彬",
-      "imgUrl": "http://localhost:8080/files/upload/img/2016/8/558537507501307.jpg",
-      "password": "123456",
-      "ename": "wangbin",
-      "nationality": "中国",
-      "sex": "男",
-      "tel": "18801285391",
-      "hospital": "人民医院",
-      "post": "外科医生",
-      "titles": "专家",
-      "department": "外科",
-      "email": "bur@13.com",
-      "createDate": "2016-08-24 10:13:23",
-      "remark": ""
-      }
-     }
-     * }
-     */
-
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -68,31 +36,20 @@ public class UserApi {
      * @apiName user.register
      * @apiGroup user
      * @apiDescription 用户注册
-     * @apiParam {STRING} email 邮箱
      * @apiParam {STRING} password 密码
-     * @apiParam {STRING} name 名称
-     * @apiParam {STRING} ename 英文名
-     * @apiParam {STRING} nationality 国籍
-     * @apiParam {STRING} sex 性别
-     * @apiParam {STRING} tel 手机
-     * @apiParam {STRING} hospital 医院
-     * @apiParam {STRING} post 职务
-     * @apiParam {STRING} titles 职称
-     * @apiParam {STRING} department 科室
-     * @apiParam {STRING} remark 备注
+     * @apiParam {String} mobile 手机
      * @apiSuccess {Result} Result 返回结果
      *
-     * @apiUse UserInfo
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
-    public Result register(User user) {
+    public Result register(@RequestBody  User user) {
         try {
             userService.create(user);
         } catch (UserException e) {
-            return Result.error().msg("邮箱或者手机已经存在!");
+            return Result.error().msg("error_1");
         }
 
-        return Result.success().msg("注册成功!").data(user2map(user));
+        return Result.success().msg("").data(user2map(user));
     }
 
 
