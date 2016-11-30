@@ -113,9 +113,6 @@ CREATE TABLE `house` (
   `fitment_level` varchar(255) DEFAULT NULL COMMENT '装修程度',
   `commission` decimal(10,3) DEFAULT NULL COMMENT '佣金',
   `direction` varchar(10) DEFAULT NULL COMMENT '朝向',
-  `sellHouseId` tinyblob,
-  `sell` decimal(19,2) DEFAULT NULL,
-  `sourceHouseStatus` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_3cuicb608pp7ye1uwdase8kdc` (`user_id`),
   CONSTRAINT `FK_3cuicb608pp7ye1uwdase8kdc` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
