@@ -30,12 +30,11 @@ public class House implements Serializable {
 
     private BigDecimal area;
 
-    @Column(name = "sell")
+    @Column(name = "sell_price")
     private BigDecimal sellPrice;
 
     //10=待审核、20=上架、30=下架
-    private String sourceHouseStatus;
-
+    private String status;
 
     private String longitude;
 
@@ -118,12 +117,12 @@ public class House implements Serializable {
         this.sellPrice = sellPrice;
     }
 
-    public String getSourceHouseStatus() {
-        return sourceHouseStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setSourceHouseStatus(String sourceHouseStatus) {
-        this.sourceHouseStatus = sourceHouseStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getLongitude() {

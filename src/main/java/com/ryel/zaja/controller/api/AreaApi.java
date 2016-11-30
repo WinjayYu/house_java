@@ -2,7 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.UserDao;
-import com.ryel.zaja.entity.community;
+import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.AreaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class AreaApi {
      * @return
      */
     @RequestMapping(value = "createarea")
-    public Result createArea(@RequestBody community community){
+    public Result createArea(@RequestBody Community community){
         try{
 
             User user = new User(1001);

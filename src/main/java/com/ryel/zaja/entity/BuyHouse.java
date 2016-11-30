@@ -40,7 +40,7 @@ public class BuyHouse implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "community_id")
-    private community communityId;
+    private Community communityId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -104,11 +104,11 @@ public class BuyHouse implements Serializable {
         this.fitmentLevelId = fitmentLevelId;
     }
 
-    public community getCommunityId() {
+    public Community getCommunityId() {
         return communityId;
     }
 
-    public void setCommunityId(community communityId) {
+    public void setCommunityId(Community communityId) {
         this.communityId = communityId;
     }
 

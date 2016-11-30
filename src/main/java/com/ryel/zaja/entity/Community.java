@@ -12,8 +12,8 @@ import java.util.Date;
  * Created by billyu on 2016/11/28.
  */
 @Entity
-@Table(name = "community")
-public class community {
+@Table(name = "Community")
+public class Community {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class community {
     @Column(name = "last_modified_by")
     private Integer lastModifiedBy;
 
-    public community(){}
+    public Community(){}
 
 
     public Integer getId() {

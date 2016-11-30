@@ -28,26 +28,12 @@ public class SellHouse implements Serializable {
     @JoinColumn(name = "user_id")
     private User userId;
 
-    @ManyToOne
-    @JoinColumn(name = "middleman_id")
-    private User middlemanId;
-
-    @ManyToOne
-    @JoinColumn(name = "house_id")
-    private House house;
-
     private String status;
-
-    private BigDecimal commission;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
     @Column(name = "add_time")
     private Date addTime;
-
-    @ManyToOne
-    @JoinColumn(name = "add_by")
-    private User addBy;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -55,8 +41,21 @@ public class SellHouse implements Serializable {
     private Date lastModifiedTime;
 
     @ManyToOne
-    @JoinColumn(name = "last_modified_by")
-    private User lastModifiedBy;
+    @JoinColumn(name = "community_uid")
+    private Community communityUid;
+
+    @Column(name = "house_type")
+    private String houseType;
+
+    @Column(name = "sell_price")
+    private BigDecimal sellPrice;
+
+    private String model;
+
+    @Column(name = "fitment_level")
+    private String fitmentLevel;
+
+    private double area;
 
     public SellHouse() {
     }
@@ -85,36 +84,12 @@ public class SellHouse implements Serializable {
         this.userId = userId;
     }
 
-    public User getMiddlemanId() {
-        return middlemanId;
-    }
-
-    public void setMiddlemanId(User middlemanId) {
-        this.middlemanId = middlemanId;
-    }
-
-    public House getHouse() {
-        return house;
-    }
-
-    public void setHouse(House house) {
-        this.house = house;
-    }
-
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public BigDecimal getCommission() {
-        return commission;
-    }
-
-    public void setCommission(BigDecimal commission) {
-        this.commission = commission;
     }
 
     public Date getAddTime() {
@@ -125,14 +100,6 @@ public class SellHouse implements Serializable {
         this.addTime = addTime;
     }
 
-    public User getAddBy() {
-        return addBy;
-    }
-
-    public void setAddBy(User addBy) {
-        this.addBy = addBy;
-    }
-
     public Date getLastModifiedTime() {
         return lastModifiedTime;
     }
@@ -141,11 +108,43 @@ public class SellHouse implements Serializable {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public User getLastModifiedBy() {
-        return lastModifiedBy;
+    public Community getCommunityUid() {
+        return communityUid;
     }
 
-    public void setLastModifiedBy(User lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
+    public void setCommunityUid(Community communityUid) {
+        this.communityUid = communityUid;
+    }
+
+    public String getHouseType() {
+        return houseType;
+    }
+
+    public void setHouseType(String houseType) {
+        this.houseType = houseType;
+    }
+
+    public BigDecimal getSellPrice() {
+        return sellPrice;
+    }
+
+    public void setSellPrice(BigDecimal sellPrice) {
+        this.sellPrice = sellPrice;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getFitmentLevel() {
+        return fitmentLevel;
+    }
+
+    public void setFitmentLevel(String fitmentLevel) {
+        this.fitmentLevel = fitmentLevel;
     }
 }

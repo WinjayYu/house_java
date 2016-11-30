@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.ryel.zaja.Application;
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,12 +34,14 @@ class JpaConfig implements TransactionManagementConfigurer {
     private String password;
     @Value("${spring.hibernate.dialect}")
     private String dialect;
-//    @Value("${spring.hibernate.hbm2ddl.auto}")
-//    private String hbm2ddlAuto;
+    @Value("${spring.hibernate.hbm2ddl.auto}")
+    private String hbm2ddlAuto;
     @Value("${spring.hibernate.show_sql}")
     private Boolean showSql;
     @Value("${spring.dataSource.driverClassName}")
     private String driver;
+    @Value("${spring.hibernate.format_sql}")
+    private String formatSql;
 
     @Bean
     public DataSource configureDataSource() {
@@ -72,8 +75,9 @@ class JpaConfig implements TransactionManagementConfigurer {
 
         Properties jpaProperties = new Properties();
         jpaProperties.put(org.hibernate.cfg.Environment.DIALECT, dialect);
-        jpaProperties.put(org.hibernate.cfg.Environment.HBM2DDL_AUTO, "update");
+        jpaProperties.put(org.hibernate.cfg.Environment.HBM2DDL_AUTO, hbm2ddlAuto);
         jpaProperties.put(org.hibernate.cfg.Environment.SHOW_SQL, showSql);
+        jpaProperties.put(org.hibernate.cfg.Environment.FORMAT_SQL,formatSql);
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
         return entityManagerFactoryBean;

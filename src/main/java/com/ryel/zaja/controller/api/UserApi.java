@@ -88,7 +88,7 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public Result update(User user) {
+    public Result update(@RequestBody  User user) {
         userService.update(user);
         return Result.success().msg("修改信息成功!").data(user2map(user));
     }
