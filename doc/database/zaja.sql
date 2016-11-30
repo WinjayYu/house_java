@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50716
 File Encoding         : 65001
 
-Date: 2016-11-29 16:54:07
+Date: 2016-11-30 11:23:15
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -22,6 +22,17 @@ DROP TABLE IF EXISTS `agent_material`;
 CREATE TABLE `agent_material` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for background_img
+-- ----------------------------
+DROP TABLE IF EXISTS `background_img`;
+CREATE TABLE `background_img` (
+  `id` int(11) NOT NULL,
+  `img` varchar(500) DEFAULT NULL COMMENT '图片url',
+  `describe` varchar(255) DEFAULT NULL COMMENT '图片描述',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -42,8 +53,20 @@ CREATE TABLE `buy_house` (
   PRIMARY KEY (`id`),
   KEY `FK_oqpk2cdqw9wig0b8mb7xx6m1i` (`community_id`),
   KEY `FK_9r1xfs0j77g05sj5rgx8pv6mo` (`fitment_level`),
-  KEY `FK_4n6n35q9vyokg6nwx23q99al8` (`user_id`)
+  KEY `FK_je50gpe4jgbx772m449hmvul0` (`user_id`),
+  CONSTRAINT `FK_je50gpe4jgbx772m449hmvul0` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='买方需求表';
+
+-- ----------------------------
+-- Table structure for collect
+-- ----------------------------
+DROP TABLE IF EXISTS `collect`;
+CREATE TABLE `collect` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `house_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='收藏表';
 
 -- ----------------------------
 -- Table structure for community
@@ -56,7 +79,14 @@ CREATE TABLE `community` (
   `address` varchar(255) DEFAULT NULL COMMENT '地址',
   `longitude` decimal(10,6) DEFAULT NULL COMMENT '经度',
   `latitude` decimal(10,6) DEFAULT NULL COMMENT '纬度',
-  PRIMARY KEY (`uid`)
+  `id` int(11) NOT NULL,
+  `add_time` datetime DEFAULT NULL,
+  `last_modified_by` int(11) DEFAULT NULL,
+  `last_modified_time` datetime DEFAULT NULL,
+  `add_by` int(11) DEFAULT NULL,
+  PRIMARY KEY (`uid`),
+  KEY `FK_j9djsni04pdhqy3w1nu5hetww` (`add_by`),
+  CONSTRAINT `FK_j9djsni04pdhqy3w1nu5hetww` FOREIGN KEY (`add_by`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='小区';
 
 -- ----------------------------
@@ -68,7 +98,7 @@ CREATE TABLE `house` (
   `user_id` int(11) DEFAULT NULL COMMENT '经纪人id',
   `house_type` varchar(50) DEFAULT '' COMMENT '房屋类型',
   `address` varchar(255) DEFAULT '' COMMENT '位置',
-  `community` decimal(10,2) DEFAULT '0.00' COMMENT '房屋面积',
+  `area` decimal(10,2) DEFAULT '0.00' COMMENT '房屋面积',
   `sell_price` decimal(10,2) DEFAULT '0.00' COMMENT '售价',
   `status` varchar(255) DEFAULT '' COMMENT '10=待审核、20=上架、30=下架',
   `longitude` varchar(50) DEFAULT '' COMMENT '经度',
@@ -83,7 +113,12 @@ CREATE TABLE `house` (
   `fitment_level` varchar(255) DEFAULT NULL COMMENT '装修程度',
   `commission` decimal(10,3) DEFAULT NULL COMMENT '佣金',
   `direction` varchar(10) DEFAULT NULL COMMENT '朝向',
-  PRIMARY KEY (`id`)
+  `sellHouseId` tinyblob,
+  `sell` decimal(19,2) DEFAULT NULL,
+  `sourceHouseStatus` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_3cuicb608pp7ye1uwdase8kdc` (`user_id`),
+  CONSTRAINT `FK_3cuicb608pp7ye1uwdase8kdc` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='房屋';
 
 -- ----------------------------
@@ -100,6 +135,7 @@ CREATE TABLE `house_order` (
   `add_time` datetime DEFAULT NULL,
   `buyer_mobile` varchar(50) DEFAULT '',
   `buyer_id` int(11) DEFAULT '0' COMMENT '买家id',
+  `middleman_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_rg7f2tiw4ir7fckr98k5tsx1x` (`buyer_id`),
   KEY `FK_1i8xt85c0l5xqgxsnbymg9o3n` (`house_id`),
@@ -117,7 +153,7 @@ CREATE TABLE `house_order` (
 DROP TABLE IF EXISTS `sell_house`;
 CREATE TABLE `sell_house` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL COMMENT '面积',
+  `user_id` int(11) DEFAULT NULL,
   `status` varchar(5) DEFAULT NULL COMMENT '状态：10=保存、20=发布、30=经济人已接单',
   `add_time` datetime DEFAULT NULL,
   `last_modified_time` datetime DEFAULT NULL,
@@ -126,7 +162,7 @@ CREATE TABLE `sell_house` (
   `sell_price` decimal(10,2) DEFAULT NULL COMMENT '售价',
   `model` varchar(255) DEFAULT NULL COMMENT '房屋类型',
   `fitment_level` varchar(255) DEFAULT NULL COMMENT '装修程度',
-  `community` double(255,0) DEFAULT NULL,
+  `area` double(255,0) DEFAULT NULL COMMENT '面积',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='卖方需求表';
 
@@ -170,5 +206,5 @@ CREATE TABLE `user` (
   `nickname` varchar(255) DEFAULT '' COMMENT '昵称',
   `head` varchar(500) DEFAULT '' COMMENT '头像',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1002 DEFAULT CHARSET=utf8 COMMENT='用户';
+) ENGINE=InnoDB AUTO_INCREMENT=1003 DEFAULT CHARSET=utf8 COMMENT='用户';
 SET FOREIGN_KEY_CHECKS=1;
