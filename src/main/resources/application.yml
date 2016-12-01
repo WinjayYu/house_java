@@ -4,9 +4,9 @@ spring:
             prefix: /WEB-INF/jsp/
             suffix: .jsp
     dataSource:
-        url: '@spring.dataSource.url@'
-        username: '@spring.dataSource.username@'
-        password: '@spring.dataSource.password@'
+        url: @spring.dataSource.url@
+        username: @spring.dataSource.username@
+        password: @spring.dataSource.password@
         driverClassName: com.mysql.jdbc.Driver
 
     hibernate:
@@ -17,8 +17,8 @@ spring:
 
 pro:
     upload:
-      path: '@pro.upload.path@'
-      url: '@pro.upload.url@'
+      path: @pro.upload.path@
+      url: @pro.upload.url@
 logging:
     level:
         me.binf.ivf: DEBUG
