@@ -1,9 +1,9 @@
 package com.ryel.zaja.service.impl;
 
-import com.ryel.zaja.dao.AreaDao;
+import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.service.AbsCommonService;
-import com.ryel.zaja.service.AreaService;
+import com.ryel.zaja.service.CommunityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,10 +17,10 @@ import java.util.List;
  * Created by billyu on 2016/11/28.
  */
 @Service
-public class AreaServiceImpl extends AbsCommonService<Community> implements AreaService{
+public class CommunityServiceImpl extends AbsCommonService<Community> implements CommunityService {
 
     @Autowired
-    private AreaDao areaDao;
+    private CommunityDao communityDao;
 
     @Override
     public Community update(Community community) {
@@ -29,7 +29,7 @@ public class AreaServiceImpl extends AbsCommonService<Community> implements Area
 
     @Override
     public List<Community> list() {
-        return areaDao.findAll();
+        return communityDao.findAll();
     }
 
     @Override
@@ -41,8 +41,7 @@ public class AreaServiceImpl extends AbsCommonService<Community> implements Area
     @Transactional
     public Community create(Community community) {
         community.setAddTime(new Date());
-        community.setLastModifiedTime(new Date());
-        areaDao.save(community);
+        communityDao.save(community);
         return community;
     }
 

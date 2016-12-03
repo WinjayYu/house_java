@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by burgl on 2016/8/27.
  */
@@ -17,6 +19,7 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
 
     @Autowired
     private SellHouseDao sellHouseDao;
+
 
     @Override
     @Transactional
@@ -29,4 +32,12 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
     public JpaRepository<SellHouse, Integer> getDao() {
         return sellHouseDao;
     }
+
+
+    @Override
+    public List<SellHouse> findByUserId(int userId) {
+        List<SellHouse> sellHouses = sellHouseDao.findByUserId(userId);
+        return sellHouses;
+    }
+
 }

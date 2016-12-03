@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
  * Created by burgl on 2016/8/16.
  */
 @Repository
-public interface AreaDao extends JpaRepository<Community, Integer> ,JpaSpecificationExecutor<Community> {
+public interface CommunityDao extends JpaRepository<Community, Integer> ,JpaSpecificationExecutor<Community> {
 
 }

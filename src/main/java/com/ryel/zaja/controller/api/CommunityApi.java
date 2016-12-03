@@ -3,8 +3,7 @@ package com.ryel.zaja.controller.api;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.Community;
-import com.ryel.zaja.entity.User;
-import com.ryel.zaja.service.AreaService;
+import com.ryel.zaja.service.CommunityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = "/api/area/")
-public class AreaApi {
+public class CommunityApi {
 
     @Autowired
-    private AreaService areaService;
+    private CommunityService communityService;
 
     @Autowired
     private UserDao userDao;
@@ -29,10 +28,7 @@ public class AreaApi {
     @RequestMapping(value = "createarea")
     public Result createArea(@RequestBody Community community){
         try{
-
-            User user = new User(1001);
-            community.setAddBy(user);
-            areaService.create(community);
+            communityService.create(community);
         }catch (Exception e){
             return Result.error().msg("error_6");
         }
@@ -41,7 +37,7 @@ public class AreaApi {
 
     @RequestMapping(value = "arealist")
     public Result areaList(){
-        return Result.success().msg("").data(areaService.list());
+        return Result.success().msg("").data(communityService.list());
     }
 
 }

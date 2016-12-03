@@ -16,6 +16,7 @@ public interface HouseService extends ICommonService<House>{
     public House update(House house);
 
 
+
     /**
      * 获取所有房源列表
      * @return

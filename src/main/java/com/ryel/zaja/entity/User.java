@@ -23,6 +23,8 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    private String sex;
+
     @Column(nullable = false)
     private String mobile;
 
@@ -34,6 +36,22 @@ public class User implements Serializable {
 
     public User(int id){
         this.id = id;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getUsername() {
@@ -50,6 +68,14 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
     }
 
     public String getMobile() {
@@ -74,21 +100,5 @@ public class User implements Serializable {
 
     public void setHead(String head) {
         this.head = head;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by burgl on 2016/8/27.
  */
@@ -28,5 +30,10 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public JpaRepository<HouseOrder, Integer> getDao() {
         return houseOrderDao;
+    }
+
+    @Override
+    public List<HouseOrder> list(Integer id) {
+        return houseOrderDao.list(id);
     }
 }

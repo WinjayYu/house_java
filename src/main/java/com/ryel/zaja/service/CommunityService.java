@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by billyu on 2016/11/28.
  */
-public interface AreaService extends ICommonService<Community>{
+public interface CommunityService extends ICommonService<Community>{
 
     public Community create(Community community);
 

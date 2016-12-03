@@ -1,5 +1,6 @@
 package com.ryel.zaja.dao;
 
+import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.SellHouse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,8 +13,9 @@ import java.util.List;
  * Created by burgl on 2016/8/16.
  */
 @Repository
-public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpecificationExecutor<SellHouse> {
+public interface BuyHouseDao extends JpaRepository<BuyHouse, Integer> ,JpaSpecificationExecutor<BuyHouse> {
 
-    @Query("select s from SellHouse s where s.user.id = ?1 order by s.addTime desc")
-    public List<SellHouse> findByUserId(Integer id);
+    @Query("select b from BuyHouse b where b.user.id = ?1 order by b.addTime desc")
+    public List<BuyHouse> findByUserId(Integer userId);
+
 }

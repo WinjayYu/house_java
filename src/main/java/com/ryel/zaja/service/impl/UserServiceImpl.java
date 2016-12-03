@@ -41,7 +41,9 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Transactional
     public User create(User user){
-
+        if(userDao.findByMobile(user.getMobile()) != null ){
+            throw new RuntimeException("手机号已存在！");
+        }
         this.save(user);
         return user;
     }
@@ -50,7 +52,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Override
     public User login(String mobile, String password) {
-        User user = null;
+        User user = userDao.findByMobileAndPassword(mobile, password);
         return user;
     }
 
