@@ -37,9 +37,8 @@ public class SellHouseApi {
             map.put("list",list);
             result = Result.success().data(map);
         } catch (Exception e) {
-            return Result.error().msg(Error_code.ERROR_CODE_0014);
             logger.error(e.getMessage(),e);
-            return Result.error().msg("error_4");
+            return Result.error().msg(Error_code.ERROR_CODE_0014);
         }
         return result;
     }
