@@ -19,8 +19,7 @@ public class Community {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Integer uid;
 
     @Column(name = "name")
     private String name;
@@ -33,27 +32,20 @@ public class Community {
     private Date addTime;
 
 
-    @ManyToOne
-    @JoinColumn(name = "add_by")
-    private  User addBy;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = CustomJsonDateSerializer.class)
-    @Column(name = "last_modified_time")
-    private Date lastModifiedTime;
-
-    @Column(name = "last_modified_by")
-    private Integer lastModifiedBy;
-
-    public Community(){}
-
-
-    public Integer getId() {
-        return id;
+    public Community() {
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Community(Integer uid){
+        this.uid = uid;
+    }
+
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
     public String getName() {
@@ -78,29 +70,5 @@ public class Community {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
-    }
-
-    public User getAddBy() {
-        return addBy;
-    }
-
-    public void setAddBy(User addBy) {
-        this.addBy = addBy;
-    }
-
-    public Date getLastModifiedTime() {
-        return lastModifiedTime;
-    }
-
-    public void setLastModifiedTime(Date lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
-    }
-
-    public Integer getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(Integer lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
     }
 }

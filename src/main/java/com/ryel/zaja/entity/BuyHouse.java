@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * APP 注册用户
+ * 买房需求
  */
 @Entity
 @Table(name = "buy_house")
@@ -24,7 +24,7 @@ public class BuyHouse implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @Column(name = "min_price")
     private BigDecimal minPrice;
@@ -39,8 +39,8 @@ public class BuyHouse implements Serializable {
     private String fitmentLevelId;
 
     @ManyToOne
-    @JoinColumn(name = "community_id")
-    private Community communityId;
+    @JoinColumn(name = "community_uid")
+    private Community community;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -64,12 +64,20 @@ public class BuyHouse implements Serializable {
         this.id = id;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Community getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
     }
 
     public BigDecimal getMinPrice() {
@@ -105,11 +113,11 @@ public class BuyHouse implements Serializable {
     }
 
     public Community getCommunityId() {
-        return communityId;
+        return community;
     }
 
     public void setCommunityId(Community communityId) {
-        this.communityId = communityId;
+        this.community = communityId;
     }
 
     public Date getAddTime() {

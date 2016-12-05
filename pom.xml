@@ -53,6 +53,17 @@
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.username>root</spring.dataSource.username>
+                <spring.dataSource.password>Zaja_123zaja</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
+                <pro.upload.path>D:/developer/apache-tomcat-8.0.36/webapps/files/upload/</pro.upload.path>
+                <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -183,7 +194,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2</version>
@@ -197,13 +208,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>me.binf.springBootJpa.boot.PreExec</mainClass>
+                    <mainClass>com.ryel.zaja.springBootJpa.boot.PreExec</mainClass>
                     <arguments>
                         <argument>${basedir}</argument>
                         <argument>${doc.base.url}</argument>
                     </arguments>
                 </configuration>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

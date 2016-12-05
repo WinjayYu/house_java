@@ -1,5 +1,6 @@
 package com.ryel.zaja.controller.api;
 
+import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
@@ -54,7 +55,7 @@ public class OrderApi {
             houseOrder.setAddTime(new Date());
             houseOrderService.create(houseOrder);
         } catch (Exception e) {
-            return Result.error().msg("error_6");
+            return Result.error().msg(Error_code.ERROR_CODE_0019);//操作失败
         }
         return Result.success().msg("");
     }
@@ -65,7 +66,7 @@ public class OrderApi {
 
         HouseOrder origHouseOrder = houseOrderService.findById(houseOrder.getId());
         if (origHouseOrder == null) {
-            return Result.error().msg("error_5");
+            return Result.error().msg(Error_code.ERROR_CODE_0006);//手机号被占用
         }
 
         return Result.success().msg("").data(origHouseOrder);
@@ -83,7 +84,7 @@ public class OrderApi {
         map.put("list", list);
         result = Result.success().data(map);
         if (list == null) {
-            return Result.error().msg("error_4");
+            return Result.error().msg(Error_code.ERROR_CODE_0014);
         }
         return result;
     }

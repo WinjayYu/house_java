@@ -1,12 +1,16 @@
 package com.ryel.zaja.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryel.zaja.utils.CustomJsonDateSerializer;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * APP 注册用户
+ * 房源
  */
 @Entity
 @Table(name = "house")
@@ -20,8 +24,8 @@ public class House implements Serializable {
 
     //经纪人id
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userId;
+    @JoinColumn(name = "agent_id")
+    private User agent;
 
     @Column(name = "house_type")
     private String houseType;
@@ -43,11 +47,19 @@ public class House implements Serializable {
     //10=经济人二次发布、20=经济人一手发布
     private String type;
 
+    @ManyToOne
     @JoinColumn(name = "sell_house_id")
-    private House sellHouseId;
+    private SellHouse sellHouse;
 
-    @Column(name = "publish_date")
-    private Date publishDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    @Column(name = "add_time")
+    private Date addTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    @Column(name = "last_modified_time")
+    private Date lastModifiedTime;
 
     //标签，如(近地铁|交通方便)，中间以|隔开
     private String tags;
@@ -67,7 +79,13 @@ public class House implements Serializable {
 
     private String direction;
 
+    @ManyToOne
+    @JoinColumn(name = "community_uid")
+    private Community community;
+
     public House(){}
+
+    public House(Integer id){this.id = id;}
 
     public Integer getId() {
         return id;
@@ -77,12 +95,12 @@ public class House implements Serializable {
         this.id = id;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getAgent() {
+        return agent;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setAgent(User agent) {
+        this.agent = agent;
     }
 
     public String getHouseType() {
@@ -149,20 +167,28 @@ public class House implements Serializable {
         this.type = type;
     }
 
-    public House getSellHouseId() {
-        return sellHouseId;
+    public SellHouse getSellHouse() {
+        return sellHouse;
     }
 
-    public void setSellHouseId(House sellHouseId) {
-        this.sellHouseId = sellHouseId;
+    public void setSellHouse(SellHouse sellHouse) {
+        this.sellHouse = sellHouse;
     }
 
-    public Date getPublishDate() {
-        return publishDate;
+    public Date getAddTime() {
+        return addTime;
     }
 
-    public void setPublishDate(Date publishDate) {
-        this.publishDate = publishDate;
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
+    }
+
+    public Date getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    public void setLastModifiedTime(Date lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
     }
 
     public String getTags() {
@@ -219,5 +245,13 @@ public class House implements Serializable {
 
     public void setDirection(String direction) {
         this.direction = direction;
+    }
+
+    public Community getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
     }
 }

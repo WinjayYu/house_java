@@ -26,7 +26,7 @@ public class SellHouse implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     private String status;
 
@@ -42,7 +42,7 @@ public class SellHouse implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "community_uid")
-    private Community communityUid;
+    private Community community;
 
     @Column(name = "house_type")
     private String houseType;
@@ -76,14 +76,6 @@ public class SellHouse implements Serializable {
         this.code = code;
     }
 
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -108,12 +100,20 @@ public class SellHouse implements Serializable {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public Community getCommunityUid() {
-        return communityUid;
+    public User getUser() {
+        return user;
     }
 
-    public void setCommunityUid(Community communityUid) {
-        this.communityUid = communityUid;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Community getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
     }
 
     public String getHouseType() {
@@ -146,5 +146,13 @@ public class SellHouse implements Serializable {
 
     public void setFitmentLevel(String fitmentLevel) {
         this.fitmentLevel = fitmentLevel;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    public void setArea(double area) {
+        this.area = area;
     }
 }

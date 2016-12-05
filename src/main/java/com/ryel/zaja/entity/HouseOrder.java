@@ -25,10 +25,6 @@ public class HouseOrder implements Serializable {
     private String code;
 
     @ManyToOne
-    @JoinColumn(name = "middleman_id")
-    private User middleman;
-
-    @ManyToOne
     @JoinColumn(name = "seller_id")
     private User seller;
 
@@ -50,6 +46,10 @@ public class HouseOrder implements Serializable {
     @Column(name = "buyer_mobile")
     private String buyerMobile;
 
+    @ManyToOne
+    @JoinColumn(name = "agent_id")
+    private User agent;
+
     public HouseOrder(){}
 
     public Integer getId() {
@@ -68,12 +68,12 @@ public class HouseOrder implements Serializable {
         this.code = code;
     }
 
-    public User getMiddleman() {
-        return middleman;
+    public User getAgent() {
+        return agent;
     }
 
-    public void setMiddleman(User middleman) {
-        this.middleman = middleman;
+    public void setAgent(User agent) {
+        this.agent = agent;
     }
 
     public User getSeller() {

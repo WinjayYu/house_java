@@ -5,6 +5,9 @@ import com.ryel.zaja.entity.SendOrder;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.SendOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,13 @@ public class SendOrderServiceImpl extends AbsCommonService<SendOrder> implements
     @Override
     public List<SendOrder> list() {
         return null;
+    }
+
+    @Override
+    public Page<SendOrder> findByPage(Integer agentId, int pageNum, int pageSize) {
+
+        Page<SendOrder> page = sendOrderDao.findByAgentId(agentId,new PageRequest(pageNum-1,pageSize, Sort.Direction.ASC, "id"));
+        return page;
     }
 
     @Override

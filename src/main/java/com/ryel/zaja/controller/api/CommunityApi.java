@@ -1,5 +1,6 @@
 package com.ryel.zaja.controller.api;
 
+import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.Community;
@@ -25,17 +26,17 @@ public class CommunityApi {
      * @param
      * @return
      */
-    @RequestMapping(value = "createarea")
+    @RequestMapping(value = "createarea", method = RequestMethod.POST)
     public Result createArea(@RequestBody Community community){
         try{
             communityService.create(community);
         }catch (Exception e){
-            return Result.error().msg("error_6");
+            return Result.error().msg(Error_code.ERROR_CODE_0019);//操作失败
         }
         return Result.success().msg("");
     }
 
-    @RequestMapping(value = "arealist")
+    @RequestMapping(value = "communitylist")
     public Result areaList(){
         return Result.success().msg("").data(communityService.list());
     }

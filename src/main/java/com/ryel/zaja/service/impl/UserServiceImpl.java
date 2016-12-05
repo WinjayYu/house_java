@@ -74,7 +74,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
 
     @Override
-    public Page<User> findByPage(final String name, final Integer type, int pageNum, int pageSize) {
+    public Page<User> findByPage(final String name, int pageNum, int pageSize) {
         Page<User> page = userDao.findAll(new Specification<User>() {
             @Override
             public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -82,10 +82,6 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
                 Predicate result = null;
                 if(StringUtils.isNotBlank(name)){
                     Predicate predicate = cb.like(root.get("name").as(String.class), "%"+name+"%");
-                    predicateList.add(predicate);
-                }
-                if (type != null) {
-                    Predicate predicate = cb.equal(root.get("type").as(Integer.class), type);
                     predicateList.add(predicate);
                 }
 

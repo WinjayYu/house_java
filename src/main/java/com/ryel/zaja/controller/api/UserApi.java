@@ -1,5 +1,6 @@
 package com.ryel.zaja.controller.api;
 
+import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.User;
@@ -19,7 +20,7 @@ import java.util.Map;
  * 8/22/16.
  * app 客户端用户登入,注册等功能.
  */
-@RestController(value = "userApi")
+@RestController()
 @RequestMapping("/api/user/")
 public class UserApi {
 
@@ -57,7 +58,7 @@ public class UserApi {
             }
             userService.create(user);
         } catch (Exception e) {
-            return Result.error().msg("error_1");
+            return Result.error().msg(Error_code.ERROR_CODE_0006);//手机号被占用
         }
 
         return Result.success().msg("").data(user2map(user));
@@ -79,7 +80,7 @@ public class UserApi {
     public Result login(@RequestBody User user) {
         User origUser = userService.login(user.getMobile(), user.getPassword());
         if (origUser == null) {
-            return Result.error().msg("error_0");
+            return Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
         } else {
             return Result.success().msg("").data(user2map(origUser));
         }
@@ -102,7 +103,7 @@ public class UserApi {
     public Result update(@RequestBody  User user) {
         userService.update(user);
         User origUser = userDao.findOne(user.getId());
-        return Result.success().msg("修改信息成功!").data(user2map(origUser));
+        return Result.success().msg("").data(user2map(origUser));
     }
 
 
@@ -128,7 +129,7 @@ public class UserApi {
         User user = userService.findById(userId);
         FileBo fileBo = defaultUploadFile.uploadFile(file.getOriginalFilename(),file.getInputStream());
         userService.update(user);
-        return Result.success().msg("上传头像成功!");
+        return Result.success().msg("");
     }
 
     /**
@@ -169,9 +170,9 @@ public class UserApi {
         {
         "status":1,
         "data":{},
-        "msg":"error_4"
+        "msg":"error_14"
         }
-        找回密码邮件发送成功:
+        找回密码短信发送成功:
         {
         "status":0,
         "data":{},
@@ -180,10 +181,11 @@ public class UserApi {
      */
     @RequestMapping(value = "findpassword", method = RequestMethod.POST)
     public Result findPassword(@RequestBody User user) {
-        if (user == null  || userDao.findByMobile(user.getMobile()) != null) {
-            return Result.error().msg("error_7");
+        if (null == user || null == userDao.findByMobile(user.getMobile())) {
+            return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
         }
-        return Result.success().msg("");
+        userService.update(user);
+        return Result.success().msg("").data("");
     }
 
 
