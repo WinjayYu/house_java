@@ -25,6 +25,16 @@ public class SendOrderVo implements Serializable{
 
     private BigDecimal area;
 
+    private Integer draw;
+
+    private Integer start;
+
+    private Integer length;
+
+    private Integer pageNum;
+
+    private Integer pageSize;
+
     public String getMobile() {
         return mobile;
     }
@@ -87,5 +97,45 @@ public class SendOrderVo implements Serializable{
 
     public void setArea(BigDecimal area) {
         this.area = area;
+    }
+
+    public Integer getDraw() {
+        return draw;
+    }
+
+    public void setDraw(Integer draw) {
+        this.draw = draw;
+    }
+
+    public Integer getStart() {
+        return start;
+    }
+
+    public void setStart(Integer start) {
+        this.start = start;
+    }
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public void setLength(Integer length) {
+        this.length = length;
+    }
+
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }

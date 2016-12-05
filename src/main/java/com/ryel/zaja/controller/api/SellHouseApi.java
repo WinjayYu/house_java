@@ -1,5 +1,6 @@
 package com.ryel.zaja.controller.api;
 
+import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.SellHouseService;
@@ -15,7 +16,7 @@ import java.util.Map;
  *
  * 卖房
  */
-@RestController(value = "sellHouse")
+@RestController()
 @RequestMapping("/api/sellhouse/")
 public class SellHouseApi {
 
@@ -34,7 +35,7 @@ public class SellHouseApi {
             map.put("list",list);
             result = Result.success().data(map);
         } catch (Exception e) {
-            return Result.error().msg("error_4");
+            return Result.error().msg(Error_code.ERROR_CODE_0014);
         }
         return result;
     }

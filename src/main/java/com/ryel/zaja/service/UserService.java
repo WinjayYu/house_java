@@ -27,5 +27,5 @@ public interface UserService extends ICommonService<User>{
 
 
 
-    public Page<User> findByPage(String name, final Integer type, int pageNum, int pageSize);
+    public Page<User> findByPage(String name, int pageNum, int pageSize);
 }
