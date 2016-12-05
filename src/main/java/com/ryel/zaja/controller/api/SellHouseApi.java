@@ -3,6 +3,8 @@ package com.ryel.zaja.controller.api;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.SellHouseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +20,7 @@ import java.util.Map;
 @RestController(value = "sellHouse")
 @RequestMapping("/api/sellhouse/")
 public class SellHouseApi {
-
+    protected final static Logger logger = LoggerFactory.getLogger(SellHouseApi.class);
 
     @Autowired
     private SellHouseService sellHouseService;
@@ -34,6 +36,7 @@ public class SellHouseApi {
             map.put("list",list);
             result = Result.success().data(map);
         } catch (Exception e) {
+            logger.error(e.getMessage(),e);
             return Result.error().msg("error_4");
         }
         return result;
