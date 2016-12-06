@@ -182,7 +182,7 @@
     </dependencies>
 
     <build>
-        <finalName>springBootJpa</finalName>
+        <finalName>zaja</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
