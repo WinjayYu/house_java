@@ -14,5 +14,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SendOrderDao  extends JpaRepository<SendOrder, Integer>,JpaSpecificationExecutor<SendOrder> {
     @Query("select s from SendOrder s where s.agent.id = ?1")
-    public Page<SendOrder> findByAgentId(Integer id, Pageable pageable);
+    Page<SendOrder> findByAgentId(Integer id, Pageable pageable);
 }

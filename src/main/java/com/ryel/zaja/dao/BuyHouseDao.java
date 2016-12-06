@@ -19,9 +19,9 @@ import java.util.List;
 public interface BuyHouseDao extends JpaRepository<BuyHouse, Integer> ,JpaSpecificationExecutor<BuyHouse> {
 
     @Query("select b from BuyHouse b where b.user.id = ?1 order by b.addTime desc")
-    public List<BuyHouse> findByUserId(Integer userId);
+    List<BuyHouse> findByUserId(Integer userId);
 
     @Query("select b from BuyHouse b where b.user.id = ?1")
-    public Page<BuyHouse> findByUserId(Integer userId, Pageable pageable);
+    Page<BuyHouse> findByUserId(Integer userId, Pageable pageable);
 
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HouseOrderService extends ICommonService<HouseOrder> {
 
-    public HouseOrder create(HouseOrder houseOrder);
+    HouseOrder create(HouseOrder houseOrder);
 
-    public List<HouseOrder> list(Integer id);
+    List<HouseOrder> list(Integer id);
 }

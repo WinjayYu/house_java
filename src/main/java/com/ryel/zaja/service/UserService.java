@@ -12,20 +12,20 @@ import java.util.List;
 
 public interface UserService extends ICommonService<User>{
 
-    public User create(User user);
+    User create(User user);
 
-    public User login(String mobile, String password);
+    User login(String mobile, String password);
 
-    public User update(User user);
+    User update(User user);
 
 
     /**
      * 获取所有用户列表
      * @return
      */
-    public List<User> list();
+    List<User> list();
 
 
 
-    public Page<User> findByPage(String name, int pageNum, int pageSize);
+    Page<User> findByPage(String name, int pageNum, int pageSize);
 }

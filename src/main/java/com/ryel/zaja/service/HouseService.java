@@ -11,9 +11,9 @@ import java.util.List;
  */
 public interface HouseService extends ICommonService<House>{
 
-    public House create(House house);
+    House create(House house);
 
-    public House update(House house);
+    House update(House house);
 
 
 
@@ -21,6 +21,6 @@ public interface HouseService extends ICommonService<House>{
      * 获取所有房源列表
      * @return
      */
-    public List<House> list();
+    List<House> list();
 
 }

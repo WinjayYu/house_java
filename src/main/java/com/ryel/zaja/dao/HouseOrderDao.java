@@ -17,6 +17,6 @@ import java.util.List;
 public interface HouseOrderDao extends JpaRepository<HouseOrder, Integer> ,JpaSpecificationExecutor<HouseOrder> {
 
     @Query("select h from HouseOrder h where h.agent.id = ?1 or h.seller.id = ?1 or h.buyer.id = ?1")
-    public List<HouseOrder> list(Integer id);
+    List<HouseOrder> list(Integer id);
 
 }

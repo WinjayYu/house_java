@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface SellHouseService extends ICommonService<SellHouse> {
 
-    public SellHouse create(SellHouse sellHouse);
+    SellHouse create(SellHouse sellHouse);
 
-    public List<SellHouse> findByUserId(int userId);
+    List<SellHouse> findByUserId(int userId);
 }

@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface BuyHouseService extends ICommonService<BuyHouse> {
 
-    public BuyHouse create(BuyHouse buyHouse);
+    BuyHouse create(BuyHouse buyHouse);
 
-    public List<BuyHouse> findByUserId(int userId);
+    List<BuyHouse> findByUserId(int userId);
 
-    public Page<BuyHouse> findByPage(Integer userId, int pageNum, int pageSize);
+    Page<BuyHouse> findByPage(Integer userId, int pageNum, int pageSize);
 
 }

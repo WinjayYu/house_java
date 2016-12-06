@@ -10,16 +10,16 @@ import java.util.List;
  */
 public interface CommunityService extends ICommonService<Community>{
 
-    public Community create(Community community);
+    Community create(Community community);
 
-    public Community update(Community community);
+    Community update(Community community);
 
 
     /**
      * 获取所有小区列表
      * @return
      */
-    public List<Community> list();
+    List<Community> list();
 
-    public Page<Community> findByPage(String name, final Integer type, int pageNum, int pageSize);
+    Page<Community> findByPage(String name, final Integer type, int pageNum, int pageSize);
 }

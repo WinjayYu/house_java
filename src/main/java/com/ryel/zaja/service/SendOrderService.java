@@ -12,16 +12,16 @@ import java.util.List;
  */
 public interface SendOrderService extends ICommonService<SendOrder>{
 
-    public SendOrder create(SendOrder sendOrder);
+    SendOrder create(SendOrder sendOrder);
 
 
     /**
      * 获取所有发送订单列表
      * @return
      */
-    public List<SendOrder> list();
+    List<SendOrder> list();
 
-    public Page<SendOrder> findByPage(Integer agentId, int pageNum, int pageSize);
+    Page<SendOrder> findByPage(Integer agentId, int pageNum, int pageSize);
 
 
 }
