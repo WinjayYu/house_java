@@ -29,7 +29,7 @@ public class BuyHouseApi {
     private BuyHouseService buyHouseService;
 
     @RequestMapping(value = "listbuyhouses", method = RequestMethod.POST)
-    public Result listBuyHouses(@RequestBody BuyHouseVo buyHouseVo) {
+    public Result listBuyHouses(BuyHouseVo buyHouseVo) {
         Map<String, Object> map = new HashMap<>();
         Page<BuyHouse> page = buyHouseService.findByPage(buyHouseVo.getUserId(),
                                                          buyHouseVo.getPageNum(),
@@ -43,7 +43,7 @@ public class BuyHouseApi {
     }
 
     @RequestMapping(value = "onebuyhouse", method = RequestMethod.POST)
-    public Result oneBuyHouse(@RequestBody BuyHouse buyHouse) {
+    public Result oneBuyHouse(BuyHouse buyHouse) {
         BuyHouse origBuyHouse = buyHouseService.findById(buyHouse.getId());
         if (null == origBuyHouse) {
             return Result.error().msg(Error_code.ERROR_CODE_0014);

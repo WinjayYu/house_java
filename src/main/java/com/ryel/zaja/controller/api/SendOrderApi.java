@@ -126,7 +126,7 @@ public class SendOrderApi {
      * @return
      */
     @RequestMapping(value = "listsendorder" ,method = RequestMethod.POST)
-    public Result listSendOrder(@RequestBody SendOrderVo sendOrderVo){
+    public Result listSendOrder(SendOrderVo sendOrderVo){
 
         Page<SendOrder> page = sendOrderService.findByPage(sendOrderVo.getAgentId(),
                                                             sendOrderVo.getPageNum(),

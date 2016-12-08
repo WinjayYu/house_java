@@ -27,7 +27,7 @@ public class SellHouseApi {
     private SellHouseService sellHouseService;
 
     @RequestMapping(value = "listsellhouses", method = RequestMethod.POST)
-    public Result allSellHouses(@RequestBody SellHouse sellHouse) {
+    public Result allSellHouses(SellHouse sellHouse) {
 
         List<SellHouse> list;
         Result result;

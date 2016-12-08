@@ -50,7 +50,7 @@ public class OrderApi {
 
     //创建订单
     @RequestMapping(value = "createorder")
-    public Result createOrder(@RequestBody HouseOrder houseOrder) {
+    public Result createOrder(HouseOrder houseOrder) {
         try {
             houseOrder.setAddTime(new Date());
             houseOrderService.create(houseOrder);
@@ -62,7 +62,7 @@ public class OrderApi {
 
     //获取某一个订单的详情
     @RequestMapping(value = "oneorder")
-    public Result oneOrder(@RequestBody HouseOrder houseOrder) {
+    public Result oneOrder(HouseOrder houseOrder) {
 
         HouseOrder origHouseOrder = houseOrderService.findById(houseOrder.getId());
         if (origHouseOrder == null) {
@@ -74,7 +74,7 @@ public class OrderApi {
     }
 
     @RequestMapping(value = "listorder", method = RequestMethod.POST)
-    public Result listOrder(@RequestBody HouseOrder houseOrder) {
+    public Result listOrder(HouseOrder houseOrder) {
 
         List<HouseOrder> list;
         Result result;

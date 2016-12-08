@@ -8,10 +8,15 @@ import com.ryel.zaja.exception.UserException;
 import com.ryel.zaja.service.DefaultUploadFile;
 import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.utils.bean.FileBo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +28,8 @@ import java.util.Map;
 @RestController()
 @RequestMapping("/api/user/")
 public class UserApi {
+    protected final static Logger logger = LoggerFactory.getLogger(UserApi.class);
+
 
     @Value("${pro.upload.url}")
     private String uploadUrl;
@@ -47,18 +54,18 @@ public class UserApi {
      *
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
-    public Result register(@RequestBody  User user) {
+    public Result register(User user) {
         try {
             user.setHead("");
             user.setNickname("");
             user.setUsername("");
             user.setType(user.getType());
-            if(user.getSex() == null) {
+            if(null == user.getSex()) {
                 user.setSex("30");//未设置
-            }
+                }
             userService.create(user);
         } catch (Exception e) {
-            return Result.error().msg(Error_code.ERROR_CODE_0006);//手机号被占用
+            return Result.error().msg(Error_code.ERROR_CODE_0006).data("");//手机号被占用
         }
 
         return Result.success().msg("").data(user2map(user));
@@ -77,7 +84,7 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public Result login(@RequestBody User user) {
+    public Result login(User user) {
         User origUser = userService.login(user.getMobile(), user.getPassword());
         if (origUser == null) {
             return Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
@@ -100,7 +107,7 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public Result update(@RequestBody  User user) {
+    public Result update(User user) {
         userService.update(user);
         User origUser = userDao.findOne(user.getId());
         return Result.success().msg("").data(user2map(origUser));
@@ -180,7 +187,7 @@ public class UserApi {
         }
      */
     @RequestMapping(value = "findpassword", method = RequestMethod.POST)
-    public Result findPassword(@RequestBody User user) {
+    public Result findPassword(User user) {
         if (null == user || null == userDao.findByMobile(user.getMobile())) {
             return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
         }
@@ -188,5 +195,8 @@ public class UserApi {
         return Result.success().msg("").data("");
     }
 
-
+    @RequestMapping(value = "sendverifycode" ,method = RequestMethod.POST)
+    public String verifyCode(){
+        return null;
+    }
 }

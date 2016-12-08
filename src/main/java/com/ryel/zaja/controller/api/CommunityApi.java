@@ -27,7 +27,7 @@ public class CommunityApi {
      * @return
      */
     @RequestMapping(value = "createarea", method = RequestMethod.POST)
-    public Result createArea(@RequestBody Community community){
+    public Result createArea(Community community){
         try{
             communityService.create(community);
         }catch (Exception e){

@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by billyu on 2016/11/28.
  */
 @Entity
-@Table(name = "Community")
+@Table(name = "community")
 public class Community {
 
     private static final long serialVersionUID = 1L;
