@@ -32,15 +32,21 @@ public class BuyHouse implements Serializable {
     @Column(name = "max_price")
     private BigDecimal maxPrice;
 
+    @JoinColumn(name = "min_area")
+    private BigDecimal minArea;
+
+    @JoinColumn(name = "max_area")
+    private BigDecimal maxArea;
+
     @Column(name = "house_type")
     private String houseType;
 
     @Column(name = "fitment_level")
-    private String fitmentLevelId;
+    private String fitmentLevel;
 
-    @ManyToOne
-    @JoinColumn(name = "community_uid")
-    private Community community;
+//以字符串的形式存到数据库，因为用户可以发1-5个小区，已"|"隔开
+    @Column(name = "community_uid")
+    private String community;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -72,11 +78,11 @@ public class BuyHouse implements Serializable {
         this.user = user;
     }
 
-    public Community getCommunity() {
+    public String getCommunity() {
         return community;
     }
 
-    public void setCommunity(Community community) {
+    public void setCommunity(String community) {
         this.community = community;
     }
 
@@ -96,6 +102,22 @@ public class BuyHouse implements Serializable {
         this.maxPrice = maxPrice;
     }
 
+    public BigDecimal getMinArea() {
+        return minArea;
+    }
+
+    public void setMinArea(BigDecimal minArea) {
+        this.minArea = minArea;
+    }
+
+    public BigDecimal getMaxArea() {
+        return maxArea;
+    }
+
+    public void setMaxArea(BigDecimal maxArea) {
+        this.maxArea = maxArea;
+    }
+
     public String getHouseType() {
         return houseType;
     }
@@ -104,20 +126,12 @@ public class BuyHouse implements Serializable {
         this.houseType = houseType;
     }
 
-    public String getFitmentLevelId() {
-        return fitmentLevelId;
+    public String getFitmentLevel() {
+        return fitmentLevel;
     }
 
-    public void setFitmentLevelId(String fitmentLevelId) {
-        this.fitmentLevelId = fitmentLevelId;
-    }
-
-    public Community getCommunityId() {
-        return community;
-    }
-
-    public void setCommunityId(Community communityId) {
-        this.community = communityId;
+    public void setFitmentLevel(String fitmentLevel) {
+        this.fitmentLevel = fitmentLevel;
     }
 
     public Date getAddTime() {

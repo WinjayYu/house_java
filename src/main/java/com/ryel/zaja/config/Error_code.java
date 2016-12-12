@@ -18,7 +18,7 @@ public interface Error_code {
 
     String ERROR_CODE_0007 = "error_07";  //昵称被占用
 
-    String ERROR_CODE_0008 = "error_08";  //验证码错误
+    String ERROR_CODE_0008 = "error_08";  //验证码发送失败
 
     String ERROR_CODE_0009 = "error_09";  //验证码不正确
 
@@ -41,5 +41,7 @@ public interface Error_code {
     String ERROR_CODE_0018 = "error_18";  //不能绑定已经登录过的第三方账号
 
     String ERROR_CODE_0019 = "error_19";  //操作失败
+
+    String ERROR_CODE_0020 = "error_20";  //此小区内没有房源
 
 }

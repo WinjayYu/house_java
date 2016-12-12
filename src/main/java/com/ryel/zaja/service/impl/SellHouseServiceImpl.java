@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,8 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
     @Override
     @Transactional
     public SellHouse create(SellHouse sellHouse) {
+        sellHouse.setAddTime(new Date());
+        sellHouse.setLastModifiedTime(new Date());
         return this.save(sellHouse);
     }
 

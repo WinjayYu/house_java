@@ -7,10 +7,17 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+
 /**
  * Created by billyu on 2016/12/6.
  */
+
 @Repository
 public interface FilterDao {
-    List<House> findByFilter(FilterVo filterVo);
+    List<House> findByFilter(String sellPrice,
+                             String area,
+                             String type,
+                             String decoration,
+                             String floor);
 }
+

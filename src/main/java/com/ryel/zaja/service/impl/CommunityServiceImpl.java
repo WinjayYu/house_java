@@ -39,10 +39,14 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
 
     @Override
     @Transactional
-    public Community create(Community community) {
-        community.setAddTime(new Date());
-        communityDao.save(community);
-        return community;
+    public void create(Community community) {
+        if(null != communityDao.findByUid(community.getUid())){
+           return;
+        }else {
+            community.setAddTime(new Date());
+            communityDao.save(community);
+        }
+        return;
     }
 
     @Override

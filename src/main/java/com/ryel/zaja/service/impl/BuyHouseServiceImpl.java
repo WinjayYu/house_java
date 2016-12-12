@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +29,8 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
     @Override
     @Transactional
     public BuyHouse create(BuyHouse buyHouse) {
+        buyHouse.setAddTime(new Date());
+        buyHouse.setLastModifiedTime(new Date());
         return this.save(buyHouse);
     }
 

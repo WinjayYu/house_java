@@ -16,9 +16,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import java.util.List;
 
+
 /**
  * Created by billyu on 2016/12/6.
  */
+
 @Service
 public class FilterDaoImpl implements FilterDao {
 
@@ -30,13 +32,18 @@ public class FilterDaoImpl implements FilterDao {
 
 
     @Override
-    public List<House> findByFilter(FilterVo filterVo) {
+    public List<House> findByFilter(String sellPrice,
+                                    String area,
+                                    String type,
+                                    String decoration,
+                                    String floor
+                                    ) {
         EntityManager em = emf.createEntityManager();
 
-        StringBuilder sql = new StringBuilder("SELECT h.* FROM house as h WHERE 1=1 ");
+        StringBuffer sql = new StringBuffer("SELECT h.* FROM house as h WHERE 1=1 ");
 
-        if (null != filterVo.getSellPrice()) {
-            String str = filterVo.getSellPrice();
+        if (null != sellPrice) {
+            String str = sellPrice;
             String[] arr = str.split("\\|");
             if ("".equals(arr[0])) {
                  sql.append(" AND h.sell_price =  " + arr[1]);
@@ -46,8 +53,8 @@ public class FilterDaoImpl implements FilterDao {
                 sql.append(" AND h.sell_price BETWEEN " + arr[0] + " AND " + arr[1]);
             }
         }
-        if (null != filterVo.getArea()) {
-            String str = filterVo.getArea();
+        if (null != area) {
+            String str = area;
             String[] arr = str.split("\\|");
             if ("".equals(arr[0])) {
                 sql.append(" AND h.area =  " + arr[1]);
@@ -57,14 +64,14 @@ public class FilterDaoImpl implements FilterDao {
                 sql.append(" AND h.area BETWEEN " + arr[0] + " AND " + arr[1]);
             }
         }
-        if(null != filterVo.getType()){
-            sql.append(" AND h.type = " + filterVo.getType());
+        if(null != type){
+            sql.append(" AND h.type = '" + type + "'");
         }
-        if(null != filterVo.getDecoration()){
-            sql.append(" AND h.decoration = " + filterVo.getDecoration());
+        if(null != decoration){
+            sql.append(" AND h.decoration = '" + decoration + "'");
         }
-        if(null != filterVo.getFloor()){
-            sql.append(" AND h.floor = " + filterVo.getFloor());
+        if(null != floor){
+            sql.append(" AND h.floor = '" + floor +"'");
         }
 
         Query query =  em.createNativeQuery(sql.toString(),House.class);
@@ -75,3 +82,4 @@ public class FilterDaoImpl implements FilterDao {
     }
 
 }
+

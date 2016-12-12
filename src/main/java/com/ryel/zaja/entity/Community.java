@@ -19,7 +19,7 @@ public class Community {
 
 
     @Id
-    private Integer uid;
+    private String uid;
 
     @Column(name = "name")
     private String name;
@@ -31,20 +31,22 @@ public class Community {
     @Column(name = "add_time")
     private Date addTime;
 
+    private String cityname;
+
 
     public Community() {
     }
 
-    public Community(Integer uid){
+    public Community(String uid){
         this.uid = uid;
     }
 
 
-    public Integer getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(Integer uid) {
+    public void setUid(String uid) {
         this.uid = uid;
     }
 
@@ -70,5 +72,13 @@ public class Community {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
+    }
+
+    public String getCityname() {
+        return cityname;
+    }
+
+    public void setCityname(String cityname) {
+        this.cityname = cityname;
     }
 }

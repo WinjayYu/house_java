@@ -74,13 +74,13 @@ public class OrderApi {
     }
 
     @RequestMapping(value = "listorder", method = RequestMethod.POST)
-    public Result listOrder(HouseOrder houseOrder) {
+    public Result listOrder(Integer id) {
 
         List<HouseOrder> list;
         Result result;
         Map<String, Object> map = new HashMap<>();
 
-        list = houseOrderService.list(houseOrder.getId());
+        list = houseOrderService.list(id);
         map.put("list", list);
         result = Result.success().data(map);
         if (list == null) {

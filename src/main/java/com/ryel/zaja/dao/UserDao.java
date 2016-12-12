@@ -16,7 +16,6 @@ public interface UserDao extends JpaRepository<User, Integer>,JpaSpecificationEx
     @Query("select u from User u where u.mobile = ?1")
     User findByMobile(String mobile);
 
-    @Query("select u from User u where u.mobile =?1 and u.password =?2")
     User findByMobileAndPassword(String mobile, String password);
 
 

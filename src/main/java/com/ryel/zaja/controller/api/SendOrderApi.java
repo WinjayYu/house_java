@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.SendOrderStatus;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.SendOrderDao;
@@ -74,7 +75,7 @@ public class SendOrderApi {
 
         sendOrder.setArea(new BigDecimal(0.00));
         sendOrder.setCommission(new BigDecimal(0.00));
-        sendOrder.setCommunity(new Community(0));
+        sendOrder.setCommunity(new Community("0"));
         sendOrder.setSellPrice(new BigDecimal(0.00));
         try {
             sendOrder.setAgent(userDao.findOne(sendOrderVo.getAgentId()));

@@ -40,9 +40,9 @@ public class House implements Serializable {
     //10=待审核、20=上架、30=下架
     private String status;
 
-    private String longitude;
+    private BigDecimal longitude;
 
-    private String latitude;
+    private BigDecimal latitude;
 
     //10=经济人二次发布、20=经济人一手发布
     private String type;
@@ -60,6 +60,11 @@ public class House implements Serializable {
     @JsonSerialize(using = CustomJsonDateSerializer.class)
     @Column(name = "last_modified_time")
     private Date lastModifiedTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    @Column(name = "publish_time")
+    private Date publishTime;
 
     //标签，如(近地铁|交通方便)，中间以|隔开
     private String tags;
@@ -79,9 +84,20 @@ public class House implements Serializable {
 
     private String direction;
 
+    private String cityname;
+
+    private String useage;
+
+    private String floor;
+
+
     @ManyToOne
     @JoinColumn(name = "community_uid")
     private Community community;
+
+    private String district;
+
+    private String title;
 
     public House(){}
 
@@ -143,19 +159,19 @@ public class House implements Serializable {
         this.status = status;
     }
 
-    public String getLongitude() {
+    public BigDecimal getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(BigDecimal longitude) {
         this.longitude = longitude;
     }
 
-    public String getLatitude() {
+    public BigDecimal getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(BigDecimal latitude) {
         this.latitude = latitude;
     }
 
@@ -253,5 +269,45 @@ public class House implements Serializable {
 
     public void setCommunity(Community community) {
         this.community = community;
+    }
+
+    public String getCityname() {
+        return cityname;
+    }
+
+    public void setCityname(String cityname) {
+        this.cityname = cityname;
+    }
+
+    public String getUseage() {
+        return useage;
+    }
+
+    public void setUseage(String useage) {
+        this.useage = useage;
+    }
+
+    public String getFloor() {
+        return floor;
+    }
+
+    public void setFloor(String floor) {
+        this.floor = floor;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

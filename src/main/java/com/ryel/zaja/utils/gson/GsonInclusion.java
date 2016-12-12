@@ -35,10 +35,7 @@ public class GsonInclusion implements ExclusionStrategy {
     @Override
     public boolean shouldSkipField(FieldAttributes f) {
         String fieldName = f.getName();
-        if (inclusionFields.contains(fieldName)) {
-            return false;
-        }
-        return true;
+        return !inclusionFields.contains(fieldName);
     }
 
     @Override

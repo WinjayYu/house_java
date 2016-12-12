@@ -22,8 +22,6 @@ public class SellHouse implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String code;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -50,8 +48,6 @@ public class SellHouse implements Serializable {
     @Column(name = "sell_price")
     private BigDecimal sellPrice;
 
-    private String model;
-
     @Column(name = "fitment_level")
     private String fitmentLevel;
 
@@ -66,14 +62,6 @@ public class SellHouse implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getStatus() {
@@ -130,14 +118,6 @@ public class SellHouse implements Serializable {
 
     public void setSellPrice(BigDecimal sellPrice) {
         this.sellPrice = sellPrice;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
     }
 
     public String getFitmentLevel() {

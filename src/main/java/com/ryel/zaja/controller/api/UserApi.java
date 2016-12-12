@@ -7,18 +7,25 @@ import com.ryel.zaja.entity.User;
 import com.ryel.zaja.exception.UserException;
 import com.ryel.zaja.service.DefaultUploadFile;
 import com.ryel.zaja.service.UserService;
+import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.ryel.zaja.utils.bean.FileBo;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Author: koabs
@@ -34,6 +41,7 @@ public class UserApi {
     @Value("${pro.upload.url}")
     private String uploadUrl;
 
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -41,6 +49,13 @@ public class UserApi {
 
     @Autowired
     private UserDao userDao;
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    private static int EXPIRES = 10*60; //超时时间10min
+    private static int captchaW = 200;
+    private static int captchaH = 60;
 
     /**
      * @api {post} /api/user/register 1.APP用户注册
@@ -54,17 +69,27 @@ public class UserApi {
      *
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
-    public Result register(User user) {
+    public Result register(User user,@RequestParam("verCode") String verCode) {
+        Object origVerCode =  redisTemplate.opsForValue().get(user.getMobile());
+        if(null == origVerCode){
+            return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
+        }
+        if(!origVerCode.equals(verCode)){
+            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object());
+        }
         try {
             user.setHead("");
             user.setNickname("");
             user.setUsername("");
-            user.setType(user.getType());
             if(null == user.getSex()) {
                 user.setSex("30");//未设置
                 }
+            if(null == user.getType()){
+                user.setType("20");//用户
+            }
             userService.create(user);
         } catch (Exception e) {
+            logger.error(e.getMessage(),e);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data("");//手机号被占用
         }
 
@@ -84,11 +109,12 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public Result login(User user) {
-        User origUser = userService.login(user.getMobile(), user.getPassword());
+    public Result login(String mobile, String password) {
+        User origUser = userService.login(mobile, password);
         if (origUser == null) {
             return Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
         } else {
+            origUser.setPassword("");
             return Result.success().msg("").data(user2map(origUser));
         }
 
@@ -130,11 +156,10 @@ public class UserApi {
      * "data": "http://localhost:8080/files/upload/img/2016/8/558537507501307.jpg"
      * }
      */
-    @RequestMapping(value = "head/upload")
-    public Result userHeadUpload(Integer userId,
-                                @RequestParam(required = true) MultipartFile file)throws Exception  {
+    @RequestMapping(value = "head")
+    public Result headUpload(Integer userId,String head) {
         User user = userService.findById(userId);
-        FileBo fileBo = defaultUploadFile.uploadFile(file.getOriginalFilename(),file.getInputStream());
+        user.setHead(head);
         userService.update(user);
         return Result.success().msg("");
     }
@@ -196,7 +221,31 @@ public class UserApi {
     }
 
     @RequestMapping(value = "sendverifycode" ,method = RequestMethod.POST)
-    public String verifyCode(){
-        return null;
+    public Result verifyCode(String mobile){
+        String verCode = VerifyCodeUtil.getVerCode();
+        redisTemplate.opsForValue().set(mobile, verCode);
+        redisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
+
+       /* String textEntity = VerifyCodeUtil.send(mobile,verCode);
+
+        try {
+            JSONObject jsonObj = new JSONObject(textEntity);
+            int error_code = jsonObj.getInt("error");
+            String error_msg = jsonObj.getString("msg");
+            if(error_code==0){
+                System.out.println("Send message success.");
+            }else{
+                System.out.println("Send message failed,code is "+error_code+",msg is "+error_msg);
+                return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
+            }
+        } catch (JSONException e) {
+            logger.error(e.getMessage(),e);
+            return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
+
+        }
+        if(null == redisTemplate.opsForValue().get("verCode")){
+            return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
+        }*/
+        return Result.success().msg("").data(new HashMap<>());
     }
 }

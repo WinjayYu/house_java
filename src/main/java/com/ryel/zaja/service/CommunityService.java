@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface CommunityService extends ICommonService<Community>{
 
-    Community create(Community community);
+    void create(Community community);
 
     Community update(Community community);
 
