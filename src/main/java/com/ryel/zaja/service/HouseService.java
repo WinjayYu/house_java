@@ -2,6 +2,7 @@ package com.ryel.zaja.service;
 
 import com.ryel.zaja.entity.House;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,5 +23,9 @@ public interface HouseService extends ICommonService<House>{
      * @return
      */
     List<House> list();
+
+    void agentDeleteHouse(int houseId);
+
+    Page<House> pageByAgentId(int agentId, Pageable pageable);
 
 }

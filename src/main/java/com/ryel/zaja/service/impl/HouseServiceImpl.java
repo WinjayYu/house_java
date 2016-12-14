@@ -1,18 +1,23 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.entity.House;
+import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.ICommonService;
+import com.ryel.zaja.utils.ClassUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -25,6 +30,7 @@ import java.util.List;
  * Created by billyu on 2016/11/28.
  */
 @Service
+@Transactional(readOnly = true)
 public class HouseServiceImpl extends AbsCommonService<House> implements HouseService{
 
     @Autowired
@@ -41,8 +47,26 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
+    @Transactional
+    public void agentDeleteHouse(int houseId) {
+        House house = this.findById(houseId);
+        if(house == null){
+            throw new BizException("房源信息已经不存在");
+        }
+        this.deleteById(houseId);
+    }
+
+    @Override
+    public Page<House> pageByAgentId(int agentId, Pageable pageable) {
+        return houseDao.pageByAgentId(agentId,pageable);
+    }
+
+    @Override
+    @Transactional
     public House update(House house) {
-        return null;
+        House origUser = findById(house.getId());
+        ClassUtil.copyProperties(origUser, house);
+        return save(origUser);
     }
 
     /*@Override
