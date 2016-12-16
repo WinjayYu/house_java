@@ -1,7 +1,6 @@
 package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.House;
-import com.ryel.zaja.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +33,7 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     @Query("select h from House h where h.community.uid = ?1 and h.area = ?2 and h.fitmentLevel = ?3 order by h.sellPrice asc")
     List<House> findByCommumityAndAreaAndFitmentLevel(String uid, BigDecimal area, String fitmentlevel);
+
+    @Query("select b from House b where b.agent.id = ?1")
+    Page<House> pageByAgentId(Integer agentId, Pageable pageable);
 }
