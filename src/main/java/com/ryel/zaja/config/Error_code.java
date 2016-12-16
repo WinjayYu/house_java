@@ -44,4 +44,6 @@ public interface Error_code {
 
     String ERROR_CODE_0020 = "error_20";  //此小区内没有房源
 
+    String ERROR_CODE_0021 = "error_21";  //您已收藏过
+
 }

@@ -26,7 +26,8 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     List<House> findByCityname(String cityname);
 
-    Page<House> findByCommunityUid(String uid, Pageable pageable);
+    @Query("select h from House h where h.community.uid = ?1")
+    Page<House> findByUid(String uid, Pageable pageable);
 
     @Query("select h from House h where h.community.uid = ?1")
     List<House> findByCommunityUid(String uid);

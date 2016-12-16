@@ -14,6 +14,7 @@ import com.ryel.zaja.entity.User;
 import com.ryel.zaja.entity.vo.SendOrderVo;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.SendOrderService;
+import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.DataTableFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,7 +38,7 @@ import java.util.Map;
 public class SendOrderApi {
 
     @Autowired
-    private UserDao userDao;
+    private UserService userService;
 
     @Autowired
     private SendOrderService sendOrderService;
@@ -45,25 +47,21 @@ public class SendOrderApi {
     private HouseService houseService;
 
     @Autowired
-    private HouseDao houseDao;
-
-    @Autowired
     private CommunityDao communityDao;
 
-    private SendOrderDao sendOrderDao;
 
     /**
      * 由已有的房源发送订单
-     * @param sendOrderVo
+     * @param
      * @return
      */
     @RequestMapping(value = "sendorder", method = RequestMethod.POST)
-    public Result sendOrder(@RequestBody SendOrderVo sendOrderVo) {
-        User user = userDao.findByMobile(sendOrderVo.getMobile());
+    public Result sendOrder(Integer houseId, String mobile,Integer agentId) {
+        User user = userService.findByMobile(mobile);
         if(user == null){
             return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
         }
-        House house = houseDao.findOne(sendOrderVo.getHouseId());
+        House house = houseService.findById(houseId);
 
         final String type = "10";//由房源发送的订单
         final String status = "10";//已派送
@@ -78,13 +76,13 @@ public class SendOrderApi {
         sendOrder.setCommunity(new Community("0"));
         sendOrder.setSellPrice(new BigDecimal(0.00));
         try {
-            sendOrder.setAgent(userDao.findOne(sendOrderVo.getAgentId()));
+            sendOrder.setAgent(userService.findById(agentId));
             sendOrder.setUser(user);
             sendOrderService.create(sendOrder);
         } catch (Exception e) {
             return Result.error().msg(Error_code.ERROR_CODE_0019);//操作失败
         }
-        return Result.success().msg("");
+        return Result.success().msg("").data(new HashMap<>());
     }
 
     /**
@@ -93,8 +91,8 @@ public class SendOrderApi {
      * @return
      */
     @RequestMapping(value = "customsendorder", method = RequestMethod.POST)
-    public Result customSendOrder(@RequestBody SendOrderVo sendOrderVo) {
-        User user = userDao.findByMobile(sendOrderVo.getMobile());
+    public Result customSendOrder(SendOrderVo sendOrderVo) {
+        User user = userService.findByMobile(sendOrderVo.getMobile());
         if(user == null){
             return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
         }
@@ -112,13 +110,13 @@ public class SendOrderApi {
         sendOrder.setSellPrice(sendOrderVo.getSellPrice());
 
         try {
-            sendOrder.setAgent(userDao.findOne(sendOrderVo.getAgentId()));
+            sendOrder.setAgent(userService.findById(sendOrderVo.getAgentId()));
             sendOrder.setUser(user);
             sendOrderService.create(sendOrder);
         } catch (Exception e) {
             return Result.error().msg(Error_code.ERROR_CODE_0019);//操作失败
         }
-        return Result.success().msg("").data("");
+        return Result.success().msg("").data(new HashMap<>());
     }
 
     /**

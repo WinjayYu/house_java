@@ -34,19 +34,7 @@ public class OrderApi {
     private HouseOrderService houseOrderService;
 
     @Autowired
-    private HouseOrderDao houseOrderDao;
-
-    @Autowired
-    private UserDao userDao;
-
-    @Autowired
     private HouseService houseService;
-
-    @Autowired
-    private HouseDao houseDao;
-
-    @Autowired
-    private CommunityDao communityDao;
 
     //创建订单
     @RequestMapping(value = "createorder")

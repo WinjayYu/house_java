@@ -50,6 +50,11 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
     }
 
     @Override
+    public Community findByUid(String uid) {
+        return communityDao.findByUid(uid);
+    }
+
+    @Override
     public JpaRepository<Community, Integer> getDao() {
         return null;
     }

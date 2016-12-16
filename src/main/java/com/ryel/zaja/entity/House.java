@@ -99,6 +99,8 @@ public class House implements Serializable {
 
     private String title;
 
+    private String cover;
+
     public House(){}
 
     public House(Integer id){this.id = id;}
@@ -309,5 +311,21 @@ public class House implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Date getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 }

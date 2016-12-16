@@ -6,6 +6,7 @@ import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -26,12 +27,18 @@ public class Community {
 
     private String address;
 
+    private BigDecimal longitude;
+
+    private BigDecimal latitude;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
     @Column(name = "add_time")
     private Date addTime;
 
     private String cityname;
+
+    private String adcode;
 
 
     public Community() {
@@ -80,5 +87,29 @@ public class Community {
 
     public void setCityname(String cityname) {
         this.cityname = cityname;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getAdcode() {
+        return adcode;
+    }
+
+    public void setAdcode(String adcode) {
+        this.adcode = adcode;
     }
 }

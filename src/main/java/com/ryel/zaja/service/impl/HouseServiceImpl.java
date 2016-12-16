@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +47,38 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return null;
     }
 
-    /*@Override
+    @Override
+    public List<House> findByCommunityUid(String uid) {
+        return houseDao.findByCommunityUid(uid);
+    }
+
+    @Override
+    public Page<House> findByUid(String uid, Pageable pageable) {
+        return houseDao.findByUid(uid, pageable);
+    }
+
+    @Override
+    public List<House> findByCityname(String cityname) {
+        return houseDao.findByCityname(cityname);
+    }
+
+    @Override
+    public List<House> findByHouseType(String houseType) {
+        return houseDao.findByHouseType(houseType);
+    }
+
+    @Override
+    public List<House> findByCommumityAndAreaAndFitmentLevel(String uid, BigDecimal area, String fitmentlevel) {
+        return houseDao.findByCommumityAndAreaAndFitmentLevel(uid, area, fitmentlevel);
+    }
+
+    @Override
     public Page<House> filter(int pageNum,
                               int pageSize,
                               final String sellPrice,
                               final String area,
-                              final String type,
-                              final String decoration,
+                              final String houseType,
+                              final String fitmentLevel,
                               final String floor) {
         Page<House> page = houseDao.findAll(new Specification<House>() {
             @Override
@@ -59,13 +86,61 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                 List<Predicate> predicateList = new ArrayList<Predicate>();
                 Predicate result = null;
                 if (null != sellPrice) {
-                    Predicate predicate = cb.between(root.get("user").get("name").as(String.class), "%"+name+"%");
+                    String[] arr = sellPrice.split("\\|");
+                    if(1 == arr.length){
+                        BigDecimal bg = new BigDecimal(arr[0]);
+                        //double d = Double.parseDouble(arr[0]);
+                        Predicate predicate = cb.lessThan(root.get("sellPrice").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    }else if(!StringUtils.isNotBlank(arr[0])){
+                        BigDecimal bg = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.greaterThan(root.get("sellPrice").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    }else{
+                        BigDecimal bg1 = new BigDecimal(arr[0]);
+                        BigDecimal bg2 = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.between(root.get("sellPrice").as(BigDecimal.class), bg1, bg2);
+                        predicateList.add(predicate);
+                    }
+                }
+
+                if (null != area) {
+                    String[] arr = area.split("\\|");
+                    if(1 == arr.length){
+                        BigDecimal bg = new BigDecimal(arr[0]);
+                        //double d = Double.parseDouble(arr[0]);
+                        Predicate predicate = cb.lessThan(root.get("area").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    }else if(!StringUtils.isNotBlank(arr[0])){
+                        BigDecimal bg = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.greaterThan(root.get("area").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    }else{
+                        BigDecimal bg1 = new BigDecimal(arr[0]);
+                        BigDecimal bg2 = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.between(root.get("area").as(BigDecimal.class), bg1, bg2);
+                        predicateList.add(predicate);
+                    }
+                }
+
+
+
+                if (null != houseType) {
+                    Predicate predicate = cb.equal(root.get("houseType").as(String.class), houseType);
                     predicateList.add(predicate);
                 }
-                if (forumId != null) {
-                    Predicate predicate = cb.equal(root.get("forumId").as(Integer.class), forumId);
+
+
+                if (null != fitmentLevel) {
+                    Predicate predicate = cb.equal(root.get("fitmentLevel").as(String.class), fitmentLevel);
                     predicateList.add(predicate);
                 }
+
+                if (null != floor) {
+                    Predicate predicate = cb.equal(root.get("floor").as(String.class), floor);
+                    predicateList.add(predicate);
+                }
+
                 if (predicateList.size() > 0) {
                     result = cb.and(predicateList.toArray(new Predicate[]{}));
                 }
@@ -74,10 +149,10 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                 }
                 return query.getRestriction();
             }
-        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "inboundDate"));
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
 
         return page;
-    }*/
+    }
 
 
     @Override

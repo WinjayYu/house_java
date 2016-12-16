@@ -8,4 +8,6 @@ import com.ryel.zaja.entity.Click;
 public interface ClickService extends ICommonService<Click>{
 
     Click add(Integer HouseId);
+
+    Click findByHouseId(Integer id);
 }

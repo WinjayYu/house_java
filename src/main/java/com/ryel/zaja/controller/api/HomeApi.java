@@ -2,10 +2,14 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.*;
+import com.ryel.zaja.dao.Impl.CollectDaoImpl;
 import com.ryel.zaja.entity.BuyHouse;
+import com.ryel.zaja.entity.Collect;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.HomeCoverUrl;
+import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.GetDistanceUtil;
+import com.ryel.zaja.utils.MapSortUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,22 +30,23 @@ public class HomeApi {
     protected final static Logger logger = LoggerFactory.getLogger(SellHouseApi.class);
 
     @Autowired
-    SellHouseDao sellHouseDao;
+    HomeCoverUrlService homeCoverUrlService;
 
     @Autowired
-    BuyHouseDao buyHouseDao;
+    RecommendService recommendService;
 
     @Autowired
-    RecommendDao recommendDao;
+    HouseService houseService;
 
     @Autowired
-    HouseDao houseDao;
+    BuyHouseService buyHouseService;
 
     @Autowired
-    CommunityDao communityDao;
+    ClickService clickService;
 
     @Autowired
-    HomeCoverUrlDao homeCoverUrlDao;
+    CollectService collectService;
+
 
     @RequestMapping(value = "home", method = RequestMethod.POST)
     public Result home(@RequestParam(value = "userId", required = false) Integer userId,
@@ -53,15 +58,21 @@ public class HomeApi {
         List<House> recomHouses = new ArrayList<House>();
         List<House> hotHouses = new ArrayList<House>();
 
-        HomeCoverUrl homeCoverUrl = homeCoverUrlDao.findOne(1);
+        HomeCoverUrl homeCoverUrl = homeCoverUrlService.find(1);
         home.put("homeCoverUrl", homeCoverUrl);
 
         //如果有userId，则调用recommend方法，zaja推荐
         if (null != userId) {
             recomHouses = recommend(userId);
             if (!recomHouses.isEmpty() && null != recomHouses) {
-                home.put("recommend", recomHouses);
+                home.put("recomHouses", recomHouses);
+            }else {
+                List<House> recoHouses = recommendService.findByStatus("10");
+                home.put("recomHouses", recoHouses);
             }
+        } else {
+            List<House> recoHouses = recommendService.findByStatus("10");
+            home.put("recomHouses", recoHouses);
         }
 
         //如果有经纬度和城市名字，则调用hotHouse方法，热门推荐
@@ -69,79 +80,89 @@ public class HomeApi {
             hotHouses = hotHouse(lon1, lat1, cityname);
             if (!hotHouses.isEmpty() && null != hotHouses) {
                 home.put("hotHouses", hotHouses);
+            }else {
+                List<House> recoHouses = recommendService.findByStatus("10");
+                home.put("hotHouses", recoHouses);
             }
+        } else {
+            List<House> recoHouses = recommendService.findByStatus("10");
+            home.put("hotHouses", recoHouses);
         }
 
-        Map homePage = new HashMap();
-        homePage.put("home",home);
-        return Result.success().msg("").data(homePage);
+        return Result.success().msg("").data(home);
     }
+
 
     public List<House> hotHouse(double lon1, double lat1, String cityname) {
         List<House> houses = new ArrayList<House>();
-        List<House> housesByCity = houseDao.findByCityname(cityname);
+        List<House> housesByCity = houseService.findByCityname(cityname);
         for (House house : housesByCity) {
             double lon2 = house.getLongitude().doubleValue();
             double lat2 = house.getLatitude().doubleValue();
             //计算两个点之间的距离
-            double distance =  GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
-            if(distance <= 5000){
+            double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
+            if (distance <= 5000) {
                 houses.add(house);
             }
-            //if(6 == houses.size()) break;
+            if(6 == houses.size()) break;
         }
 
-        for(House house : houses){
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < houses.size(); i++) {
 
+            int clickNum = 0;
+            if (null != clickService.findByHouseId(houses.get(i).getId())) {
+                clickNum = clickService.findByHouseId(houses.get(i).getId()).getClickNum();
+            }
+            int collect = collectService.countByHouseId(houses.get(i).getId());
+            //热度值，clickNum*1  + collect*2
+            int hotNum = clickNum + collect * 2;
+            map.put(i, hotNum);
         }
-        return houses;
+
+        Map sortMap = MapSortUtils.sortByValue(map);
+        List<Integer> list = new ArrayList<Integer>(sortMap.keySet());
+
+        List<House> sortHouses = new ArrayList<>();
+        for (int b = list.size() - 1; b >= 0; b--) {
+            sortHouses.add(houses.get(list.get(b)));
+        }
+        return sortHouses;
+
     }
-
-   /* public static double getDistatce(BigDecimal lon1, BigDecimal lon2, BigDecimal lat1, BigDecimal lat2) {
-        BigDecimal R = BigDecimal.valueOf(6378.137);
-        BigDecimal distance = BigDecimal.ZERO;
-        double dLat = (lat2 - lat1) * Math.PI / 180;
-        double dLon = (lon2 - lon1) * Math.PI / 180;
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(lat1 * Math.PI / 180)
-                * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2)
-                * Math.sin(dLon / 2);
-        distance = (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))) * R;
-        return distance;
-    }*/
 
 
     //zaja推荐房源
     public List<House> recommend(int userId) {
         List<House> result = new ArrayList<>();
-        List<BuyHouse> buyHouses = buyHouseDao.findByUserId(userId);
+        List<BuyHouse> buyHouses = buyHouseService.findByUserId(userId);
 
         if (0 == buyHouses.size()) {
-            return recommendDao.findByStatus("10");
+            return recommendService.findByStatus("10");
         } else {
             //随机获取一条数据
             BuyHouse bh = buyHouses.get(new Random().nextInt(buyHouses.size()));
 
             List<House> houses = new ArrayList<House>();
 
-            if(-1 != bh.getCommunity().indexOf("|")) {
+            if (-1 != bh.getCommunity().indexOf("|")) {
                 String[] str = bh.getCommunity().split("\\|");
                 int j = new Random().nextInt(str.length);
-                houses = houseDao.findByCommunityUid(str[j]);
-            }else{
-                houses = houseDao.findByCommunityUid(bh.getCommunity());
+                houses = houseService.findByCommunityUid(str[j]);
+            } else {
+                houses = houseService.findByCommunityUid(bh.getCommunity());
             }
           /*  if (null == houses) {
                 houses = houseDao.findByCommunityAddress();
             }*/
 
             if (null == houses) {
-                houses = houseDao.findByHouseType(bh.getHouseType());
+                houses = houseService.findByHouseType(bh.getHouseType());
                 return houses;
             } else {
                 //如果小于5条数据则返回结果
                 if (houses.size() <= 5) {
-                    List<House> recoHouses = recommendDao.findByStatus("10");
+                    List<House> recoHouses = recommendService.findByStatus("10");
                     for (int i = 0; houses.size() < 5; ) {
                         houses.add(recoHouses.get(i));
                         i++;
@@ -155,7 +176,7 @@ public class HomeApi {
                     }
 
                     if (result.size() <= 5) {
-                        List<House> recoHouses = recommendDao.findByStatus("10");
+                        List<House> recoHouses = recommendService.findByStatus("10");
                         for (int i = 0; houses.size() <= 5; ) {
                             houses.add(recoHouses.get(i));
                             i++;
@@ -167,4 +188,5 @@ public class HomeApi {
         }
         return null;
     }
+
 }

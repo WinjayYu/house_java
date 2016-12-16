@@ -14,6 +14,8 @@ public interface CommunityService extends ICommonService<Community>{
 
     Community update(Community community);
 
+    Community findByUid(String uid);
+
 
     /**
      * 获取所有小区列表

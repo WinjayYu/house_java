@@ -18,8 +18,6 @@ public class CommunityApi {
     @Autowired
     private CommunityService communityService;
 
-    @Autowired
-    private UserDao userDao;
 
     /**
      * 创建小区

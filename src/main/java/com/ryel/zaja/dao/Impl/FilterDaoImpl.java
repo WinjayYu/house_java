@@ -34,13 +34,13 @@ public class FilterDaoImpl implements FilterDao {
     @Override
     public List<House> findByFilter(String sellPrice,
                                     String area,
-                                    String type,
-                                    String decoration,
+                                    String houseType,
+                                    String fitmentLevel,
                                     String floor
                                     ) {
         EntityManager em = emf.createEntityManager();
 
-        StringBuffer sql = new StringBuffer("SELECT h.* FROM house as h WHERE 1=1 ");
+            StringBuffer sql = new StringBuffer("SELECT h.* FROM house as h WHERE 1=1 ");
 
         if (null != sellPrice) {
             String str = sellPrice;
@@ -64,11 +64,11 @@ public class FilterDaoImpl implements FilterDao {
                 sql.append(" AND h.area BETWEEN " + arr[0] + " AND " + arr[1]);
             }
         }
-        if(null != type){
-            sql.append(" AND h.type = '" + type + "'");
+        if(null != houseType){
+            sql.append(" AND h.type = '" + houseType + "'");
         }
-        if(null != decoration){
-            sql.append(" AND h.decoration = '" + decoration + "'");
+        if(null != fitmentLevel){
+            sql.append(" AND h.fitment_level = '" + fitmentLevel + "'");
         }
         if(null != floor){
             sql.append(" AND h.floor = '" + floor +"'");

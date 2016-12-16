@@ -5,6 +5,8 @@ import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.RecommendDao;
 import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.House;
+import com.ryel.zaja.service.HouseService;
+import com.ryel.zaja.service.RecommendService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,28 +25,31 @@ import java.util.*;
 public class SimilarHouseApi {
     protected final static Logger logger = LoggerFactory.getLogger(SimilarHouseApi.class);
 
-    @Autowired
-    HouseDao houseDao;
 
     @Autowired
-    RecommendDao recommendDao;
+    private RecommendService recommendService;
+
+    @Autowired
+    private HouseService houseService;
 
     @RequestMapping(value = "similar", method = RequestMethod.POST)
     public Result similarHouse(Integer id){
-        House house = houseDao.findOne(id);
+        House house = houseService.findById(id);
 
         Map<String,Object> similarHouse = new HashMap<String,Object>();
         List<House> resultHouses = new ArrayList<House>();
 
-        List<House> houses = houseDao.findByCommumityAndAreaAndFitmentLevel(house.getCommunity().getUid(),
+        List<House> houses = houseService.findByCommumityAndAreaAndFitmentLevel(house.getCommunity().getUid(),
                                                                             house.getArea(),
                                                                             house.getFitmentLevel());
+
         if(null == house){
-            return Result.success().msg("").data(recommendDao.findByStatus("10"));
+            return Result.success().msg("").data(similarHouse.put("list",recommendService.findByStatus("10")));
         }
 
         if(houses.size() <= 1){
-            return Result.success().msg("").data(houses);
+            similarHouse.put("list", houses);
+            return Result.success().msg("").data(similarHouse);
         }else{
             double sellPrice = house.getSellPrice().doubleValue();
             double interval = Math.abs(houses.get(0).getSellPrice().doubleValue() - sellPrice);
@@ -72,6 +77,6 @@ public class SimilarHouseApi {
               }
           }
         }
-        return Result.success().msg("").data(similarHouse.put("similarHouse", resultHouses));
+        return Result.success().msg("").data(similarHouse.put("list", resultHouses));
     }
 }

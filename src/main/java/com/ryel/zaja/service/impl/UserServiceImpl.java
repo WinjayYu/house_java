@@ -65,7 +65,10 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         return save(origUser);
     }
 
-
+    @Override
+    public User findByMobile(String mobile) {
+        return userDao.findByMobile(mobile);
+    }
 
     @Override
     public List<User> list() {

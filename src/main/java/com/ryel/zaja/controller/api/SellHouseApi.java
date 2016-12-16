@@ -8,6 +8,7 @@ import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.CommunityService;
 import com.ryel.zaja.service.SellHouseService;
+import com.ryel.zaja.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +30,13 @@ public class SellHouseApi {
     protected final static Logger logger = LoggerFactory.getLogger(SellHouseApi.class);
 
     @Autowired
-    private CommunityDao communityDao;
+    private UserService userService;
 
     @Autowired
     private CommunityService communityService;
 
     @Autowired
     private SellHouseService sellHouseService;
-
-    @Autowired
-    private UserDao userDao;
 
     @RequestMapping(value = "listsellhouses", method = RequestMethod.POST)
     public Result allSellHouses(SellHouse sellHouse) {
@@ -52,7 +50,7 @@ public class SellHouseApi {
             result = Result.success().data(map);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            return Result.error().msg(Error_code.ERROR_CODE_0014);
+            return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
         }
         return result;
     }
@@ -61,21 +59,21 @@ public class SellHouseApi {
     @RequestMapping(value = "sellhouse", method = RequestMethod.POST)
     public Result sellHouse(Community community, Integer id, BigDecimal sellPrice,
                             String houseType, String fitmentLevel,double area) {
-        Community origComm = communityDao.findByUid(community.getUid());
+        Community origComm = communityService.findByUid(community.getUid());
         if(null == origComm) {
             try {
                 communityService.create(community);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                return Result.error().msg(Error_code.ERROR_CODE_0019).data("");
+                return Result.error().msg(Error_code.ERROR_CODE_0019).data(new HashMap<>());
             }
         }
         try{
-            Community OrigCom = communityDao.findByUid(community.getUid());
+            Community OrigCom = communityService.findByUid(community.getUid());
 
             SellHouse sellHouse = new SellHouse();
             sellHouse.setCommunity(community);
-            sellHouse.setUser(userDao.findOne(id));
+            sellHouse.setUser(userService.findById(id));
             sellHouse.setSellPrice(sellPrice);
             sellHouse.setHouseType(houseType);
             sellHouse.setFitmentLevel(fitmentLevel);
@@ -84,8 +82,8 @@ public class SellHouseApi {
             sellHouseService.create(sellHouse);
         }catch (Exception e){
             logger.error(e.getMessage(),e);
-            return Result.error().msg(Error_code.ERROR_CODE_0019).data("");
+            return Result.error().msg(Error_code.ERROR_CODE_0019).data(new HashMap<>());
         }
-        return Result.success().msg("").data("");
+        return Result.success().msg("").data(new HashMap<>());
     }
 }

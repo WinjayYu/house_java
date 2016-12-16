@@ -18,6 +18,8 @@ public interface UserService extends ICommonService<User>{
 
     User update(User user);
 
+    User findByMobile(String mobile);
+
 
     /**
      * 获取所有用户列表

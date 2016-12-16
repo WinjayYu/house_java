@@ -32,10 +32,10 @@ public class BuyHouse implements Serializable {
     @Column(name = "max_price")
     private BigDecimal maxPrice;
 
-    @JoinColumn(name = "min_area")
+    @Column(name = "min_area")
     private BigDecimal minArea;
 
-    @JoinColumn(name = "max_area")
+    @Column(name = "max_area")
     private BigDecimal maxArea;
 
     @Column(name = "house_type")
@@ -44,7 +44,7 @@ public class BuyHouse implements Serializable {
     @Column(name = "fitment_level")
     private String fitmentLevel;
 
-//以字符串的形式存到数据库，因为用户可以发1-5个小区，已"|"隔开
+    //以字符串的形式存到数据库，因为用户可以发1-5个小区，已"|"隔开
     @Column(name = "community_uid")
     private String community;
 
@@ -76,14 +76,6 @@ public class BuyHouse implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getCommunity() {
-        return community;
-    }
-
-    public void setCommunity(String community) {
-        this.community = community;
     }
 
     public BigDecimal getMinPrice() {
@@ -132,6 +124,14 @@ public class BuyHouse implements Serializable {
 
     public void setFitmentLevel(String fitmentLevel) {
         this.fitmentLevel = fitmentLevel;
+    }
+
+    public String getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(String community) {
+        this.community = community;
     }
 
     public Date getAddTime() {
