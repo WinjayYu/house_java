@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.RecommendDao;
@@ -80,7 +81,8 @@ public class DiscoveryApi {
         if (null == pageSize) {
             pageSize = 1;
         }
-        Page<House> houses = houseService.findByUid(uid, new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+
+        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
         if (null == houses) {
             return Result.error().msg(Error_code.ERROR_CODE_0020);
         }

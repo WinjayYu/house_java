@@ -18,7 +18,7 @@ import java.util.List;
 public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificationExecutor<House> {
 
     @Query("select h from House h where h.layout = ?1 and h.status in ?2")
-    List<House> findByHouseLayout(String layout, List<String> status);
+    List<House> findByLayout(String layout, List<String> status);
 
     List<House> findByCityname(String cityname);
 
