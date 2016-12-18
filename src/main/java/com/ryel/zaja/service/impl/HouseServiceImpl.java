@@ -143,9 +143,6 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return houseDao.findByCity(city);
     }
 
-    @Override
-    public List<House> findByLayout(String houseType) {
-        return houseDao.findByLayout(houseType);
     public List<House> findByLayout(String houseType, String type) {
         List<String> list = new ArrayList<>();
         if (UserType.AGENT.getType().equals(type)) {

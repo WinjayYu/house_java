@@ -95,8 +95,6 @@ public class House implements Serializable {
     private String cover;
 
     @Column(name = "view_num")
-    private Long viewNum;
-    @Column(name = "view_num")
     private Integer viewNum;
 
     public House(){}
@@ -132,13 +130,6 @@ public class House implements Serializable {
         return area;
     }
 
-    public Long getViewNum() {
-        return viewNum;
-    }
-
-    public void setViewNum(Long viewNum) {
-        this.viewNum = viewNum;
-    }
 
     public void setArea(BigDecimal area) {
         this.area = area;

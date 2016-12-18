@@ -52,14 +52,8 @@ public class HouseOrder implements Serializable {
     private User agent;
 
     @ManyToOne
-    @JoinColumn(columnDefinition="String", name = "community_uid", nullable = true)
+    @JoinColumn(columnDefinition="String", name = "community_uid", nullable = true,insertable = false,updatable = false)
     private Community communityUid;
-
-    private BigDecimal area;
-
-    private BigDecimal price;
-
-    private String commission;
 
     //10=从house表生成的订单，20=经纪人自定义的订单
     private String type;
@@ -154,30 +148,6 @@ public class HouseOrder implements Serializable {
 
     public void setCommunityUid(Community communityUid) {
         this.communityUid = communityUid;
-    }
-
-    public BigDecimal getArea() {
-        return area;
-    }
-
-    public void setArea(BigDecimal area) {
-        this.area = area;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getCommission() {
-        return commission;
-    }
-
-    public void setCommission(String commission) {
-        this.commission = commission;
     }
 
     public String getType() {

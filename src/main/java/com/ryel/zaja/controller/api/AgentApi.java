@@ -4,7 +4,6 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.AgentMaterial;
-import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.HouseService;
@@ -39,6 +38,8 @@ public class AgentApi {
     private HouseService houseService;
     @Autowired
     private UserService userService;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     /**
      * 登录
@@ -78,11 +79,7 @@ public class AgentApi {
         }
     }
 
-    @Resource
-    private RedisTemplate redisTemplate;
 
-    @Autowired
-    private UserService userService;
 
     /**
      * 删除房源
@@ -160,8 +157,8 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "register", method = RequestMethod.POST)
-    public Result register(User user, @RequestParam("verCode") String verCode) {
+    @RequestMapping(value = "register111", method = RequestMethod.POST)
+    public Result register111(User user, @RequestParam("verCode") String verCode) {
         Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
         if (null == origVerCode) {
             return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
@@ -194,15 +191,4 @@ public class AgentApi {
         return result;
     }
 
-    @RequestMapping(value = "login", method = RequestMethod.POST)
-    public Result login(String mobile, String password) {
-        User origUser = userService.login(mobile, password);
-        if (origUser == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
-        } else {
-            origUser.setPassword("");
-            return Result.success().msg("").data(user2map(origUser));
-        }
-
-    }
 }

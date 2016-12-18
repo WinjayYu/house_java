@@ -20,11 +20,9 @@ public interface HouseService extends ICommonService<House> {
     List<House> findByCommunityUid(String uid, String type);
 
     List<House> findByCity(String city);
+
     Page<House> findByUid(String uid,String type, Pageable pageable);
 
-    Page<House> findByUid(String uid, Pageable pageable);
-
-    List<House> findByLayout(String houseType);
     List<House> findByLayout(String houseType, String type);
 
     List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel);

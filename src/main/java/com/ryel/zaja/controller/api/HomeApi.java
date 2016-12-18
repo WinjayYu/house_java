@@ -2,8 +2,6 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
-import com.ryel.zaja.dao.*;
-import com.ryel.zaja.dao.Impl.CollectDaoImpl;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.GetDistanceUtil;
@@ -11,6 +9,7 @@ import com.ryel.zaja.utils.MapSortUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -113,12 +112,6 @@ public class HomeApi {
         for (Community community : communityBycity) {
             double lon2 = community.getLongitude().doubleValue();
             double lat2 = community.getLatitude().doubleValue();
-    public List<House> hotHouse(double lon1, double lat1, String cityname) {
-        List<House> houses = new ArrayList<House>();
-        List<House> housesByCity = houseService.findByCity(cityname);
-        for (House house : housesByCity) {
-            double lon2 = house.getLongitude().doubleValue();
-            double lat2 = house.getLatitude().doubleValue();
             //计算两个点之间的距离
             double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
             if (distance <= 10000) {//10公里之内的
@@ -136,10 +129,6 @@ public class HomeApi {
         Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < houses.size(); i++) {
 
-            int clickNum = 0;
-//            if (null != clickService.findByHouseId(houses.get(i).getId())) {
-//                clickNum = clickService.findByHouseId(houses.get(i).getId()).getClickNum();
-//            }
             int clickNum = houses.get(i).getViewNum();
             int collect = collectService.countByHouseId(houses.get(i).getId());
             //热度值，clickNum*1  + collect*2
@@ -163,7 +152,7 @@ public class HomeApi {
     public List<House> recommend(int userId, String type) {
         List<House> result = new ArrayList<>();
         List<BuyHouse> buyHouses = new ArrayList<>();
-        if(UserType.USER.getType().equals(type)) {
+        if (UserType.USER.getType().equals(type)) {
             buyHouses = buyHouseService.findByUserId(userId);
         }
         if (buyHouses.isEmpty()) {
@@ -179,17 +168,14 @@ public class HomeApi {
                 int j = new Random().nextInt(str.length);
                 houses = houseService.findByCommunityUid(str[j], type);
             } else {
-                houses = houseService.findByCommunityUid(bh.getCommunity(),type);
+                houses = houseService.findByCommunityUid(bh.getCommunity(), type);
             }
           /*  if (null == houses) {
                 houses = houseDao.findByCommunityAddress();
             }*/
 
-            if (houses.isEmpty()) {
-                houses = houseService.findByHouseType(bh.getLayout(),type);
-            if (null == houses) {
-                houses = houseService.findByLayout(bh.getHouseType());
-                return houses;
+            if (CollectionUtils.isEmpty(houses)) {
+                houses = houseService.findByLayout(bh.getLayout(), type);
             } else {
                 //如果小于5条数据则返回结果
                 if (houses.size() <= 5) {
@@ -201,24 +187,24 @@ public class HomeApi {
                     return houses;
                 } else {
                     for (House house : houses) {
-                        if (bh.getLayout().equals(house.getHouseType())) {
-                        if (bh.getHouseType().equals(house.getLayout())) {
-                            result.add(house);
+                        if (bh.getLayout().equals(house.getLayout())) {
+                            if (bh.getLayout().equals(house.getLayout())) {
+                                result.add(house);
+                            }
                         }
-                    }
 
-                    if (result.size() <= 5) {
-                        List<House> recoHouses = recommendService.findByStatus("10");
-                        for (int i = 0; houses.size() <= 5; ) {
-                            houses.add(recoHouses.get(i));
-                            i++;
+                        if (result.size() <= 5) {
+                            List<House> recoHouses = recommendService.findByStatus("10");
+                            for (int i = 0; houses.size() <= 5; ) {
+                                houses.add(recoHouses.get(i));
+                                i++;
+                            }
+                            return houses;
                         }
-                        return houses;
                     }
                 }
             }
+            return null;
         }
-        return null;
     }
-
 }

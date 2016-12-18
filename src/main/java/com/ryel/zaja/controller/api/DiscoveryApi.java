@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.RecommendDao;
@@ -80,7 +81,7 @@ public class DiscoveryApi {
         if (null == pageSize) {
             pageSize = 1;
         }
-        Page<House> houses = houseService.findByUid(uid, new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+        Page<House> houses = houseService.findByUid(uid, UserType.AGENT.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
         if (null == houses) {
             return Result.error().msg(Error_code.ERROR_CODE_0020);
         }
@@ -127,12 +128,6 @@ public class DiscoveryApi {
         for (Community community : communityBycity) {
             double lon2 = community.getLongitude().doubleValue();
             double lat2 = community.getLatitude().doubleValue();
-    public List<House> hotHouse(double lon1, double lat1, String cityname) {
-        List<House> houses = new ArrayList<House>();
-        List<House> housesByCity = houseService.findByCity(cityname);
-        for (House house : housesByCity) {
-            double lon2 = house.getLongitude().doubleValue();
-            double lat2 = house.getLatitude().doubleValue();
             //计算两个点之间的距离
             double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
             if (distance <= 5000) {
