@@ -38,6 +38,7 @@ public class Result implements Serializable {
     public static Result success() {
         Result result = new Result();
         result.setStatus(ResultStatus.Success);
+        result.setMsg("");
         return result;
     }
 

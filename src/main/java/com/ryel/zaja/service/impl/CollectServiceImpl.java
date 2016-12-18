@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class CollectServiceImpl extends AbsCommonService<Collect> implements CollectService{
-    protected final static Logger logger = LoggerFactory.getLogger(ClickServiceImpl.class);
+    protected final static Logger logger = LoggerFactory.getLogger(CollectServiceImpl.class);
 
     @Autowired
     HouseDao houseDao;

@@ -102,7 +102,6 @@ public class SendOrderApi {
         SendOrder sendOrder = new SendOrder();
         sendOrder.setType(type);
         sendOrder.setStatus(status);
-        sendOrder.setHouse(new House(0));
 
         sendOrder.setArea(sendOrderVo.getArea());
         sendOrder.setCommission(sendOrderVo.getCommission());

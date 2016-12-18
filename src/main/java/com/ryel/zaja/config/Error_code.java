@@ -46,4 +46,12 @@ public interface Error_code {
 
     String ERROR_CODE_0021 = "error_21";  //您已收藏过
 
+    String ERROR_CODE_0022 = "error_22";  // 登录时，用户名或密码为空
+
+    String ERROR_CODE_0023 = "error_23";  // 必填参数为空或参数错误
+
+    String ERROR_CODE_0024 = "error_24";  // 用户已经存在
+
+    String ERROR_CODE_0025 = "error_25";  // 数据异常，请刷新后重试
+
 }

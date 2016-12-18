@@ -115,7 +115,7 @@ public class DiscoveryApi {
 
     public List<House> hotHouse(double lon1, double lat1, String cityname) {
         List<House> houses = new ArrayList<House>();
-        List<House> housesByCity = houseService.findByCityname(cityname);
+        List<House> housesByCity = houseService.findByCity(cityname);
         for (House house : housesByCity) {
             double lon2 = house.getLongitude().doubleValue();
             double lat2 = house.getLatitude().doubleValue();

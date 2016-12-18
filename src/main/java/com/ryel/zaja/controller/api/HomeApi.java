@@ -42,9 +42,6 @@ public class HomeApi {
     BuyHouseService buyHouseService;
 
     @Autowired
-    ClickService clickService;
-
-    @Autowired
     CollectService collectService;
 
 
@@ -95,7 +92,7 @@ public class HomeApi {
 
     public List<House> hotHouse(double lon1, double lat1, String cityname) {
         List<House> houses = new ArrayList<House>();
-        List<House> housesByCity = houseService.findByCityname(cityname);
+        List<House> housesByCity = houseService.findByCity(cityname);
         for (House house : housesByCity) {
             double lon2 = house.getLongitude().doubleValue();
             double lat2 = house.getLatitude().doubleValue();
@@ -111,9 +108,9 @@ public class HomeApi {
         for (int i = 0; i < houses.size(); i++) {
 
             int clickNum = 0;
-            if (null != clickService.findByHouseId(houses.get(i).getId())) {
-                clickNum = clickService.findByHouseId(houses.get(i).getId()).getClickNum();
-            }
+//            if (null != clickService.findByHouseId(houses.get(i).getId())) {
+//                clickNum = clickService.findByHouseId(houses.get(i).getId()).getClickNum();
+//            }
             int collect = collectService.countByHouseId(houses.get(i).getId());
             //热度值，clickNum*1  + collect*2
             int hotNum = clickNum + collect * 2;
@@ -157,7 +154,7 @@ public class HomeApi {
             }*/
 
             if (null == houses) {
-                houses = houseService.findByHouseType(bh.getHouseType());
+                houses = houseService.findByLayout(bh.getHouseType());
                 return houses;
             } else {
                 //如果小于5条数据则返回结果
@@ -170,7 +167,7 @@ public class HomeApi {
                     return houses;
                 } else {
                     for (House house : houses) {
-                        if (bh.getHouseType().equals(house.getHouseType())) {
+                        if (bh.getHouseType().equals(house.getLayout())) {
                             result.add(house);
                         }
                     }

@@ -39,23 +39,23 @@ public class SimilarHouseApi {
         Map<String,Object> similarHouse = new HashMap<String,Object>();
         List<House> resultHouses = new ArrayList<House>();
 
-        List<House> houses = houseService.findByCommumityAndAreaAndFitmentLevel(house.getCommunity().getUid(),
-                                                                            house.getArea(),
-                                                                            house.getFitmentLevel());
-
         if(null == house){
             return Result.success().msg("").data(similarHouse.put("list",recommendService.findByStatus("10")));
         }
+
+        List<House> houses = houseService.findByCommumityAndAreaAndRenovation(house.getCommunity().getUid(),
+                                                                            house.getArea(),
+                                                                            house.getRenovation());
 
         if(houses.size() <= 1){
             similarHouse.put("list", houses);
             return Result.success().msg("").data(similarHouse);
         }else{
-            double sellPrice = house.getSellPrice().doubleValue();
-            double interval = Math.abs(houses.get(0).getSellPrice().doubleValue() - sellPrice);
+            double sellPrice = house.getPrice().doubleValue();
+            double interval = Math.abs(houses.get(0).getPrice().doubleValue() - sellPrice);
             int index = 0;
             for(int i=0; i<=houses.size(); i++){
-                double subtract = Math.abs(houses.get(i).getSellPrice().doubleValue() - sellPrice);
+                double subtract = Math.abs(houses.get(i).getPrice().doubleValue() - sellPrice);
                 //将售价相差最小的值赋给interval
                 if(interval >= subtract){
                     interval = subtract;

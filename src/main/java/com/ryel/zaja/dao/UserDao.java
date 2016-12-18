@@ -18,5 +18,7 @@ public interface UserDao extends JpaRepository<User, Integer>,JpaSpecificationEx
 
     User findByMobileAndPassword(String mobile, String password);
 
+    User findByMobileAndPasswordAndType(String mobile, String password,String type);
+
 
 }

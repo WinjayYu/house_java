@@ -19,13 +19,13 @@ public interface HouseService extends ICommonService<House> {
 
     List<House> findByCommunityUid(String uid);
 
-    List<House> findByCityname(String cityname);
+    List<House> findByCity(String city);
 
     Page<House> findByUid(String uid, Pageable pageable);
 
-    List<House> findByHouseType(String houseType);
+    List<House> findByLayout(String houseType);
 
-    List<House> findByCommumityAndAreaAndFitmentLevel(String uid, BigDecimal area, String fitmentlevel);
+    List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel);
 
     Page<House> filter(int pageNum,
                        int pageSize,
@@ -45,5 +45,9 @@ public interface HouseService extends ICommonService<House> {
     void agentDeleteHouse(int houseId);
 
     Page<House> pageByAgentId(int agentId, Pageable pageable);
+
+    void agentPutawayHouse(Integer houseId);
+
+    House getHouseByCheck(Integer houseId);
 
 }

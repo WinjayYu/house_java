@@ -7,6 +7,7 @@ import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -49,6 +50,19 @@ public class HouseOrder implements Serializable {
     @ManyToOne
     @JoinColumn(name = "agent_id")
     private User agent;
+
+    //10=从house表生成的订单，20=经纪人自定义的订单
+    private String type;
+
+    @ManyToOne
+    @JoinColumn(name = "community_uid")
+    private Community community;
+
+    private BigDecimal area;
+
+    private BigDecimal price;
+
+    private BigDecimal commission;
 
     public HouseOrder(){}
 
@@ -122,5 +136,45 @@ public class HouseOrder implements Serializable {
 
     public void setBuyerMobile(String buyerMobile) {
         this.buyerMobile = buyerMobile;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Community getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
+    }
+
+    public BigDecimal getArea() {
+        return area;
+    }
+
+    public void setArea(BigDecimal area) {
+        this.area = area;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getCommission() {
+        return commission;
+    }
+
+    public void setCommission(BigDecimal commission) {
+        this.commission = commission;
     }
 }

@@ -1,5 +1,7 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.config.Error_code;
+import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.entity.House;
@@ -64,6 +66,25 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     @Transactional
+    public void agentPutawayHouse(Integer houseId) {
+        House house = getHouseByCheck(houseId);
+        if(!HouseStatus.SOLD_OUT_YET.getCode().equals(house.getStatus())){
+            throw new BizException(Error_code.ERROR_CODE_0025);
+        }
+    }
+
+    @Override
+    @Transactional
+    public House getHouseByCheck(Integer houseId) {
+        House house = this.findById(houseId);
+        if(house == null){
+            throw new BizException(Error_code.ERROR_CODE_0025);
+        }
+        return house;
+    }
+
+    @Override
+    @Transactional
     public House update(House house) {
         House origUser = findById(house.getId());
         ClassUtil.copyProperties(origUser, house);
@@ -81,18 +102,18 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
-    public List<House> findByCityname(String cityname) {
-        return houseDao.findByCityname(cityname);
+    public List<House> findByCity(String city) {
+        return houseDao.findByCity(city);
     }
 
     @Override
-    public List<House> findByHouseType(String houseType) {
-        return houseDao.findByHouseType(houseType);
+    public List<House> findByLayout(String houseType) {
+        return houseDao.findByLayout(houseType);
     }
 
     @Override
-    public List<House> findByCommumityAndAreaAndFitmentLevel(String uid, BigDecimal area, String fitmentlevel) {
-        return houseDao.findByCommumityAndAreaAndFitmentLevel(uid, area, fitmentlevel);
+    public List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel) {
+        return houseDao.findByCommumityAndAreaAndRenovation(uid, area, fitmentlevel);
     }
 
     @Override
