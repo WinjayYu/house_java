@@ -2,8 +2,6 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
-import com.ryel.zaja.dao.*;
-import com.ryel.zaja.dao.Impl.CollectDaoImpl;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.GetDistanceUtil;
@@ -11,6 +9,7 @@ import com.ryel.zaja.utils.MapSortUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -153,7 +152,7 @@ public class HomeApi {
     public List<House> recommend(int userId, String type) {
         List<House> result = new ArrayList<>();
         List<BuyHouse> buyHouses = new ArrayList<>();
-        if(UserType.USER.getType().equals(type)) {
+        if (UserType.USER.getType().equals(type)) {
             buyHouses = buyHouseService.findByUserId(userId);
         }
         if (buyHouses.isEmpty()) {
@@ -169,12 +168,14 @@ public class HomeApi {
                 int j = new Random().nextInt(str.length);
                 houses = houseService.findByCommunityUid(str[j], type);
             } else {
-                houses = houseService.findByCommunityUid(bh.getCommunity(),type);
+                houses = houseService.findByCommunityUid(bh.getCommunity(), type);
             }
           /*  if (null == houses) {
                 houses = houseDao.findByCommunityAddress();
             }*/
 
+            if (CollectionUtils.isEmpty(houses)) {
+                houses = houseService.findByLayout(bh.getLayout(), type);
             if (houses.isEmpty()) {
                 houses = houseService.findByLayout(bh.getLayout(),type);
                 return houses;
@@ -189,23 +190,24 @@ public class HomeApi {
                     return houses;
                 } else {
                     for (House house : houses) {
-                        if (bh.getLayout().equals(house.getHouseType())) {
-                            result.add(house);
+                        if (bh.getLayout().equals(house.getLayout())) {
+                            if (bh.getLayout().equals(house.getLayout())) {
+                                result.add(house);
+                            }
                         }
-                    }
 
-                    if (result.size() <= 5) {
-                        List<House> recoHouses = recommendService.findByStatus("10");
-                        for (int i = 0; houses.size() <= 5; ) {
-                            houses.add(recoHouses.get(i));
-                            i++;
+                        if (result.size() <= 5) {
+                            List<House> recoHouses = recommendService.findByStatus("10");
+                            for (int i = 0; houses.size() <= 5; ) {
+                                houses.add(recoHouses.get(i));
+                                i++;
+                            }
+                            return houses;
                         }
-                        return houses;
                     }
                 }
             }
+            return null;
         }
-        return null;
     }
-
 }

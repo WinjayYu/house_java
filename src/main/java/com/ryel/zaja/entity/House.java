@@ -27,13 +27,11 @@ public class House implements Serializable {
     @JoinColumn(name = "agent_id")
     private User agent;
 
-    @Column(name = "house_type")
-    private String houseType;
+    private String layout;
 
     private BigDecimal area;
 
-    @Column(name = "sell_price")
-    private BigDecimal sellPrice;
+    private BigDecimal price;
 
     //10=待审核、20=上架、30=下架、40=审核失败、50=交接中、60交接完成
     private String status;
@@ -71,20 +69,20 @@ public class House implements Serializable {
 
     private String imgs;
 
-    @Column(name = "fitment_level")
-    private String fitmentLevel;
+    // 装修程度
+    private String renovation;
 
     //佣金
     private BigDecimal commission;
 
     private String direction;
 
-    private String cityname;
+    private String city;
 
-    private String useage;
+    // 用途
+    private String purpose;
 
     private String floor;
-
 
     @ManyToOne
     @JoinColumn(name = "community_uid")
@@ -119,12 +117,12 @@ public class House implements Serializable {
         this.agent = agent;
     }
 
-    public String getHouseType() {
-        return houseType;
+    public String getLayout() {
+        return layout;
     }
 
-    public void setHouseType(String houseType) {
-        this.houseType = houseType;
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
 
@@ -132,16 +130,17 @@ public class House implements Serializable {
         return area;
     }
 
+
     public void setArea(BigDecimal area) {
         this.area = area;
     }
 
-    public BigDecimal getSellPrice() {
-        return sellPrice;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setSellPrice(BigDecimal sellPrice) {
-        this.sellPrice = sellPrice;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public String getStatus() {
@@ -185,6 +184,14 @@ public class House implements Serializable {
         this.lastModifiedTime = lastModifiedTime;
     }
 
+    public Date getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
+    }
+
     public String getTags() {
         return tags;
     }
@@ -217,12 +224,12 @@ public class House implements Serializable {
         this.imgs = imgs;
     }
 
-    public String getFitmentLevel() {
-        return fitmentLevel;
+    public String getRenovation() {
+        return renovation;
     }
 
-    public void setFitmentLevel(String fitmentLevel) {
-        this.fitmentLevel = fitmentLevel;
+    public void setRenovation(String renovation) {
+        this.renovation = renovation;
     }
 
     public BigDecimal getCommission() {
@@ -241,28 +248,20 @@ public class House implements Serializable {
         this.direction = direction;
     }
 
-    public Community getCommunity() {
-        return community;
+    public String getCity() {
+        return city;
     }
 
-    public void setCommunity(Community community) {
-        this.community = community;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public String getCityname() {
-        return cityname;
+    public String getPurpose() {
+        return purpose;
     }
 
-    public void setCityname(String cityname) {
-        this.cityname = cityname;
-    }
-
-    public String getUseage() {
-        return useage;
-    }
-
-    public void setUseage(String useage) {
-        this.useage = useage;
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 
     public String getFloor() {
@@ -271,6 +270,14 @@ public class House implements Serializable {
 
     public void setFloor(String floor) {
         this.floor = floor;
+    }
+
+    public Community getCommunity() {
+        return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
     }
 
     public String getDistrict() {
@@ -287,14 +294,6 @@ public class House implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public Date getPublishTime() {
-        return publishTime;
-    }
-
-    public void setPublishTime(Date publishTime) {
-        this.publishTime = publishTime;
     }
 
     public String getCover() {

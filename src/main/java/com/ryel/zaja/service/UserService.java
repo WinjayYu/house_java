@@ -1,5 +1,6 @@
 package com.ryel.zaja.service;
 
+import com.ryel.zaja.entity.AgentMaterial;
 import com.ryel.zaja.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ public interface UserService extends ICommonService<User>{
 
     User login(String mobile, String password);
 
+    User agentLogin(String mobile, String password);
+
     User update(User user);
 
     User findByMobile(String mobile);
@@ -30,4 +33,6 @@ public interface UserService extends ICommonService<User>{
 
 
     Page<User> findByPage(String name, int pageNum, int pageSize);
+
+    void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode);
 }
