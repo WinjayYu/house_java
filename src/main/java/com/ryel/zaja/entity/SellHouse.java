@@ -42,14 +42,11 @@ public class SellHouse implements Serializable {
     @JoinColumn(name = "community_uid")
     private Community community;
 
-    @Column(name = "house_type")
-    private String houseType;
+    private String layout;
 
-    @Column(name = "sell_price")
-    private BigDecimal sellPrice;
+    private BigDecimal price;
 
-    @Column(name = "fitment_level")
-    private String fitmentLevel;
+    private String renovation;
 
     private double area;
 
@@ -104,28 +101,28 @@ public class SellHouse implements Serializable {
         this.community = community;
     }
 
-    public String getHouseType() {
-        return houseType;
+    public String getLayout() {
+        return layout;
     }
 
-    public void setHouseType(String houseType) {
-        this.houseType = houseType;
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
-    public BigDecimal getSellPrice() {
-        return sellPrice;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setSellPrice(BigDecimal sellPrice) {
-        this.sellPrice = sellPrice;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
-    public String getFitmentLevel() {
-        return fitmentLevel;
+    public String getRenovation() {
+        return renovation;
     }
 
-    public void setFitmentLevel(String fitmentLevel) {
-        this.fitmentLevel = fitmentLevel;
+    public void setRenovation(String renovation) {
+        this.renovation = renovation;
     }
 
     public double getArea() {

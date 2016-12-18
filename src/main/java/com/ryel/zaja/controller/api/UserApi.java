@@ -8,6 +8,8 @@ import com.ryel.zaja.service.QiNiuService;
 import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.ryel.zaja.utils.bean.FileBo;;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,10 +129,14 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public Result update(Integer userId, String nickname) {
+    public Result update(Integer userId, String nickname, String sex) {
         User user = new User();
         user.setId(userId);
-        user.setNickname(nickname);
+        if(null != nickname) {
+            user.setNickname(nickname);
+        }else{
+            user.setSex(sex);
+        }
         userService.update(user);
         User origUser = userService.findById(user.getId());
         return Result.success().msg("").data(user2map(origUser));
@@ -156,10 +162,10 @@ public class UserApi {
     //@RequestParam(value = "head", required = true) MultipartFile file
     @RequestMapping(value = "head")
     public Result headUpload(Integer userId,
-                             @RequestParam(required = true) MultipartFile file) throws Exception {
+                             @RequestParam(required = true) MultipartFile image) throws Exception {
 
         User user = userService.findById(userId);
-        FileBo fileBo = defaultUploadFile.uploadFile(file.getOriginalFilename(), file.getInputStream());
+        FileBo fileBo = defaultUploadFile.uploadFile(image.getOriginalFilename(), image.getInputStream());
 
         StringBuffer key = new StringBuffer();
 //        key.append(qiNiuService.getDomain());
@@ -251,7 +257,7 @@ public class UserApi {
         redisTemplate.opsForValue().set(mobile, verCode);
         redisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
-       /* String textEntity = VerifyCodeUtil.send(mobile,verCode);
+        String textEntity = VerifyCodeUtil.send(mobile,verCode);
 
         try {
             JSONObject jsonObj = new JSONObject(textEntity);
@@ -270,7 +276,7 @@ public class UserApi {
         }
         if(null == redisTemplate.opsForValue().get("verCode")){
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
-        }*/
+        }
         return Result.success().msg("").data(new HashMap<>());
     }
 }

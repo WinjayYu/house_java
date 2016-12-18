@@ -18,6 +18,8 @@ public class HomeCoverUrl {
 
     private String describe;
 
+    private String type;
+
     public int getId() {
         return id;
     }
@@ -40,5 +42,13 @@ public class HomeCoverUrl {
 
     public void setDescribe(String describe) {
         this.describe = describe;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

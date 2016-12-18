@@ -22,7 +22,6 @@ public class Collect {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String status;
 
     public int getId() {
         return id;
@@ -48,11 +47,4 @@ public class Collect {
         this.user = user;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

@@ -17,13 +17,15 @@ public interface HouseService extends ICommonService<House> {
 
     House update(House house);
 
-    List<House> findByCommunityUid(String uid);
+    List<House> findByCommunityUid(String uid, String type);
 
     List<House> findByCity(String city);
+    Page<House> findByUid(String uid,String type, Pageable pageable);
 
     Page<House> findByUid(String uid, Pageable pageable);
 
     List<House> findByLayout(String houseType);
+    List<House> findByLayout(String houseType, String type);
 
     List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel);
 
@@ -34,6 +36,12 @@ public interface HouseService extends ICommonService<House> {
                        final String houseType,
                        final String fitmentLevel,
                        final String floor);
+
+    Page<House> findByCommunities(List<String> uids, Pageable pageable);
+
+    List<House> findByCommunities(List<String> uids);
+
+    Page<House> findByAddTime(Pageable pageable);
 
     /**
      * 获取所有房源列表

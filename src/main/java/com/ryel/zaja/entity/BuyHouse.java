@@ -38,11 +38,9 @@ public class BuyHouse implements Serializable {
     @Column(name = "max_area")
     private BigDecimal maxArea;
 
-    @Column(name = "house_type")
-    private String houseType;
+    private String layout;
 
-    @Column(name = "fitment_level")
-    private String fitmentLevel;
+    private String renovation;
 
     //以字符串的形式存到数据库，因为用户可以发1-5个小区，已"|"隔开
     @Column(name = "community_uid")
@@ -110,20 +108,20 @@ public class BuyHouse implements Serializable {
         this.maxArea = maxArea;
     }
 
-    public String getHouseType() {
-        return houseType;
+    public String getLayout() {
+        return layout;
     }
 
-    public void setHouseType(String houseType) {
-        this.houseType = houseType;
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
-    public String getFitmentLevel() {
-        return fitmentLevel;
+    public String getRenovation() {
+        return renovation;
     }
 
-    public void setFitmentLevel(String fitmentLevel) {
-        this.fitmentLevel = fitmentLevel;
+    public void setRenovation(String renovation) {
+        this.renovation = renovation;
     }
 
     public String getCommunity() {

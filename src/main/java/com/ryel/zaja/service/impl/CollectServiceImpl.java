@@ -1,5 +1,6 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CollectDao;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.UserDao;
@@ -36,8 +37,6 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
         return collectDao.countByHouseId(id);
     }
 
-    private static final String COLLECT = "10"; // "10"为收藏
-    private static final String CANCEL_COLLECT = "20"; // "20"为取消收藏
 
     @Override
     @Transactional(readOnly = false)
@@ -46,12 +45,8 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
         //如果已经收藏，抛出异常，如果status为"20"，则修改为"10"
         if(null != collect){
-            if("10".equals(collect.getStatus())) {
-                throw new RuntimeException("已收藏过！");
-            }else{
-                collect.setStatus(COLLECT);
                 this.save(collect);
-            }
+
         }else {
 
             collect = new Collect();
@@ -61,8 +56,6 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
 
             User user = userDao.findOne(userId);
             collect.setUser(user);
-
-            collect.setStatus(COLLECT);
 
             collectDao.save(collect);
             return collect;
@@ -77,10 +70,19 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
         if(null == collect){
             throw new RuntimeException("没有收藏过！");
         }else{
-            collect.setStatus(CANCEL_COLLECT);
             collectDao.save(collect);
         }
         return null;
+    }
+
+    @Override
+    public boolean check(Integer userId, Integer houseId) {
+            Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
+            if(null == collect){
+                return false;//未收藏
+            }else{
+                return true;//已收藏
+            }
     }
 
     @Override

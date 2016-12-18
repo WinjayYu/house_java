@@ -57,8 +57,8 @@ public class SellHouseApi {
 
 
     @RequestMapping(value = "sellhouse", method = RequestMethod.POST)
-    public Result sellHouse(Community community, Integer id, BigDecimal sellPrice,
-                            String houseType, String fitmentLevel,double area) {
+    public Result sellHouse(Community community, Integer id, BigDecimal price,
+                            String layout, String renovation,double area) {
         Community origComm = communityService.findByUid(community.getUid());
         if(null == origComm) {
             try {
@@ -74,9 +74,9 @@ public class SellHouseApi {
             SellHouse sellHouse = new SellHouse();
             sellHouse.setCommunity(community);
             sellHouse.setUser(userService.findById(id));
-            sellHouse.setSellPrice(sellPrice);
-            sellHouse.setHouseType(houseType);
-            sellHouse.setFitmentLevel(fitmentLevel);
+            sellHouse.setPrice(price);
+            sellHouse.setLayout(layout);
+            sellHouse.setRenovation(renovation);
             sellHouse.setArea(area);
             sellHouse.setStatus("10");
             sellHouseService.create(sellHouse);

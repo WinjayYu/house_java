@@ -17,6 +17,8 @@ import java.util.List;
 @Repository
 public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificationExecutor<House> {
 
+    @Query("select h from House h where h.layout = ?1 and h.status in ?2")
+    List<House> findByHouseLayout(String layout, List<String> status);
     List<House> findByCommunityName(String communityName);
 
     List<House> findByCommunityAddress(String communityAddress);
@@ -25,15 +27,22 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     List<House> findByCity(String city);
 
-    @Query("select h from House h where h.community.uid = ?1")
-    Page<House> findByUid(String uid, Pageable pageable);
+    @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
+    Page<House> findByUid(String uid, List<String> status, Pageable pageable);
 
-    @Query("select h from House h where h.community.uid = ?1")
-    List<House> findByCommunityUid(String uid);
+
+    @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
+    List<House> findByCommunityUid(String uid, List<String> status);
 
     @Query("select h from House h where h.community.uid = ?1 and h.area = ?2 and h.renovation = ?3 order by h.price asc")
     List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String renovation);
 
     @Query("select b from House b where b.agent.id = ?1")
     Page<House> pageByAgentId(Integer agentId, Pageable pageable);
+
+    @Query("select h from House h where h.community.uid in ?1")
+    Page<House> findByCommunities(List<String> uidList, Pageable pageable);
+
+    @Query("select h from House h order by h.addTime")
+    Page<House> findByAddTime(Pageable pageable);
 }

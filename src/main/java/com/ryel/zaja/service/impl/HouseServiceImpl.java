@@ -1,5 +1,6 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
@@ -34,10 +35,14 @@ import java.util.List;
  */
 @Service
 @Transactional(readOnly = true)
-public class HouseServiceImpl extends AbsCommonService<House> implements HouseService{
+public class HouseServiceImpl extends AbsCommonService<House> implements HouseService {
 
     @Autowired
     private HouseDao houseDao;
+
+//    private final static String MANAGER = "10";
+//    private final static String USER = "20";
+//    private final static String AGENT = "30";
 
     @Override
     public House create(House house) {
@@ -53,7 +58,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Transactional
     public void agentDeleteHouse(int houseId) {
         House house = this.findById(houseId);
-        if(house == null){
+        if (house == null) {
             throw new BizException("房源信息已经不存在");
         }
         this.deleteById(houseId);
@@ -61,7 +66,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     public Page<House> pageByAgentId(int agentId, Pageable pageable) {
-        return houseDao.pageByAgentId(agentId,pageable);
+        return houseDao.pageByAgentId(agentId, pageable);
     }
 
     @Override
@@ -92,13 +97,45 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
-    public List<House> findByCommunityUid(String uid) {
-        return houseDao.findByCommunityUid(uid);
+    public List<House> findByCommunityUid(String uid, String type) {
+        List<String> list = new ArrayList<>();
+        if (UserType.AGENT.getType().equals(type)) {
+            list.add("10");
+            list.add("50");
+            return houseDao.findByCommunityUid(uid, list);
+        }else if(UserType.USER.getType().equals(type)){
+            list.add("10");
+            return houseDao.findByCommunityUid(uid, list);
+        }else{
+            list.add("10");
+            list.add("20");
+            list.add("30");
+            list.add("40");
+            list.add("50");
+            list.add("60");
+            return houseDao.findByCommunityUid(uid, list);
+        }
     }
 
     @Override
-    public Page<House> findByUid(String uid, Pageable pageable) {
-        return houseDao.findByUid(uid, pageable);
+    public Page<House> findByUid(String uid,String type, Pageable pageable) {
+        List<String> list = new ArrayList<>();
+        if (UserType.AGENT.getType().equals(type)) {
+            list.add("10");
+            list.add("50");
+            return houseDao.findByUid(uid, list, pageable);
+        }else if(UserType.USER.getType().equals(type)){
+            list.add("10");
+            return houseDao.findByUid(uid, list, pageable);
+        }else{
+            list.add("10");
+            list.add("20");
+            list.add("30");
+            list.add("40");
+            list.add("50");
+            list.add("60");
+            return houseDao.findByUid(uid, list, pageable);
+        }
     }
 
     @Override
@@ -109,11 +146,44 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Override
     public List<House> findByLayout(String houseType) {
         return houseDao.findByLayout(houseType);
+    public List<House> findByLayout(String houseType, String type) {
+        List<String> list = new ArrayList<>();
+        if (UserType.AGENT.getType().equals(type)) {
+            list.add("10");
+            list.add("50");
+            return houseDao.findByHouseLayout(houseType, list);
+        }else if(UserType.USER.getType().equals(type)){
+            list.add("10");
+            return houseDao.findByHouseLayout(houseType, list);
+        }else{
+            list.add("10");
+            list.add("20");
+            list.add("30");
+            list.add("40");
+            list.add("50");
+            list.add("60");
+            return houseDao.findByHouseLayout(houseType, list);
+        }
     }
 
     @Override
     public List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel) {
         return houseDao.findByCommumityAndAreaAndRenovation(uid, area, fitmentlevel);
+    }
+
+    @Override
+    public Page<House> findByCommunities(List<String> uids, Pageable pageable) {
+        return houseDao.findByCommunities(uids, pageable);
+    }
+
+    @Override
+    public Page<House> findByAddTime(Pageable pageable) {
+        return houseDao.findByAddTime(pageable);
+    }
+
+    @Override
+    public List<House> findByCommunities(List<String> uids) {
+        return null;
     }
 
     @Override
@@ -131,16 +201,16 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                 Predicate result = null;
                 if (null != sellPrice) {
                     String[] arr = sellPrice.split("\\|");
-                    if(1 == arr.length){
+                    if (1 == arr.length) {
                         BigDecimal bg = new BigDecimal(arr[0]);
                         //double d = Double.parseDouble(arr[0]);
                         Predicate predicate = cb.lessThan(root.get("sellPrice").as(BigDecimal.class), bg);
                         predicateList.add(predicate);
-                    }else if(!StringUtils.isNotBlank(arr[0])){
+                    } else if (!StringUtils.isNotBlank(arr[0])) {
                         BigDecimal bg = new BigDecimal(arr[1]);
                         Predicate predicate = cb.greaterThan(root.get("sellPrice").as(BigDecimal.class), bg);
                         predicateList.add(predicate);
-                    }else{
+                    } else {
                         BigDecimal bg1 = new BigDecimal(arr[0]);
                         BigDecimal bg2 = new BigDecimal(arr[1]);
                         Predicate predicate = cb.between(root.get("sellPrice").as(BigDecimal.class), bg1, bg2);
@@ -150,23 +220,22 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
                 if (null != area) {
                     String[] arr = area.split("\\|");
-                    if(1 == arr.length){
+                    if (1 == arr.length) {
                         BigDecimal bg = new BigDecimal(arr[0]);
                         //double d = Double.parseDouble(arr[0]);
                         Predicate predicate = cb.lessThan(root.get("area").as(BigDecimal.class), bg);
                         predicateList.add(predicate);
-                    }else if(!StringUtils.isNotBlank(arr[0])){
+                    } else if (!StringUtils.isNotBlank(arr[0])) {
                         BigDecimal bg = new BigDecimal(arr[1]);
                         Predicate predicate = cb.greaterThan(root.get("area").as(BigDecimal.class), bg);
                         predicateList.add(predicate);
-                    }else{
+                    } else {
                         BigDecimal bg1 = new BigDecimal(arr[0]);
                         BigDecimal bg2 = new BigDecimal(arr[1]);
                         Predicate predicate = cb.between(root.get("area").as(BigDecimal.class), bg1, bg2);
                         predicateList.add(predicate);
                     }
                 }
-
 
 
                 if (null != houseType) {

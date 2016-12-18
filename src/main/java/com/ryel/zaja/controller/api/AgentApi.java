@@ -17,10 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +77,12 @@ public class AgentApi {
             return Result.success().msg(Error_code.ERROR_CODE_0001);
         }
     }
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 删除房源
@@ -149,5 +158,51 @@ public class AgentApi {
             logger.error(e.getMessage(), e);
             return Result.success().msg(Error_code.ERROR_CODE_0001);
         }
+    }
+
+    @RequestMapping(value = "register", method = RequestMethod.POST)
+    public Result register(User user, @RequestParam("verCode") String verCode) {
+        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
+        if (null == origVerCode) {
+            return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
+        }
+        if (!origVerCode.equals(verCode)) {
+            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object());
+        }
+        try {
+            user.setHead("");
+            user.setNickname("");
+            user.setUsername("");
+            if (null == user.getSex()) {
+                user.setSex("30");//未设置
+            }
+            if (null == user.getType()) {
+                user.setType("20");//用户
+            }
+            userService.create(user);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0006).data("");//手机号被占用
+        }
+
+        return Result.success().msg("").data(user2map(user));
+    }
+
+    private Map<String, Object> user2map(User user) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("user", user);
+        return result;
+    }
+
+    @RequestMapping(value = "login", method = RequestMethod.POST)
+    public Result login(String mobile, String password) {
+        User origUser = userService.login(mobile, password);
+        if (origUser == null) {
+            return Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
+        } else {
+            origUser.setPassword("");
+            return Result.success().msg("").data(user2map(origUser));
+        }
+
     }
 }
