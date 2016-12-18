@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by billyu on 2016/12/14.
@@ -45,5 +46,19 @@ public class CollectApi {
             return Result.error().msg(Error_code.ERROR_CODE_0016).data(new HashMap<>());
         }
         return null;
+    }
+
+    //点击房源详情的时候调用此接口，检查是否收藏
+    @RequestMapping(value = "check", method = RequestMethod.POST)
+    public Result check(Integer userId, Integer houseId){
+        Map<String, String> map = new HashMap<String,String>();
+        String status = "0";
+        if(collectService.check(userId, houseId)){
+            status = "0";//已收藏
+        }else{
+            status = "1";//未收藏
+        }
+        map.put("status", status);
+        return Result.success().msg("").data(map);
     }
 }

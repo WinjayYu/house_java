@@ -1,7 +1,12 @@
 package com.ryel.zaja.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryel.zaja.utils.CustomJsonDateSerializer;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * APP 注册用户
@@ -31,6 +36,14 @@ public class User implements Serializable {
     private String type;
 
     private String head;
+
+    @Column(name = "agent_status")
+    private String agentStatus;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    @Column(name = "add_time")
+    private Date addTime;
 
     public User(){}
 
@@ -100,5 +113,21 @@ public class User implements Serializable {
 
     public void setHead(String head) {
         this.head = head;
+    }
+
+    public String getAgentStatus() {
+        return agentStatus;
+    }
+
+    public void setAgentStatus(String agentStatus) {
+        this.agentStatus = agentStatus;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

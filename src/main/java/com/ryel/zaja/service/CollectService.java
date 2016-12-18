@@ -12,4 +12,6 @@ public interface CollectService {
     Collect cancelCollect(Integer userId, Integer houseId);
 
     Integer countByHouseId(Integer id);
+
+    boolean check(Integer userid, Integer houseId);
 }

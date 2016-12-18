@@ -7,6 +7,7 @@ import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -49,6 +50,16 @@ public class HouseOrder implements Serializable {
     @ManyToOne
     @JoinColumn(name = "agent_id")
     private User agent;
+
+    @ManyToOne
+    @JoinColumn(columnDefinition="String", name = "community_uid", nullable = true)
+    private Community communityUid;
+
+    private BigDecimal area;
+
+    private BigDecimal price;
+
+    private String commission;
 
     public HouseOrder(){}
 
@@ -122,5 +133,37 @@ public class HouseOrder implements Serializable {
 
     public void setBuyerMobile(String buyerMobile) {
         this.buyerMobile = buyerMobile;
+    }
+
+    public Community getCommunityUid() {
+        return communityUid;
+    }
+
+    public void setCommunityUid(Community communityUid) {
+        this.communityUid = communityUid;
+    }
+
+    public BigDecimal getArea() {
+        return area;
+    }
+
+    public void setArea(BigDecimal area) {
+        this.area = area;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public String getCommission() {
+        return commission;
+    }
+
+    public void setCommission(String commission) {
+        this.commission = commission;
     }
 }

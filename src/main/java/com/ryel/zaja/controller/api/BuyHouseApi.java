@@ -73,7 +73,7 @@ public class BuyHouseApi {
 
     @RequestMapping(value = "buyhouse", method = RequestMethod.POST)
     public Result buyHouse(String community, Integer userId, String buyPrice,
-                           String houseType, String fitmentLevel, String area) {
+                           String layout, String renovation, String area) {
 //        String cutComm = community.substring(1,community.length()-1);
 
         String spliceString = "{\"community\":" + community + "}";
@@ -131,8 +131,8 @@ public class BuyHouseApi {
 //        buyHouse.setMinPrice(new BigDecimal(pri[0]));
 //        buyHouse.setMaxPrice(new BigDecimal(pri[1]));
 
-        buyHouse.setHouseType(houseType);
-        buyHouse.setFitmentLevel(fitmentLevel);
+        buyHouse.setLayout(layout);
+        buyHouse.setRenovation(renovation);
 
         String[] are = area.split("\\|");
         if(1 == are.length){

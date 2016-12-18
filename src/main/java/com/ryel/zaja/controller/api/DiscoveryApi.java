@@ -9,6 +9,7 @@ import com.ryel.zaja.dao.custom.FilterDao;
 import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.vo.FilterVo;
+import com.ryel.zaja.service.CommunityService;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.RecommendService;
 import com.ryel.zaja.utils.APIFactory;
@@ -42,6 +43,9 @@ public class DiscoveryApi {
     @Autowired
     private RecommendService recommendService;
 
+    @Autowired
+    private CommunityService communityService;
+
 /*    @RequestMapping(value = "filter", method = RequestMethod.POST)
     public Result filter(String sellPrice,
                          String area,
@@ -63,7 +67,7 @@ public class DiscoveryApi {
                           String floor) {
 
         Page<House> houses = houseService.filter(pageNum, pageSize, sellPrice, area, houseType, fitmentLevel, floor);
-        Map<String,Object> dataMap = APIFactory.fitting(houses);
+        Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);
     }
 
@@ -85,47 +89,55 @@ public class DiscoveryApi {
     }
 
     @RequestMapping(value = "dis", method = RequestMethod.POST)
-    public Result discovery(@RequestParam(value = "longitude",required = false) Double lon1,
-                            @RequestParam(value = "latitude", required = false)Double lat1,
+    public Result discovery(@RequestParam(value = "longitude", required = false) Double lon1,
+                            @RequestParam(value = "latitude", required = false) Double lat1,
                             String cityname,
                             Integer pageNum,
-                            Integer pageSize){
-        List<House> nearbyHouses = new ArrayList<>();
-        Map<String, Object> result = new HashMap<>();
-
-        //如果有经纬度和城市名字，则调用hotHouse方法，热门推荐
-        if (null != lon1 && null != lat1 && null != cityname) {
-            nearbyHouses = hotHouse(lon1, lat1, cityname);
-            if (!nearbyHouses.isEmpty() && null != nearbyHouses) {
-                Page<House> page = new PageImpl<House>(nearbyHouses,
-                        new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"), nearbyHouses.size());
-                Map<String, Object> dataMap = APIFactory.fitting(page);
-//                result.put("nearbyHouses", dataMap);
-                return Result.success().msg("").data(dataMap);
-            }else {
-                List<House> recoHouses = recommendService.findByStatus("10");
-                result.put("nearbyHouses", recoHouses);
-            }
-        } else {
-            List<House> recoHouses = recommendService.findByStatus("10");
-            result.put("nearbyHouses", recoHouses);
+                            Integer pageSize) {
+        if (null == pageNum) {
+            pageNum = 1;
         }
-        return Result.success().msg("").data(result);
+        if (null == pageSize) {
+            pageSize = 1;
+        }
+
+        if (null != lon1 && null != lat1 && null != cityname) {
+            List<String> uids = nearbyCommunity(lon1,lat1,cityname);
+            if(!uids.isEmpty() && null!= uids){
+                Page<House> page =  houseService.findByCommunities(uids, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                return Result.success().msg("").data(dataMap);
+            }else{
+                Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                return Result.success().msg("").data(dataMap);
+            }
+        }else{
+            Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            return Result.success().msg("").data(dataMap);
+        }
+
     }
 
-    public List<House> hotHouse(double lon1, double lat1, String cityname) {
-        List<House> houses = new ArrayList<House>();
-        List<House> housesByCity = houseService.findByCityname(cityname);
-        for (House house : housesByCity) {
-            double lon2 = house.getLongitude().doubleValue();
-            double lat2 = house.getLatitude().doubleValue();
+    public List<String> nearbyCommunity(double lon1, double lat1, String cityname) {
+        List<Community> communities = new ArrayList<Community>();
+        List<Community> communityBycity = communityService.findByCityname(cityname);
+        List<String> uids = new ArrayList<>();
+        for (Community community : communityBycity) {
+            double lon2 = community.getLongitude().doubleValue();
+            double lat2 = community.getLatitude().doubleValue();
             //计算两个点之间的距离
             double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
             if (distance <= 5000) {
-                houses.add(house);
+                communities.add(community);
             }
             //if(6 == houses.size()) break;
         }
-        return houses;
+        for(Community community : communities){
+            uids.add(community.getUid());
+        }
+        return uids;
     }
 }
+

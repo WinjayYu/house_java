@@ -1,6 +1,5 @@
 package com.ryel.zaja.service;
 
-import com.ryel.zaja.entity.Click;
 import com.ryel.zaja.entity.HomeCoverUrl;
 
 /**

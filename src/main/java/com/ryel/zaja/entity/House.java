@@ -30,19 +30,14 @@ public class House implements Serializable {
     @Column(name = "house_type")
     private String houseType;
 
-    private String address;
-
     private BigDecimal area;
 
     @Column(name = "sell_price")
     private BigDecimal sellPrice;
 
-    //10=待审核、20=上架、30=下架
+    //10=待审核、20=上架、30=下架、40=审核失败、50=交接中、60交接完成
     private String status;
 
-    private BigDecimal longitude;
-
-    private BigDecimal latitude;
 
     //10=经济人二次发布、20=经济人一手发布
     private String type;
@@ -101,6 +96,9 @@ public class House implements Serializable {
 
     private String cover;
 
+    @Column(name = "view_num")
+    private Integer viewNum;
+
     public House(){}
 
     public House(Integer id){this.id = id;}
@@ -129,13 +127,6 @@ public class House implements Serializable {
         this.houseType = houseType;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public BigDecimal getArea() {
         return area;
@@ -161,21 +152,6 @@ public class House implements Serializable {
         this.status = status;
     }
 
-    public BigDecimal getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(BigDecimal longitude) {
-        this.longitude = longitude;
-    }
-
-    public BigDecimal getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(BigDecimal latitude) {
-        this.latitude = latitude;
-    }
 
     public String getType() {
         return type;
@@ -327,5 +303,13 @@ public class House implements Serializable {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public Integer getViewNum() {
+        return viewNum;
+    }
+
+    public void setViewNum(Integer viewNum) {
+        this.viewNum = viewNum;
     }
 }
