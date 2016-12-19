@@ -5,6 +5,9 @@ import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.SellHouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,11 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
     public List<SellHouse> findByUserId(int userId) {
         List<SellHouse> sellHouses = sellHouseDao.findByUserId(userId);
         return sellHouses;
+    }
+
+    @Override
+    public Page<SellHouse> pageAll(int pageNum, int pageSize) {
+        return sellHouseDao.pageAll(new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
     }
 
 }

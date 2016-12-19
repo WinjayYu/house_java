@@ -76,6 +76,19 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         if(!HouseStatus.SOLD_OUT_YET.getCode().equals(house.getStatus())){
             throw new BizException(Error_code.ERROR_CODE_0025);
         }
+        house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
+        update(house);
+    }
+
+    @Override
+    @Transactional
+    public void agentSoldOutHouse(Integer houseId) {
+        House house = getHouseByCheck(houseId);
+        if(!HouseStatus.PUTAWAY_YET.getCode().equals(house.getStatus())){
+            throw new BizException(Error_code.ERROR_CODE_0025);
+        }
+        house.setStatus(HouseStatus.SOLD_OUT_YET.getCode());
+        update(house);
     }
 
     @Override
@@ -267,6 +280,6 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     public JpaRepository<House, Integer> getDao() {
-        return null;
+        return houseDao;
     }
 }

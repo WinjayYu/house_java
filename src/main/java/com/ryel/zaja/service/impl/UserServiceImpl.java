@@ -7,6 +7,7 @@ import com.ryel.zaja.entity.AgentMaterial;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.exception.UserException;
 import com.ryel.zaja.service.AbsCommonService;
+import com.ryel.zaja.service.AgentMaterialService;
 import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.utils.ClassUtil;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +38,8 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private AgentMaterialService agentMaterialService;
 
 
     @Autowired
@@ -125,6 +128,9 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         if(u != null){
             throw new BizException(Error_code.ERROR_CODE_0024);
         }
+        create(user);
+        agentMaterial.setAgent(user);
+        agentMaterialService.save(agentMaterial);
     }
 
 

@@ -19,7 +19,7 @@ public interface CommunityDao extends JpaRepository<Community, Integer> ,JpaSpec
 
     List<Community> findByAddress(String address);
 
-    List<Community> findByCityname(String cityname);
+    List<Community> findByCity(String city);
 
     Community findByUid(String uid);
 

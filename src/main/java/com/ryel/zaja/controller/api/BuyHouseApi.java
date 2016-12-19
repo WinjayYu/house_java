@@ -99,7 +99,7 @@ public class BuyHouseApi {
                     community1.setAdcode(adcode);
                     community1.setLongitude(longitude);
                     community1.setLatitude(latitude);
-                    community1.setCityname(cityname);
+                    community1.setCity(cityname);
                     community1.setAddress(address);
                     communityService.create(community1);
                 } catch (Exception e) {

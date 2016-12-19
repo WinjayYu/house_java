@@ -36,7 +36,7 @@ public class Community {
     @Column(name = "add_time")
     private Date addTime;
 
-    private String cityname;
+    private String city;
 
     private String adcode;
 
@@ -81,12 +81,12 @@ public class Community {
         this.addTime = addTime;
     }
 
-    public String getCityname() {
-        return cityname;
+    public String getCity() {
+        return city;
     }
 
-    public void setCityname(String cityname) {
-        this.cityname = cityname;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public BigDecimal getLongitude() {

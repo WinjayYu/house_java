@@ -1,6 +1,9 @@
 package com.ryel.zaja.dao;
 
+import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.SellHouse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +19,7 @@ public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpec
 
     @Query("select s from SellHouse s where s.user.id = ?1 order by s.addTime desc")
     List<SellHouse> findByUserId(Integer id);
+
+    @Query("select b from SellHouse b")
+    Page<SellHouse> pageAll(Pageable pageable);
 }

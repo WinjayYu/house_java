@@ -5,6 +5,8 @@ import com.ryel.zaja.entity.HouseOrder;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,5 +37,10 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public List<HouseOrder> list(Integer id) {
         return houseOrderDao.list(id);
+    }
+
+    @Override
+    public Page<HouseOrder> pageByAgentId(Integer agentId, Pageable pageable) {
+        return houseOrderDao.pageByAgentId(agentId,pageable);
     }
 }

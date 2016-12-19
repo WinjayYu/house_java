@@ -53,6 +53,7 @@ public interface HouseService extends ICommonService<House> {
     Page<House> pageByAgentId(int agentId, Pageable pageable);
 
     void agentPutawayHouse(Integer houseId);
+    void agentSoldOutHouse(Integer houseId);
 
     House getHouseByCheck(Integer houseId);
 
