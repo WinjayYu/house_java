@@ -176,6 +176,9 @@ public class HomeApi {
 
             if (CollectionUtils.isEmpty(houses)) {
                 houses = houseService.findByLayout(bh.getLayout(), type);
+            if (houses.isEmpty()) {
+                houses = houseService.findByLayout(bh.getLayout(),type);
+                return houses;
             } else {
                 //如果小于5条数据则返回结果
                 if (houses.size() <= 5) {
