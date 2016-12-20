@@ -3,13 +3,13 @@ package com.ryel.zaja.config.enums;
 /**
  * Created by billyu on 2016/12/18.
  */
-public enum UserType {
-    USER("10","用户"),AGENT("20","经纪人"),;
+public enum HouseType {
+    FIRST("10","经济人二次发布"),SECOND("20","经济人一手发布"),;
 
     private String code;
     private String desc;
 
-    UserType(String code, String desc){
+    HouseType(String code, String desc){
         this.code = code;
         this.desc = desc;
     }

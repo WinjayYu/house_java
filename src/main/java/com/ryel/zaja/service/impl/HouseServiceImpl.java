@@ -40,10 +40,6 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Autowired
     private HouseDao houseDao;
 
-//    private final static String MANAGER = "10";
-//    private final static String USER = "20";
-//    private final static String AGENT = "30";
-
     @Override
     public House create(House house) {
         return null;
@@ -99,20 +95,20 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Override
     public List<House> findByCommunityUid(String uid, String type) {
         List<String> list = new ArrayList<>();
-        if (UserType.AGENT.getType().equals(type)) {
-            list.add("10");
-            list.add("50");
+        if (UserType.AGENT.getCode().equals(type)) {
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
             return houseDao.findByCommunityUid(uid, list);
-        }else if(UserType.USER.getType().equals(type)){
-            list.add("10");
+        }else if(UserType.USER.getCode().equals(type)){
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
             return houseDao.findByCommunityUid(uid, list);
         }else{
-            list.add("10");
-            list.add("20");
-            list.add("30");
-            list.add("40");
-            list.add("50");
-            list.add("60");
+            list.add(HouseStatus.SAVED.getCode());
+            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.SOLD_OUT_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            list.add(HouseStatus.CLOSED.getCode());
             return houseDao.findByCommunityUid(uid, list);
         }
     }
@@ -120,20 +116,20 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Override
     public Page<House> findByUid(String uid,String type, Pageable pageable) {
         List<String> list = new ArrayList<>();
-        if (UserType.AGENT.getType().equals(type)) {
-            list.add("10");
-            list.add("50");
+        if (UserType.AGENT.getCode().equals(type)) {
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
             return houseDao.findByUid(uid, list, pageable);
-        }else if(UserType.USER.getType().equals(type)){
-            list.add("10");
+        }else if(UserType.USER.getCode().equals(type)){
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
             return houseDao.findByUid(uid, list, pageable);
         }else{
-            list.add("10");
-            list.add("20");
-            list.add("30");
-            list.add("40");
-            list.add("50");
-            list.add("60");
+            list.add(HouseStatus.SAVED.getCode());
+            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.SOLD_OUT_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            list.add(HouseStatus.CLOSED.getCode());
             return houseDao.findByUid(uid, list, pageable);
         }
     }
@@ -145,20 +141,20 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     public List<House> findByLayout(String houseType, String type) {
         List<String> list = new ArrayList<>();
-        if (UserType.AGENT.getType().equals(type)) {
-            list.add("10");
-            list.add("50");
+        if (UserType.AGENT.getCode().equals(type)) {
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
             return houseDao.findByHouseLayout(houseType, list);
-        }else if(UserType.USER.getType().equals(type)){
-            list.add("10");
+        }else if(UserType.USER.getCode().equals(type)){
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
             return houseDao.findByHouseLayout(houseType, list);
         }else{
-            list.add("10");
-            list.add("20");
-            list.add("30");
-            list.add("40");
-            list.add("50");
-            list.add("60");
+            list.add(HouseStatus.SAVED.getCode());
+            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.SOLD_OUT_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            list.add(HouseStatus.CLOSED.getCode());
             return houseDao.findByHouseLayout(houseType, list);
         }
     }
@@ -186,18 +182,19 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Override
     public Page<House> filter(int pageNum,
                               int pageSize,
-                              final String sellPrice,
+                              final String price,
                               final String area,
-                              final String houseType,
-                              final String fitmentLevel,
-                              final String floor) {
+                              final String layout,
+                              final String renovation,
+                              final String floor,
+                              final String userType) {
         Page<House> page = houseDao.findAll(new Specification<House>() {
             @Override
             public Predicate toPredicate(Root<House> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicateList = new ArrayList<Predicate>();
                 Predicate result = null;
-                if (null != sellPrice) {
-                    String[] arr = sellPrice.split("\\|");
+                if (null != price) {
+                    String[] arr = price.split("\\|");
                     if (1 == arr.length) {
                         BigDecimal bg = new BigDecimal(arr[0]);
                         //double d = Double.parseDouble(arr[0]);
@@ -235,20 +232,33 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                 }
 
 
-                if (null != houseType) {
-                    Predicate predicate = cb.equal(root.get("houseType").as(String.class), houseType);
+                if (null != layout) {
+                    Predicate predicate = cb.equal(root.get("houseType").as(String.class), layout);
                     predicateList.add(predicate);
                 }
 
 
-                if (null != fitmentLevel) {
-                    Predicate predicate = cb.equal(root.get("fitmentLevel").as(String.class), fitmentLevel);
+                if (null != renovation) {
+                    Predicate predicate = cb.equal(root.get("fitmentLevel").as(String.class), renovation);
                     predicateList.add(predicate);
                 }
 
                 if (null != floor) {
                     Predicate predicate = cb.equal(root.get("floor").as(String.class), floor);
                     predicateList.add(predicate);
+                }
+
+
+                 //  如果是用户则只筛选上架的房源，如果是经纪人则筛选上架和交接中的房源
+                if(UserType.USER.getCode().equals(userType)) {
+                    Predicate p = cb.equal(root.get("status").as(String.class), new ArrayList<>().add(HouseStatus.PUTAWAY_YET.getCode()));
+                    predicateList.add(p);
+                }else{
+                    List<String> list = new ArrayList<>();
+                    list.add(HouseStatus.PUTAWAY_YET.getCode());
+                    list.add(HouseStatus.IN_CONNECT.getCode());
+                    Predicate p = cb.equal(root.get("status").as(String.class), list);
+                    predicateList.add(p);
                 }
 
                 if (predicateList.size() > 0) {
@@ -264,6 +274,10 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return page;
     }
 
+    @Override
+    public House findById(Integer id) {
+        return houseDao.findOne(id);
+    }
 
     @Override
     public JpaRepository<House, Integer> getDao() {

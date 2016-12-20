@@ -56,7 +56,7 @@ public class HomeApi {
     public Result home(@RequestParam(value = "userId", required = false) Integer userId,
                        @RequestParam(value = "longitude", required = false) Double lon1,
                        @RequestParam(value = "latitude", required = false) Double lat1,
-                       @RequestParam(value = "cityname", required = false) String cityname) {
+                       @RequestParam(value = "city", required = false) String city) {
 
         Map<String, Object> home = new HashMap<String, Object>();
         List<House> recomHouses = new ArrayList<House>();
@@ -65,14 +65,14 @@ public class HomeApi {
         HomeCoverUrl homeCoverUrl = homeCoverUrlService.find(1);
         home.put("homeCoverUrl", homeCoverUrl);
 
-        User user = userService.findById(userId);
-        String type = user.getType();//用户类型
-
+        String type = "10";//用户类型,默认为用户
 
         //如果有userId，则调用recommend方法，zaja推荐
         if (null != userId) {
-            recomHouses = recommend(userId,type);
-            if (!recomHouses.isEmpty() && null != recomHouses) {
+            User user = userService.findById(userId);
+            type = user.getType();
+            recomHouses = recommend(userId, type);
+            if (!CollectionUtils.isEmpty(recomHouses)) {
                 home.put("recomHouses", recomHouses);
             } else {
                 List<House> recoHouses = recommendService.findByStatus("10");
@@ -84,15 +84,14 @@ public class HomeApi {
         }
 
         //如果有经纬度和城市名字，则调用hotHouse方法，热门推荐
-        if (null != lon1 && null != lat1 && null != cityname) {
-
-            hotHouses = hotHouse(lon1, lat1, cityname, type);
-            if (!hotHouses.isEmpty() && null != hotHouses) {
-                home.put("hotHouses", hotHouses);
-            } else {
-                List<House> recoHouses = recommendService.findByStatus("10");
-                home.put("hotHouses", recoHouses);
-            }
+        if (null != lon1 && null != lat1 && null != city) {
+            hotHouses = hotHouse(lon1, lat1, city, type);
+        } else {
+            lon1 = 114.323705; lat1 = 30.468666; city = "武汉";
+            hotHouses = hotHouse(lon1, lat1, city, type);
+        }
+        if (!hotHouses.isEmpty() && null != hotHouses) {
+            home.put("hotHouses", hotHouses);
         } else {
             List<House> recoHouses = recommendService.findByStatus("10");
             home.put("hotHouses", recoHouses);
@@ -102,10 +101,10 @@ public class HomeApi {
     }
 
 
-    public List<House> hotHouse(double lon1, double lat1, String cityname ,String type) {
+    public List<House> hotHouse(double lon1, double lat1, String city, String type) {
 
         List<Community> communities = new ArrayList<Community>();
-        List<Community> communityBycity = communityService.findByCityname(cityname);
+        List<Community> communityBycity = communityService.findByCity(city);
         List<String> uids = new ArrayList<>();
         List<House> houses = new ArrayList<>();
 
@@ -114,7 +113,7 @@ public class HomeApi {
             double lat2 = community.getLatitude().doubleValue();
             //计算两个点之间的距离
             double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
-            if (distance <= 10000) {//10公里之内的
+            if (distance <= 100000) {//100公里之内的
                 communities.add(community);
             }
         }
@@ -152,7 +151,7 @@ public class HomeApi {
     public List<House> recommend(int userId, String type) {
         List<House> result = new ArrayList<>();
         List<BuyHouse> buyHouses = new ArrayList<>();
-        if (UserType.USER.getType().equals(type)) {
+        if (UserType.USER.getCode().equals(type)) {
             buyHouses = buyHouseService.findByUserId(userId);
         }
         if (buyHouses.isEmpty()) {
@@ -163,51 +162,32 @@ public class HomeApi {
 
             List<House> houses = new ArrayList<House>();
 
+            //加上小区一样的房源
             if (-1 != bh.getCommunity().indexOf("|")) {
                 String[] str = bh.getCommunity().split("\\|");
-                int j = new Random().nextInt(str.length);
-                houses = houseService.findByCommunityUid(str[j], type);
+//                int j = new Random().nextInt(str.length);
+                for (int i = 0; i < str.length; i++) {
+                    houses.addAll(houseService.findByCommunityUid(str[i], type));
+                }
             } else {
                 houses = houseService.findByCommunityUid(bh.getCommunity(), type);
             }
-          /*  if (null == houses) {
-                houses = houseDao.findByCommunityAddress();
-            }*/
+            //加上户型一样的房源
+            houses.addAll(houseService.findByLayout(bh.getLayout(), type));
 
-            if (CollectionUtils.isEmpty(houses)) {
-                houses = houseService.findByLayout(bh.getLayout(), type);
-            if (houses.isEmpty()) {
-                houses = houseService.findByLayout(bh.getLayout(),type);
-                return houses;
-            } else {
-                //如果小于5条数据则返回结果
-                if (houses.size() <= 5) {
-                    List<House> recoHouses = recommendService.findByStatus("10");
-                    for (int i = 0; houses.size() < 5; ) {
-                        houses.add(recoHouses.get(i));
-                        i++;
-                    }
-                    return houses;
-                } else {
-                    for (House house : houses) {
-                        if (bh.getLayout().equals(house.getLayout())) {
-                            if (bh.getLayout().equals(house.getLayout())) {
-                                result.add(house);
-                            }
-                        }
-
-                        if (result.size() <= 5) {
-                            List<House> recoHouses = recommendService.findByStatus("10");
-                            for (int i = 0; houses.size() <= 5; ) {
-                                houses.add(recoHouses.get(i));
-                                i++;
-                            }
-                            return houses;
-                        }
-                    }
+            //如果小于5条数据则返回结果
+            if (houses.size() <= 5) {
+                List<House> recoHouses = recommendService.findByStatus("10");
+                for (int i = 0; houses.size() < 5; ) {
+                    houses.add(recoHouses.get(i));
+                    i++;
                 }
+                return houses;
             }
-            return null;
         }
+
+        return null;
     }
 }
+
+

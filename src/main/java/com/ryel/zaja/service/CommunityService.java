@@ -16,7 +16,7 @@ public interface CommunityService extends ICommonService<Community>{
 
     Community findByUid(String uid);
 
-    List<Community> findByCityname(String cityname);
+    List<Community> findByCity(String city);
 
 
     /**

@@ -25,15 +25,16 @@ public interface HouseService extends ICommonService<House> {
 
     List<House> findByLayout(String houseType, String type);
 
-    List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel);
+    List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String renovation);
 
     Page<House> filter(int pageNum,
                        int pageSize,
-                       final String sellPrice,
+                       final String price,
                        final String area,
-                       final String houseType,
-                       final String fitmentLevel,
-                       final String floor);
+                       final String layout,
+                       final String renovation,
+                       final String floor,
+                       final String userType);
 
     Page<House> findByCommunities(List<String> uids, Pageable pageable);
 
@@ -55,5 +56,7 @@ public interface HouseService extends ICommonService<House> {
     void agentPutawayHouse(Integer houseId);
 
     House getHouseByCheck(Integer houseId);
+
+    House findById(Integer id);
 
 }

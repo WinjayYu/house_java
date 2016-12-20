@@ -74,8 +74,8 @@ public class House implements Serializable {
 
     //佣金
     private BigDecimal commission;
-
-    private String direction;
+    //朝向
+    private String orientation;
 
     private String city;
 
@@ -87,8 +87,6 @@ public class House implements Serializable {
     @ManyToOne
     @JoinColumn(name = "community_uid")
     private Community community;
-
-    private String district;
 
     private String title;
 
@@ -240,12 +238,12 @@ public class House implements Serializable {
         this.commission = commission;
     }
 
-    public String getDirection() {
-        return direction;
+    public String getOrientation() {
+        return orientation;
     }
 
-    public void setDirection(String direction) {
-        this.direction = direction;
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
     }
 
     public String getCity() {
@@ -280,13 +278,6 @@ public class House implements Serializable {
         this.community = community;
     }
 
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
 
     public String getTitle() {
         return title;
