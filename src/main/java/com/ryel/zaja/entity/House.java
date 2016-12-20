@@ -36,12 +36,12 @@ public class House implements Serializable {
     //10=待审核、20=上架、30=下架、40=审核失败、50=交接中、60交接完成
     private String status;
 
-
     //10=经济人二次发布、20=经济人一手发布
     private String type;
 
+    // 房源id
     @ManyToOne
-    @JoinColumn(name = "sell_house_id")
+    @JoinColumn(name = "sell_house_id",nullable = true,insertable = false,updatable = false)
     private SellHouse sellHouse;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

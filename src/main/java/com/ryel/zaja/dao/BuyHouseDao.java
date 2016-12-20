@@ -24,4 +24,7 @@ public interface BuyHouseDao extends JpaRepository<BuyHouse, Integer> ,JpaSpecif
     @Query("select b from BuyHouse b where b.user.id = ?1")
     Page<BuyHouse> findByUserId(Integer userId, Pageable pageable);
 
+    @Query("select b from BuyHouse b")
+    Page<BuyHouse> pageAll(Pageable pageable);
+
 }

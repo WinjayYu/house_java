@@ -87,7 +87,7 @@ public class BuyHouseApi {
             String adcode = object3.getString("adcode");
             BigDecimal longitude = object3.getBigDecimal("longitude");
             BigDecimal latitude = object3.getBigDecimal("latitude");
-            String city = object3.getString("city");
+            String cityname = object3.getString("cityname");
             String address = object3.getString("address");
 
             Community origComm = communityService.findByUid(uid);
@@ -99,7 +99,7 @@ public class BuyHouseApi {
                     community1.setAdcode(adcode);
                     community1.setLongitude(longitude);
                     community1.setLatitude(latitude);
-                    community1.setCity(city);
+                    community1.setCityname(cityname);
                     community1.setAddress(address);
                     communityService.create(community1);
                 } catch (Exception e) {

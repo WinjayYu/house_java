@@ -52,4 +52,9 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
         Page<BuyHouse> page = buyHouseDao.findByUserId(userId,new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
         return page;
     }
+
+    @Override
+    public Page<BuyHouse> pageAll(int pageNum, int pageSize) {
+        return buyHouseDao.pageAll(new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
+    }
 }

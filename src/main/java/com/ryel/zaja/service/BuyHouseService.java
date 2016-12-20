@@ -15,4 +15,6 @@ public interface BuyHouseService extends ICommonService<BuyHouse> {
 
     Page<BuyHouse> findByPage(Integer userId, int pageNum, int pageSize);
 
+    Page<BuyHouse> pageAll(int pageNum, int pageSize);
+
 }

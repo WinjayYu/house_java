@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
+<<<<<<< HEAD
 import java.util.Date;
 
 @Entity
@@ -16,14 +17,33 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+=======
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 评论
+ */
+@Entity
+@Table(name = "comment")
+public class Comment implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    //用户
+>>>>>>> origin/master
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    //经纪人
     @ManyToOne
     @JoinColumn(name = "agent_id")
     private User agent;
 
+    // 订单
     @ManyToOne
     @JoinColumn(name = "house_order_id")
     private HouseOrder houseOrder;
@@ -44,6 +64,11 @@ public class Comment {
     }
 
     public void setId(int id) {
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -61,6 +86,14 @@ public class Comment {
 
     public void setAgent(User agent) {
         this.agent = agent;
+    }
+
+    public HouseOrder getHouseOrder() {
+        return houseOrder;
+    }
+
+    public void setHouseOrder(HouseOrder houseOrder) {
+        this.houseOrder = houseOrder;
     }
 
     public String getContent() {
