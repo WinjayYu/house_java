@@ -5,6 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
+<<<<<<< HEAD
+import java.util.Date;
+
+@Entity
+@Table(name = "comment")
+public class Comment {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+
+=======
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,6 +33,7 @@ public class Comment implements Serializable {
     private Integer id;
 
     //用户
+>>>>>>> origin/master
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -43,6 +57,13 @@ public class Comment implements Serializable {
     @Column(name = "add_time")
     private Date addTime;
 
+    public Comment(){}
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
     public Integer getId() {
         return id;
     }
@@ -97,5 +118,13 @@ public class Comment implements Serializable {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
+    }
+
+    public HouseOrder getHouseOrder() {
+        return houseOrder;
+    }
+
+    public void setHouseOrder(HouseOrder houseOrder) {
+        this.houseOrder = houseOrder;
     }
 }

@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
@@ -136,10 +137,10 @@ public class AgentApi {
 
     /**
      * 获取发布的房源列表
-     * @param agentId 经济人id
+     * @param userId 经济人id
      */
     @RequestMapping(value = "queryMyPublishList", method = RequestMethod.POST)
-    public Result queryMyPublishList(Integer agentId, Integer pageNum, Integer pageSize) {
+    public Result queryMyPublishList(Integer userId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -147,7 +148,7 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<House> houses = houseService.pageByAgentId(agentId,
+            Page<House> houses = houseService.pageByAgentId(userId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == houses) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
@@ -468,6 +469,32 @@ public class AgentApi {
             return Result.success().msg(Error_code.ERROR_CODE_0001);
         }
     }
+
+    /**
+     * 筛选
+     * @param pageNum
+     * @param pageSize
+     * @param price
+     * @param area
+     * @param layout
+     * @param renovation
+     * @param floor
+     * @return
+     */
+    @RequestMapping(value = "filter", method = RequestMethod.POST)
+    public Result filters(Integer pageNum,
+                          Integer pageSize,
+                          String price,
+                          String area,
+                          String layout,
+                          String renovation,
+                          String floor) {
+
+        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, UserType.AGENT.getCode());
+        Map<String, Object> dataMap = APIFactory.fitting(houses);
+        return Result.success().msg("").data(dataMap);
+    }
+
 
     private Map<String, Object> user2map(User user) {
         Map<String, Object> result = new HashMap<>();

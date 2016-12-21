@@ -61,13 +61,13 @@ public class DiscoveryApi {
     @RequestMapping(value = "filter", method = RequestMethod.POST)
     public Result filters(Integer pageNum,
                           Integer pageSize,
-                          String sellPrice,
+                          String price,
                           String area,
-                          String houseType,
-                          String fitmentLevel,
+                          String layout,
+                          String renovation,
                           String floor) {
 
-        Page<House> houses = houseService.filter(pageNum, pageSize, sellPrice, area, houseType, fitmentLevel, floor);
+        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, UserType.USER.getCode());
         Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);
     }
@@ -81,6 +81,7 @@ public class DiscoveryApi {
         if (null == pageSize) {
             pageSize = 1;
         }
+        Page<House> houses = houseService.findByUid(uid, UserType.USER.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
         Page<House> houses = houseService.findByUid(uid, UserType.AGENT.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
 
 //        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
@@ -94,7 +95,7 @@ public class DiscoveryApi {
     @RequestMapping(value = "dis", method = RequestMethod.POST)
     public Result discovery(@RequestParam(value = "longitude", required = false) Double lon1,
                             @RequestParam(value = "latitude", required = false) Double lat1,
-                            String cityname,
+                            String city,
                             Integer pageNum,
                             Integer pageSize) {
         if (null == pageNum) {
@@ -104,8 +105,8 @@ public class DiscoveryApi {
             pageSize = 1;
         }
 
-        if (null != lon1 && null != lat1 && null != cityname) {
-            List<String> uids = nearbyCommunity(lon1,lat1,cityname);
+        if (null != lon1 && null != lat1 && null != city) {
+            List<String> uids = nearbyCommunity(lon1,lat1,city);
             if(!uids.isEmpty() && null!= uids){
                 Page<House> page =  houseService.findByCommunities(uids, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
                 Map<String, Object> dataMap = APIFactory.fitting(page);
@@ -116,16 +117,16 @@ public class DiscoveryApi {
                 return Result.success().msg("").data(dataMap);
             }
         }else{
-            Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
+            Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "addTime"));
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
         }
 
     }
 
-    public List<String> nearbyCommunity(double lon1, double lat1, String cityname) {
+    public List<String> nearbyCommunity(double lon1, double lat1, String city) {
         List<Community> communities = new ArrayList<Community>();
-        List<Community> communityBycity = communityService.findByCityname(cityname);
+        List<Community> communityBycity = communityService.findByCity(city);
         List<String> uids = new ArrayList<>();
         for (Community community : communityBycity) {
             double lon2 = community.getLongitude().doubleValue();

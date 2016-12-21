@@ -43,10 +43,8 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     public Collect create(Integer userId, Integer houseId) {
 
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
-        //如果已经收藏，抛出异常，如果status为"20"，则修改为"10"
-        if(null != collect){
+        if(null == collect){
                 this.save(collect);
-
         }else {
 
             collect = new Collect();

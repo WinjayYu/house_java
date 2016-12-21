@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by billyu on 2016/11/28.
  */
 @RestController
-@RequestMapping(value = "/api/area/")
+@RequestMapping(value = "/api/community/")
 public class CommunityApi {
 
     @Autowired
@@ -24,7 +24,7 @@ public class CommunityApi {
      * @param
      * @return
      */
-    @RequestMapping(value = "createarea", method = RequestMethod.POST)
+    @RequestMapping(value = "createCommunity", method = RequestMethod.POST)
     public Result createArea(Community community){
         try{
             communityService.create(community);

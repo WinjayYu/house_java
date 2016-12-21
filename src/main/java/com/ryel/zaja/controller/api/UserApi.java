@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,7 +67,9 @@ public class UserApi {
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public Result register(User user, @RequestParam("verCode") String verCode) {
-        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
+        ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+        String origVerCode = valueops.get(user.getMobile());
+//        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
         if (null == origVerCode) {
             return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
         }
@@ -81,7 +84,7 @@ public class UserApi {
                 user.setSex("30");//未设置
             }
             if (null == user.getType()) {
-                user.setType("20");//用户
+                user.setType("10");//用户
             }
             userService.create(user);
         } catch (Exception e) {
@@ -254,7 +257,9 @@ public class UserApi {
     @RequestMapping(value = "sendverifycode", method = RequestMethod.POST)
     public Result verifyCode(String mobile) {
         String verCode = VerifyCodeUtil.getVerCode();
-        redisTemplate.opsForValue().set(mobile, verCode);
+        ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+        valueops.set(mobile, verCode);
+        //redisTemplate.opsForValue().set(mobile, verCode);
         redisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
         String textEntity = VerifyCodeUtil.send(mobile,verCode);
@@ -274,9 +279,7 @@ public class UserApi {
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
 
         }
-        if(null == redisTemplate.opsForValue().get("verCode")){
-            return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
-        }
+
         return Result.success().msg("").data(new HashMap<>());
     }
 }

@@ -24,8 +24,6 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     List<House> findByCommunityAddress(String communityAddress);
 
-    List<House> findByLayout(String layout);
-
     List<House> findByCity(String city);
 
     @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
@@ -34,7 +32,7 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
     List<House> findByCommunityUid(String uid, List<String> status);
 
-    @Query("select h from House h where h.community.uid = ?1 and h.area = ?2 and h.renovation = ?3 order by h.price asc")
+    @Query("select h from House h where h.community.uid = ?1 or h.area = ?2 or h.renovation = ?3 order by h.price asc")
     List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String renovation);
 
     @Query("select b from House b where b.agent.id = ?1")

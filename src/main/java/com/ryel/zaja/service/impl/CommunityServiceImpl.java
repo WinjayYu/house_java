@@ -38,8 +38,8 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
     }
 
     @Override
-    public List<Community> findByCityname(String cityname) {
-        return communityDao.findByCity(cityname);
+    public List<Community> findByCity(String city) {
+        return communityDao.findByCity(city);
     }
 
     @Override

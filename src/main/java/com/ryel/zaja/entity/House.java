@@ -27,13 +27,10 @@ public class House implements Serializable {
     @JoinColumn(name = "agent_id")
     private User agent;
 
-    // 户型
     private String layout;
 
-    // 房屋面积
     private BigDecimal area;
 
-    // 售价
     private BigDecimal price;
 
     //10=待审核、20=上架、30=下架、40=审核失败、50=交接中、60交接完成
@@ -68,7 +65,6 @@ public class House implements Serializable {
     //年代
     private String year;
 
-    // 房屋特色
     private String feature;
 
     private String imgs;
@@ -78,8 +74,7 @@ public class House implements Serializable {
 
     //佣金
     private BigDecimal commission;
-
-    // 朝向
+    //朝向
     private String orientation;
 
     private String city;
@@ -154,13 +149,6 @@ public class House implements Serializable {
         this.status = status;
     }
 
-    public String getOrientation() {
-        return orientation;
-    }
-
-    public void setOrientation(String orientation) {
-        this.orientation = orientation;
-    }
 
     public String getType() {
         return type;
@@ -250,6 +238,14 @@ public class House implements Serializable {
         this.commission = commission;
     }
 
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
+    }
+
     public String getCity() {
         return city;
     }
@@ -281,6 +277,7 @@ public class House implements Serializable {
     public void setCommunity(Community community) {
         this.community = community;
     }
+
 
     public String getTitle() {
         return title;
