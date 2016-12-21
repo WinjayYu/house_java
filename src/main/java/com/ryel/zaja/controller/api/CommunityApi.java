@@ -29,7 +29,7 @@ public class CommunityApi {
         try{
             communityService.create(community);
         }catch (Exception e){
-            return Result.error().msg(Error_code.ERROR_CODE_0019);//操作失败
+            return Result.error().msg(Error_code.ERROR_CODE_0025);//操作失败
         }
         return Result.success().msg("");
     }

@@ -1,8 +1,6 @@
 package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.BuyHouse;
-import com.ryel.zaja.entity.SellHouse;
-import com.ryel.zaja.entity.SendOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

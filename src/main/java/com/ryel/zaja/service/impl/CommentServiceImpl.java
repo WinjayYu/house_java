@@ -1,10 +1,13 @@
 package com.ryel.zaja.service.impl;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CommentDao;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.dao.UserDao;
+import com.ryel.zaja.dao.CommentDao;
 import com.ryel.zaja.entity.Comment;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.CommentService;
@@ -13,14 +16,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 import java.util.Date;
 
 /**
  * Created by billyu on 2016/12/19.
  */
+
 @Service
 @Transactional(readOnly = true)
 public class CommentServiceImpl extends AbsCommonService<Comment> implements CommentService {
@@ -62,15 +69,17 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
         return commentDao.findByAgentId(agentId, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "addTime"));
     }
 
-
     @Override
     public JpaRepository<Comment, Integer> getDao() {
-        return commentDao;
+        return null;
     }
+
+
 
     @Override
     public Page<Comment> pageByAgentId(Integer agentId, Pageable pageable) {
         return commentDao.findByAgentId(agentId,pageable);
     }
+
 
 }

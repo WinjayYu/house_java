@@ -41,9 +41,8 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
 
 
     @Override
-    public List<SellHouse> findByUserId(int userId) {
-        List<SellHouse> sellHouses = sellHouseDao.findByUserId(userId);
-        return sellHouses;
+    public Page<SellHouse> pageByUserId(int userId, int pageNum, int pageSize) {
+        return sellHouseDao.findByUserId(userId, new PageRequest(pageNum-1,pageSize));
     }
 
     @Override

@@ -22,10 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -182,8 +179,8 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
-    public List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String fitmentlevel) {
-        return houseDao.findByCommumityAndAreaAndRenovation(uid, area, fitmentlevel);
+    public List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation) {
+        return houseDao.findSimilar(price, uid, area, renovation);
     }
 
     @Override
@@ -255,13 +252,13 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
 
                 if (null != layout) {
-                    Predicate predicate = cb.equal(root.get("houseType").as(String.class), layout);
+                    Predicate predicate = cb.equal(root.get("layout").as(String.class), layout);
                     predicateList.add(predicate);
                 }
 
 
                 if (null != renovation) {
-                    Predicate predicate = cb.equal(root.get("fitmentLevel").as(String.class), renovation);
+                    Predicate predicate = cb.equal(root.get("renovation").as(String.class), renovation);
                     predicateList.add(predicate);
                 }
 
@@ -272,15 +269,16 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
 
                  //  如果是用户则只筛选上架的房源，如果是经纪人则筛选上架和交接中的房源
-                if(UserType.USER.getCode().equals(userType)) {
-                    Predicate p = cb.equal(root.get("status").as(String.class), new ArrayList<>().add(HouseStatus.PUTAWAY_YET.getCode()));
+               if(UserType.USER.getCode().equals(userType)) {
+                    Predicate p = cb.equal(root.get("status").as(String.class), HouseStatus.PUTAWAY_YET.getCode());
                     predicateList.add(p);
                 }else{
                     List<String> list = new ArrayList<>();
                     list.add(HouseStatus.PUTAWAY_YET.getCode());
                     list.add(HouseStatus.IN_CONNECT.getCode());
-                    Predicate p = cb.equal(root.get("status").as(String.class), list);
-                    predicateList.add(p);
+
+                    Expression<String> exp = root.get("status").as(String.class);
+                    predicateList.add(exp.in(list));
                 }
 
                 if (predicateList.size() > 0) {

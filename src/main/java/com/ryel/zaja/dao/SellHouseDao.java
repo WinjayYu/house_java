@@ -18,7 +18,7 @@ import java.util.List;
 public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpecificationExecutor<SellHouse> {
 
     @Query("select s from SellHouse s where s.user.id = ?1 order by s.addTime desc")
-    List<SellHouse> findByUserId(Integer id);
+    Page<SellHouse> findByUserId(Integer id, Pageable pageable);
 
     @Query("select b from SellHouse b")
     Page<SellHouse> pageAll(Pageable pageable);

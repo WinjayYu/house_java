@@ -35,7 +35,7 @@ public class FilterDaoImpl implements FilterDao {
     public List<House> findByFilter(String sellPrice,
                                     String area,
                                     String houseType,
-                                    String fitmentLevel,
+                                    String renovation,
                                     String floor
                                     ) {
         EntityManager em = emf.createEntityManager();
@@ -67,8 +67,8 @@ public class FilterDaoImpl implements FilterDao {
         if(null != houseType){
             sql.append(" AND h.type = '" + houseType + "'");
         }
-        if(null != fitmentLevel){
-            sql.append(" AND h.fitment_level = '" + fitmentLevel + "'");
+        if(null != renovation){
+            sql.append(" AND h.fitment_level = '" + renovation + "'");
         }
         if(null != floor){
             sql.append(" AND h.floor = '" + floor +"'");

@@ -1,6 +1,8 @@
 package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.Collect;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +24,7 @@ public interface CollectDao extends JpaRepository<Collect, Integer>,JpaSpecifica
 
     @Query("select co from Collect co where co.user.id = ?1 and co.house.id = ?2")
     Collect findByUserIdAndHouseId(Integer userId, Integer HouseId);
+
+    @Query("select c from Collect c where c.user.id = ?1")
+    Page<Collect> pageByUserId(Integer userId, Pageable pageable);
 }

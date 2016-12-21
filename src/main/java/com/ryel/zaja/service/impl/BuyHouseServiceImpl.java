@@ -2,8 +2,6 @@ package com.ryel.zaja.service.impl;
 
 import com.ryel.zaja.dao.BuyHouseDao;
 import com.ryel.zaja.entity.BuyHouse;
-import com.ryel.zaja.entity.SellHouse;
-import com.ryel.zaja.entity.SendOrder;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.BuyHouseService;
 import org.springframework.beans.factory.annotation.Autowired;

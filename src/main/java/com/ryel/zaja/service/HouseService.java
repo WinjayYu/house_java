@@ -25,7 +25,7 @@ public interface HouseService extends ICommonService<House> {
 
     List<House> findByLayout(String houseType, String type);
 
-    List<House> findByCommumityAndAreaAndRenovation(String uid, BigDecimal area, String renovation);
+    List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation);
 
     Page<House> filter(int pageNum,
                        int pageSize,

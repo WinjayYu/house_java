@@ -1,13 +1,14 @@
 package com.ryel.zaja.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by billyu on 2016/12/10.
  */
 @Entity
 @Table(name = "collect")
-public class Collect {
+public class Collect implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
