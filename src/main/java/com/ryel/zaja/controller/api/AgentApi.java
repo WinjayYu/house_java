@@ -76,7 +76,7 @@ public class AgentApi {
             return Result.success().data(data);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001).data("服务器异常");
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data("服务器异常");
         }
     }
 
@@ -98,7 +98,7 @@ public class AgentApi {
             return Result.success().msg(e.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -115,7 +115,7 @@ public class AgentApi {
             return Result.success().msg("");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -131,7 +131,7 @@ public class AgentApi {
             return Result.success();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -157,7 +157,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -186,7 +186,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -210,7 +210,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -236,7 +236,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -262,7 +262,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -288,7 +288,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -312,7 +312,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -336,7 +336,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -372,7 +372,7 @@ public class AgentApi {
             return Result.success().msg(e.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -387,10 +387,10 @@ public class AgentApi {
             return Result.success();
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(e.getMessage());
+            return Result.error().msg(e.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -405,10 +405,10 @@ public class AgentApi {
             return Result.success();
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(e.getMessage());
+            return Result.error().msg(e.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -441,7 +441,7 @@ public class AgentApi {
             return Result.success();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -466,7 +466,7 @@ public class AgentApi {
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
