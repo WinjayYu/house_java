@@ -187,43 +187,6 @@ public class HomeApi {
         }
 
         return null;
-            if (CollectionUtils.isEmpty(houses)) {
-                houses = houseService.findByLayout(bh.getLayout(), type);
-                if (houses.isEmpty()) {
-                    houses = houseService.findByLayout(bh.getLayout(), type);
-                    return houses;
-                } else {
-                    //如果小于5条数据则返回结果
-                    if (houses.size() <= 5) {
-                        List<House> recoHouses = recommendService.findByStatus("10");
-                        for (int i = 0; houses.size() < 5; ) {
-                            houses.add(recoHouses.get(i));
-                            i++;
-                        }
-                        return houses;
-                    } else {
-                        for (House house : houses) {
-                            if (bh.getLayout().equals(house.getLayout())) {
-                                if (bh.getLayout().equals(house.getLayout())) {
-                                    result.add(house);
-                                }
-                            }
-
-                            if (result.size() <= 5) {
-                                List<House> recoHouses = recommendService.findByStatus("10");
-                                for (int i = 0; houses.size() <= 5; ) {
-                                    houses.add(recoHouses.get(i));
-                                    i++;
-                                }
-                                return houses;
-                            }
-                        }
-                    }
-                }
-                return null;
-            }
-        }
-        return null;
     }
 }
 
