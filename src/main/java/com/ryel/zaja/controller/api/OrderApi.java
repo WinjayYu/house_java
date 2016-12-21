@@ -5,19 +5,13 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.HouseOrderDao;
-import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.*;
-import com.ryel.zaja.exception.HouseException;
-import com.ryel.zaja.exception.UserException;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
-import com.ryel.zaja.service.SendOrderService;
-import com.ryel.zaja.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +37,7 @@ public class OrderApi {
             houseOrder.setAddTime(new Date());
             houseOrderService.create(houseOrder);
         } catch (Exception e) {
-            return Result.error().msg(Error_code.ERROR_CODE_0019);//操作失败
+            return Result.error().msg(Error_code.ERROR_CODE_0025);
         }
         return Result.success().msg("");
     }

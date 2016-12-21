@@ -5,21 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
-<<<<<<< HEAD
-import java.util.Date;
-
-@Entity
-@Table(name = "comment")
-public class Comment {
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-
-=======
 import java.io.Serializable;
 import java.util.Date;
+
 
 /**
  * 评论
@@ -28,23 +16,23 @@ import java.util.Date;
 @Table(name = "comment")
 public class Comment implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     //用户
->>>>>>> origin/master
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     //经纪人
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id")
     private User agent;
 
     // 订单
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "house_order_id")
     private HouseOrder houseOrder;
 
@@ -59,11 +47,6 @@ public class Comment implements Serializable {
 
     public Comment(){}
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
     public Integer getId() {
         return id;
     }
@@ -118,13 +101,5 @@ public class Comment implements Serializable {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
-    }
-
-    public HouseOrder getHouseOrder() {
-        return houseOrder;
-    }
-
-    public void setHouseOrder(HouseOrder houseOrder) {
-        this.houseOrder = houseOrder;
     }
 }

@@ -1,8 +1,6 @@
 package com.ryel.zaja.service;
 
 import com.ryel.zaja.entity.Comment;
-<<<<<<< HEAD
-import com.ryel.zaja.entity.Recommend;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,15 +14,8 @@ public interface CommentService extends ICommonService<Comment>{
     Comment findByHouseOrderId(Integer houseOrderId);
 
     Page<Comment> findByAgentId(Integer agentId, Integer pageNum, Integer pageSize);
-=======
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-public interface CommentService extends ICommonService<Comment> {
 
     Page<Comment> pageByAgentId(Integer agentId, Pageable pageable);
 
 
-
->>>>>>> origin/master
 }

@@ -182,7 +182,7 @@ public class UserApi {
         try {
             bodyString = qiNiuService.upload(path, key.toString());
         }catch (Exception e){
-            return Result.error().msg(Error_code.ERROR_CODE_0019).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
 
         StringBuffer remotePath = new StringBuffer();
@@ -246,23 +246,49 @@ public class UserApi {
      * }
      */
     @RequestMapping(value = "findpassword", method = RequestMethod.POST)
-    public Result findPassword(User user) {
-        if (null == user || null == userService.findByMobile(user.getMobile())) {
-            return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
+    public Result findPassword(String mobile, String password, String verCode) {
+        try {
+            User user = userService.findByMobile(mobile);
+
+            if (null == user) {
+                return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
+            }
+
+            ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+            String origVerCode = valueops.get(mobile);
+
+            if (null == origVerCode) {
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
+            }
+            if (!origVerCode.equals(verCode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object());
+            }
+
+            user.setPassword(password);
+            userService.update(user);
+
+            return Result.success().msg("").data("");
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
-        userService.update(user);
-        return Result.success().msg("").data("");
     }
 
+    /**
+     * 发送验证码
+     * @param mobile
+     * @param type 1=注册，2=修改密码
+     * @return
+     */
     @RequestMapping(value = "sendverifycode", method = RequestMethod.POST)
-    public Result verifyCode(String mobile) {
+    public Result verifyCode(String mobile, String type) {
         String verCode = VerifyCodeUtil.getVerCode();
         ValueOperations<String, String> valueops = redisTemplate.opsForValue();
         valueops.set(mobile, verCode);
         //redisTemplate.opsForValue().set(mobile, verCode);
         redisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
-        String textEntity = VerifyCodeUtil.send(mobile,verCode);
+        String textEntity = VerifyCodeUtil.send(mobile,verCode,type);
 
         try {
             JSONObject jsonObj = new JSONObject(textEntity);

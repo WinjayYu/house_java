@@ -6,6 +6,7 @@ import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
 import javax.xml.crypto.Data;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "community")
-public class Community {
+public class Community implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -20,7 +20,13 @@ import org.json.JSONObject;
  */
 public class VerifyCodeUtil {
 
-    public static String send(String mobile, String verCode) {
+    public static String send(String mobile, String verCode, String type) {
+        String msg = "";
+        if("1".equals(type)){
+            msg = "您正在绑定手机号，验证码：";
+        }else{
+            msg = "您正在修改密码，验证码：";
+        }
         // just replace key here
         Client client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(
@@ -29,7 +35,7 @@ public class VerifyCodeUtil {
                 "http://sms-api.luosimao.com/v1/send.json");
         MultivaluedMapImpl formData = new MultivaluedMapImpl();
         formData.add("mobile", mobile);
-        formData.add("message",  "您正在绑定手机号，验证码：" + verCode + ", 5分钟内有效. 【ZAJA】");
+        formData.add("message",  msg + verCode + ", 5分钟内有效. 【ZAJA】");
         ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).
                 post(ClientResponse.class, formData);
         String textEntity = response.getEntity(String.class);

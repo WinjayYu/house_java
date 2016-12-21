@@ -52,14 +52,24 @@ public class BuyHouseApi {
 
     @RequestMapping(value = "listbuyhouses", method = RequestMethod.POST)
     public Result listBuyHouses(Integer userId, Integer pageNum, Integer pageSize) {
-        Map<String, Object> map = new HashMap<>();
-        Page<BuyHouse> page = buyHouseService.findByPage(userId, pageNum, pageSize);
+        try {
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
 
-        Map<String, Object> dataMap = APIFactory.fitting(page);
-        return Result.success().msg("").data(dataMap);
+            Map<String, Object> map = new HashMap<>();
+            Page<BuyHouse> page = buyHouseService.findByPage(userId, pageNum, pageSize);
 
-//        map.put("list", list);
-//        return Result.success().data(map);
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            return Result.success().msg("").data(dataMap);
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+
     }
 
     @RequestMapping(value = "onebuyhouse", method = RequestMethod.POST)
@@ -104,7 +114,7 @@ public class BuyHouseApi {
                     communityService.create(community1);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                    return Result.error().msg(Error_code.ERROR_CODE_0019).data(new HashMap<>());
+                    return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
                 }
             }
 
@@ -150,7 +160,7 @@ public class BuyHouseApi {
             buyHouseService.create(buyHouse);
         }catch (Exception e){
             logger.error(e.getMessage(),e);
-            return Result.error().msg(Error_code.ERROR_CODE_0019).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
 
         return Result.success().msg("").data(new HashMap<>());

@@ -1,5 +1,6 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.service.AbsCommonService;
@@ -45,13 +46,12 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
     @Override
     @Transactional
     public void create(Community community) {
-        if(null != communityDao.findByUid(community.getUid())){
-           return;
-        }else {
+        try {
             community.setAddTime(new Date());
             communityDao.save(community);
+        }catch (Exception e){
+            throw new BizException("小区数据有误");
         }
-        return;
     }
 
     @Override

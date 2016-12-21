@@ -40,47 +40,21 @@ public class SimilarHouseApi {
         Map<String, Object> similarHouse = new HashMap<String, Object>();
         List<House> resultHouses = new ArrayList<House>();
 
-        List<House> houses = houseService.findByCommumityAndAreaAndRenovation(house.getCommunity().getUid(),
+        List<House> houses = houseService.findSimilar(house.getPrice(),
+                house.getCommunity().getUid(),
                 house.getArea(),
                 house.getRenovation());
 
-            if (!CollectionUtils.isEmpty(houses)) {
-            /*for (House h : houses) {
-                if (h.getId() == houseId) {
-                    houses.remove(h);
-                }
-            }*/
-                similarHouse.put("list", houses);
-                return Result.success().msg("").data(similarHouse);
-             /*else {
-                double sellPrice = house.getPrice().doubleValue();
-                double interval = Math.abs(houses.get(0).getPrice().doubleValue() - sellPrice);
-                int index = 0;
-                for (int i = 0; i <= houses.size()-1; i++) {
-                    double subtract = Math.abs(houses.get(i).getPrice().doubleValue() - sellPrice);
-                    //将售价相差最小的值赋给interval
-                    if (interval >= subtract) {
-                        interval = subtract;
-                        index = i;
-                    }
-                }
-                if (index <= 1) {
-                    for (int i = 0; i < houses.size()-1; i++) {
-                        resultHouses.add(houses.get(i));
-                    }
-                } else if (index >= houses.size() - 1) {
-                    int size = houses.size();
-                    for (int i = size - 6; i <= size - 1; i++) {
-                        resultHouses.add(houses.get(i));
-                    }
-                } else {
-                    for (int i = index - 2; i <= index + 2; i++) {
-                        resultHouses.add(houses.get(i));
-                    }
+        if (!CollectionUtils.isEmpty(houses)) {
+            if(houses.size() > 5){
+                for(int i=houses.size()-1; i>4; i--){
+                    houses.remove(i);
                 }
             }
-            return Result.success().msg("").data(similarHouse.put("list", resultHouses));*/
-        }else{
+            similarHouse.put("list", houses);
+            return Result.success().msg("").data(similarHouse);
+
+        } else {
             return Result.success().msg("").data(similarHouse.put("list", recommendService.findByStatus("10")));
         }
     }

@@ -41,11 +41,15 @@ public class CommentApi {
         try{
 
             commentService.create(userId, agentId, houseOrderId, star, content);
+            Comment comment = commentService.findByHouseOrderId(houseOrderId);
+            Map<String, Object> map = new HashMap<>();
+            map.put("comment", comment);
+            return Result.success().data(map);
         }catch (BizException e){
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0019);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
-        return Result.success().data(new HashMap<>());
+
     }
 
     /**

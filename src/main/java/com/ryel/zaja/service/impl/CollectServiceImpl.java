@@ -12,6 +12,9 @@ import com.ryel.zaja.service.CollectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,9 +69,9 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     public Collect cancelCollect(Integer userId, Integer houseId) {
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
         if(null == collect){
-            throw new RuntimeException("没有收藏过！");
+            throw new BizException("没有收藏过！");
         }else{
-            collectDao.save(collect);
+            collectDao.delete(collect);
         }
         return null;
     }
@@ -81,6 +84,11 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
             }else{
                 return true;//已收藏
             }
+    }
+
+    @Override
+    public Page<Collect> pageByUserId(Integer userId, Integer pageNum, Integer pageSize) {
+        return collectDao.pageByUserId(userId, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id" ));
     }
 
     @Override

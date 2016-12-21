@@ -11,7 +11,7 @@ public interface SellHouseService extends ICommonService<SellHouse> {
 
     SellHouse create(SellHouse sellHouse);
 
-    List<SellHouse> findByUserId(int userId);
+    Page<SellHouse> pageByUserId(int userId, int pageNum, int pageSize);
 
     Page<SellHouse> pageAll(int pageNum, int pageSize);
 }
