@@ -70,6 +70,15 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
+    public Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable) {
+        return houseDao.pageByCommunityUid(uid,status, pageable);
+    }
+    @Override
+    public Page<House> agentPage(List<String> status, Pageable pageable) {
+        return houseDao.agentPage(status, pageable);
+    }
+
+    @Override
     @Transactional
     public void agentPutawayHouse(Integer houseId) {
         House house = getHouseByCheck(houseId);

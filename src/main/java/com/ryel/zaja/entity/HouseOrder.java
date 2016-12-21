@@ -53,14 +53,10 @@ public class HouseOrder implements Serializable {
 
     @ManyToOne
     @JoinColumn(columnDefinition="String", name = "community_uid", nullable = true,insertable = false,updatable = false)
-    private Community communityUid;
+    private Community community;
 
     //10=从house表生成的订单，20=经纪人自定义的订单
     private String type;
-
-    @ManyToOne
-    @JoinColumn(name = "community_uid")
-    private Community community;
 
     private BigDecimal area;
 
@@ -140,14 +136,6 @@ public class HouseOrder implements Serializable {
 
     public void setBuyerMobile(String buyerMobile) {
         this.buyerMobile = buyerMobile;
-    }
-
-    public Community getCommunityUid() {
-        return communityUid;
-    }
-
-    public void setCommunityUid(Community communityUid) {
-        this.communityUid = communityUid;
     }
 
     public String getType() {

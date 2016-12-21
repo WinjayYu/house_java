@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -157,6 +161,59 @@ public class AgentApi {
     }
 
     /**
+     * 根据小区uid查询访问信息
+     * @param communityUid 小区uid
+     */
+    @RequestMapping(value = "houseListByCommunityUid", method = RequestMethod.POST)
+    public Result houseListByCom(String communityUid, Integer pageNum, Integer pageSize) {
+        try {
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
+            List<String> status = new ArrayList<String>();
+            status.add(HouseStatus.PUTAWAY_YET.getCode());
+            status.add(HouseStatus.IN_CONNECT.getCode());
+            Page<House> houses = houseService.pageByCommunityUid(communityUid,status,
+                    new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+            if (null == houses) {
+                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            }
+            Map<String, Object> dataMap = APIFactory.fitting(houses);
+            return Result.success().data(dataMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.success().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    @RequestMapping(value = "houseList", method = RequestMethod.POST)
+    public Result houseList(Integer pageNum, Integer pageSize) {
+        try {
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
+            List<String> status = new ArrayList<String>();
+            status.add(HouseStatus.PUTAWAY_YET.getCode());
+            status.add(HouseStatus.IN_CONNECT.getCode());
+            Page<House> houses = houseService.agentPage(status, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+            if (null == houses) {
+                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            }
+            Map<String, Object> dataMap = APIFactory.fitting(houses);
+            return Result.success().data(dataMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.success().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    /**
      * 我的订单列表
      * @param agentId 经济人id
      */
@@ -276,6 +333,42 @@ public class AgentApi {
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().data(dataMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.success().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    /**
+     * 创建订单
+     */
+    @RequestMapping(value = "createOrder", method = RequestMethod.POST)
+    public Result createOrder(Integer userId, Integer houseId, String communityUid, BigDecimal area,BigDecimal price,
+                              String toMobile,Integer buyerId) {
+        try {
+
+            User agent = new User();
+            agent.setId(userId);
+            House house = new House();
+            house.setId(houseId);
+            User user = new User();
+            user.setId(buyerId);
+            Community community = new Community();
+            community.setUid(communityUid);
+
+            HouseOrder houseOrder = new HouseOrder();
+            houseOrder.setAgent(agent);
+            houseOrder.setBuyer(user);
+            houseOrder.setCommunity(community);
+            houseOrder.setArea(area);
+            houseOrder.setPrice(price);
+            houseOrder.setBuyerMobile(toMobile);
+
+            houseService.agentPutawayHouse(houseId);
+            return Result.success();
+        } catch (BizException e) {
+            logger.error(e.getMessage(), e);
+            return Result.success().msg(e.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.success().msg(Error_code.ERROR_CODE_0001);
