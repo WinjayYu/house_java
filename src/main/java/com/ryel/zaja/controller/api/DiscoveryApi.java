@@ -82,6 +82,8 @@ public class DiscoveryApi {
             pageSize = 1;
         }
         Page<House> houses = houseService.findByUid(uid, UserType.USER.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+
+//        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
         if (null == houses) {
             return Result.error().msg(Error_code.ERROR_CODE_0020);
         }

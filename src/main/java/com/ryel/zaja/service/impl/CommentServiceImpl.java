@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Date;
@@ -52,7 +54,7 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
             comment.setStar(star);
             commentDao.save(comment);
         }catch (BizException be){
-            new BizException(Error_code.ERROR_CODE_0025);
+            new BizException(Error_code.ERROR_CODE_0019);
         }
     }
 
@@ -76,7 +78,7 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
 
     @Override
     public Page<Comment> pageByAgentId(Integer agentId, Pageable pageable) {
-        return commentDao.pageByAgentId(agentId,pageable);
+        return commentDao.findByAgentId(agentId,pageable);
     }
 
 
