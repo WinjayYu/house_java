@@ -8,6 +8,8 @@ import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
+import com.ryel.zaja.utils.JsonUtil;
+import com.ryel.zaja.utils.bean.FileBo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +20,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 经济人相关功能
@@ -54,6 +55,11 @@ public class AgentApi {
     private HouseOrderService houseOrderService;
     @Resource
     private RedisTemplate redisTemplate;
+    @Resource
+    private BizUploadFile bizUploadFile;
+    @Resource
+    private CommunityService communityService;
+
 
     /**
      * 登录
@@ -158,6 +164,7 @@ public class AgentApi {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -211,6 +218,31 @@ public class AgentApi {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    @RequestMapping(value = "test", method = RequestMethod.POST)
+    public String test(Integer pageNum, Integer pageSize) {
+        try {
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
+            List<String> status = new ArrayList<String>();
+            status.add(HouseStatus.PUTAWAY_YET.getCode());
+            status.add(HouseStatus.IN_CONNECT.getCode());
+            Page<House> houses = houseService.agentPage(status, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+            if (null == houses) {
+                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0014));
+            }
+            Map<String, Object> dataMap = APIFactory.fitting(houses);
+            return JsonUtil.obj2ApiJson(Result.success().data(dataMap),"agent");
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001));
         }
     }
 

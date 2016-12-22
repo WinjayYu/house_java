@@ -41,7 +41,7 @@ public class House implements Serializable {
 
     // 房源id
     @ManyToOne
-    @JoinColumn(name = "sell_house_id",nullable = true,insertable = false,updatable = false)
+    @JoinColumn(name = "sell_house_id")
     private SellHouse sellHouse;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
