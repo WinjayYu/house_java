@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,6 +60,8 @@ public class AgentApi {
     private BizUploadFile bizUploadFile;
     @Resource
     private CommunityService communityService;
+    @Autowired
+    private RecommendService recommendService;
 
 
     /**
@@ -111,8 +114,8 @@ public class AgentApi {
     /**
      * 发布房源
      */
-    @RequestMapping(value = "publishHouse", method = RequestMethod.POST)
-    public String publishHouse(@RequestParam(required = false) MultipartFile image1,@RequestParam(required = false) MultipartFile image2,
+    @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
+    public String publishhouse(@RequestParam(required = false) MultipartFile image1,@RequestParam(required = false) MultipartFile image2,
                                @RequestParam(required = false) MultipartFile image3,@RequestParam(required = false) MultipartFile image4,
                                @RequestParam(required = false) MultipartFile image5,
                                Integer userId,Integer sellhouseId,String title,BigDecimal price,String tags,Community community,
@@ -199,8 +202,8 @@ public class AgentApi {
      *
      * @param houseId 房源id
      */
-    @RequestMapping(value = "deleteHouse", method = RequestMethod.POST)
-    public Result deleteHouse(int houseId) {
+    @RequestMapping(value = "deletehouse", method = RequestMethod.POST)
+    public Result deletehouse(int houseId) {
         try {
             houseService.agentDeleteHouse(houseId);
             return Result.success().msg("");
@@ -215,8 +218,8 @@ public class AgentApi {
      *
      * @param house 房源信息
      */
-    @RequestMapping(value = "modifyHouse", method = RequestMethod.POST)
-    public Result modifyHouse(House house) {
+    @RequestMapping(value = "modifyhouse", method = RequestMethod.POST)
+    public Result modifyhouse(House house) {
         try {
             houseService.update(house);
             return Result.success();
@@ -230,8 +233,8 @@ public class AgentApi {
      * 获取发布的房源列表
      * @param userId 经济人id
      */
-    @RequestMapping(value = "queryMyPublishList", method = RequestMethod.POST)
-    public Result queryMyPublishList(Integer userId, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "querymypublishlist", method = RequestMethod.POST)
+    public Result querymypublishlist(Integer userId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -256,8 +259,8 @@ public class AgentApi {
      * 根据小区uid查询访问信息
      * @param communityUid 小区uid
      */
-    @RequestMapping(value = "houseListByCommunityUid", method = RequestMethod.POST)
-    public Result houseListByCom(String communityUid, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "houselistbycommunityuid", method = RequestMethod.POST)
+    public Result houselistbycommunityuid(String communityUid, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -281,8 +284,8 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "houseList", method = RequestMethod.POST)
-    public Result houseList(Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "houselist", method = RequestMethod.POST)
+    public Result houselist(Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -305,36 +308,12 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "test", method = RequestMethod.POST)
-    public String test(Integer pageNum, Integer pageSize) {
-        try {
-            if (null == pageNum) {
-                pageNum = 1;
-            }
-            if (null == pageSize) {
-                pageSize = 1;
-            }
-            List<String> status = new ArrayList<String>();
-            status.add(HouseStatus.PUTAWAY_YET.getCode());
-            status.add(HouseStatus.IN_CONNECT.getCode());
-            Page<House> houses = houseService.agentPage(status, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == houses) {
-                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0014));
-            }
-            Map<String, Object> dataMap = APIFactory.fitting(houses);
-            return JsonUtil.obj2ApiJson(Result.success().data(dataMap),"agent");
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001));
-        }
-    }
-
     /**
      * 我的订单列表
      * @param agentId 经济人id
      */
-    @RequestMapping(value = "myOrderList", method = RequestMethod.POST)
-    public Result myOrderList(Integer agentId, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "myorderlist", method = RequestMethod.POST)
+    public Result myorderlist(Integer agentId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -359,8 +338,8 @@ public class AgentApi {
      * 我的买房需求列表
      * @param agentId 经济人id
      */
-    @RequestMapping(value = "buyHouseList", method = RequestMethod.POST)
-    public Result buyHouseList(Integer agentId, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "buyhouselist", method = RequestMethod.POST)
+    public Result buyhouselist(Integer agentId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -385,8 +364,8 @@ public class AgentApi {
      * 我的卖房需求列表
      * @param agentId 经济人id
      */
-    @RequestMapping(value = "sellHouseList", method = RequestMethod.POST)
-    public Result sellHouseList(Integer agentId, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "sellhouselist", method = RequestMethod.POST)
+    public Result sellhouselist(Integer agentId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -410,8 +389,8 @@ public class AgentApi {
     /**
      * 全部买房需求列表
      */
-    @RequestMapping(value = "allBuyHouseList", method = RequestMethod.POST)
-    public Result allBuyHouseList(Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "allbuyhouselist", method = RequestMethod.POST)
+    public Result allbuyhouselist(Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -434,8 +413,8 @@ public class AgentApi {
     /**
      * 全部卖房需求列表
      */
-    @RequestMapping(value = "allSellHouseList", method = RequestMethod.POST)
-    public Result allSellHouseList(Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "allsellhouselist", method = RequestMethod.POST)
+    public Result allsellhouselist(Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -458,8 +437,8 @@ public class AgentApi {
     /**
      * 创建订单
      */
-    @RequestMapping(value = "createOrder", method = RequestMethod.POST)
-    public Result createOrder(Integer userId, Integer houseId, String communityUid, BigDecimal area,BigDecimal price,
+    @RequestMapping(value = "createorder", method = RequestMethod.POST)
+    public Result createorder(Integer userId, Integer houseId, String communityUid, BigDecimal area,BigDecimal price,
                               String toMobile,Integer buyerId) {
         try {
 
@@ -495,8 +474,8 @@ public class AgentApi {
      * 经济人上架房源
      * @param houseId 房源id
      */
-    @RequestMapping(value = "putawayHouse", method = RequestMethod.POST)
-    public Result putawayHouse(Integer houseId) {
+    @RequestMapping(value = "putawayhouse", method = RequestMethod.POST)
+    public Result putawayhouse(Integer houseId) {
         try {
             houseService.agentPutawayHouse(houseId);
             return Result.success();
@@ -513,8 +492,8 @@ public class AgentApi {
      * 下架房源
      * @param houseId 房源id
      */
-    @RequestMapping(value = "soldOutHouse", method = RequestMethod.POST)
-    public Result soldOutHouse(Integer houseId) {
+    @RequestMapping(value = "soldouthouse", method = RequestMethod.POST)
+    public Result soldouthouse(Integer houseId) {
         try {
             houseService.agentSoldOutHouse(houseId);
             return Result.success();
@@ -530,8 +509,8 @@ public class AgentApi {
     /**
      * 接单
      */
-    @RequestMapping(value = "receiveOrder", method = RequestMethod.POST)
-    public Result receiveOrder(Integer demandId,Integer userId,String type) {
+    @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
+    public Result receiveorder(Integer demandId,Integer userId,String type) {
         try {
             if(demandId == null || ("10".equals(type) && "20".equals(type))){
                 return Result.success().msg(Error_code.ERROR_CODE_0023);
@@ -563,8 +542,8 @@ public class AgentApi {
     /**
      * 我的评论
      */
-    @RequestMapping(value = "myComment", method = RequestMethod.POST)
-    public Result myComment(Integer userId, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "mycomment", method = RequestMethod.POST)
+    public Result mycomment(Integer userId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -617,6 +596,52 @@ public class AgentApi {
         return result;
     }
 
+    /**
+     * 相似房源
+     */
+    @RequestMapping(value = "similar", method = RequestMethod.POST)
+    public Result similarHouse(Integer houseId) {
+        House house = houseService.findById(houseId);
+        Map<String, Object> similarHouse = new HashMap<String, Object>();
+        List<House> houses = houseService.findSimilar(house.getPrice(),
+                house.getCommunity().getUid(),
+                house.getArea(),
+                house.getRenovation());
+        if (!CollectionUtils.isEmpty(houses)) {
+            if (houses.size() > 5) {
+                for (int i = houses.size() - 1; i > 4; i--) {
+                    houses.remove(i);
+                }
+            }
+            similarHouse.put("list", houses);
+            return Result.success().msg("").data(similarHouse);
+        } else {
+            return Result.success().msg("").data(similarHouse.put("list", recommendService.findByStatus("10")));
+        }
+    }
+
+    /**
+     * 修改头像
+     */
+    @RequestMapping(value = "modifyhead")
+    public Result modifyhead(Integer userId, @RequestParam(required = true) MultipartFile image){
+        try {
+            String path = bizUploadFile.uploadUserImageToQiniu(image,userId);
+            if(StringUtils.isNotBlank(path)){
+                Map<String ,String> dataMap = new HashMap<>();
+                dataMap.put("remotePath",path);
+                User user = userService.findById(userId);
+                user.setHead(path);
+                userService.update(user);
+                return Result.success().msg("").data(dataMap);
+            }else {
+                throw new BizException("修改头像异常");
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
 
 
 }
