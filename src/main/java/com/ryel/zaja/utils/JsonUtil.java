@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ryel.zaja.utils.gson.DmsExclusionStrategy;
 import com.ryel.zaja.utils.gson.DmsIncludeStrategy;
+import com.ryel.zaja.utils.gson.NullStringToEmptyAdapterFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -83,6 +84,36 @@ public class JsonUtil {
                   .setExclusionStrategies(strategy)
                 .create();
         return  gson.toJson(obj);
+    }
+
+    /**
+     * java对象转换成json字符串,过滤成api需要的字段值
+     * @param obj
+     * @param excludes
+     * @return
+     */
+    public static String obj2ApiJson(Object obj,String ... excludes ){
+        ExclusionStrategy strategy = new DmsExclusionStrategy(excludes);
+        Gson gson = createGsonBuilder()
+                .registerTypeAdapterFactory(new NullStringToEmptyAdapterFactory())
+                .setExclusionStrategies(strategy)
+                .create();
+        String json = gson.toJson(obj);
+        return  filterJson(json);
+    }
+
+    /**
+     * 过滤字符串 -> true转换成0，false转换成1,null转换成""或者{}
+     * @param json
+     * @return
+     */
+    public static String  filterJson(String json){
+        //"image":null
+        String lastStr =  json.replaceAll(":true", ":\"0\"")
+                .replaceAll(":false", ":\"1\"")
+                .replaceAll(":null", ":{}");
+
+        return lastStr;
     }
 
 
