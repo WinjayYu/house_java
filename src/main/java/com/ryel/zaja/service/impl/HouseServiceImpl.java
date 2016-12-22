@@ -38,8 +38,9 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     private HouseDao houseDao;
 
     @Override
+    @Transactional
     public House create(House house) {
-        return null;
+        return houseDao.save(house);
     }
 
     @Override

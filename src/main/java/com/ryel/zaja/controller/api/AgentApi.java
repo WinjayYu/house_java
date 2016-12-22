@@ -9,6 +9,7 @@ import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
+import com.ryel.zaja.utils.bean.FileBo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +20,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 经济人相关功能
@@ -55,6 +55,11 @@ public class AgentApi {
     private HouseOrderService houseOrderService;
     @Resource
     private RedisTemplate redisTemplate;
+    @Resource
+    private BizUploadFile bizUploadFile;
+    @Resource
+    private CommunityService communityService;
+
 
     /**
      * 登录
@@ -103,6 +108,91 @@ public class AgentApi {
         }
     }
 
+    /**
+     * 发布房源
+     */
+    @RequestMapping(value = "publishHouse", method = RequestMethod.POST)
+    public String publishHouse(@RequestParam(required = false) MultipartFile image1,@RequestParam(required = false) MultipartFile image2,
+                               @RequestParam(required = false) MultipartFile image3,@RequestParam(required = false) MultipartFile image4,
+                               @RequestParam(required = false) MultipartFile image5,
+                               Integer userId,Integer sellhouseId,String title,BigDecimal price,String tags,Community community,
+                               String layout,BigDecimal area,String floor,String renovation,String orientation,String purpose,
+                               String features) {
+        try {
+            if(userId == null || sellhouseId == null || community == null){
+                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("userId或sellhouseId或community为空"));
+            }
+            Community origComm = communityService.findByUid(community.getUid());
+            if (null == origComm) {
+                communityService.create(community);
+            }
+            List<String> imagePathList = new ArrayList<String>();
+            if(image1 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image1,sellhouseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image2 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image2,sellhouseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image3 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image3,sellhouseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image4 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image4,sellhouseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image5 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image5,sellhouseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            User agent = userService.findById(userId);
+            if(agent == null){
+                throw new BizException("查询到用户为空userId:"+userId);
+            }
+            SellHouse sellHouse = sellHouseService.findById(sellhouseId);
+            if(sellHouse == null){
+                throw new BizException("查询到sellHouse为空sellhouseId:"+sellhouseId);
+            }
+            House house = new House();
+            house.setPrice(price);
+            house.setAgent(agent);
+            house.setCommunity(community);
+            house.setSellHouse(sellHouse);
+            house.setStatus(HouseStatus.SAVED.getCode());
+            house.setAddTime(new Date());
+            house.setArea(area);
+            house.setFeature(features);
+            house.setFloor(floor);
+            house.setRenovation(renovation);
+            house.setOrientation(orientation);
+            house.setLayout(layout);
+            house.setTitle(title);
+            house.setTags(tags);
+            house.setPurpose(purpose);
+            house.setPublishTime(new Date());
+            house.setImgs(JsonUtil.obj2Json(imagePathList));
+            houseService.create(house);
+            return JsonUtil.obj2ApiJson(Result.success());
+        } catch (BizException e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001).data(e.getMessage()));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001));
+        }
+    }
 
     /**
      * 删除房源
@@ -526,5 +616,7 @@ public class AgentApi {
         result.put("user", user);
         return result;
     }
+
+
 
 }
