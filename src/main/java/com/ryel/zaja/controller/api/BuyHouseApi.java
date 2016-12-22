@@ -72,17 +72,37 @@ public class BuyHouseApi {
 
     }
 
-    @RequestMapping(value = "onebuyhouse", method = RequestMethod.POST)
+    /**
+     * 已废弃
+     * @param community
+     * @param userId
+     * @param price
+     * @param layout
+     * @param renovation
+     * @param area
+     * @return
+     */
+   /* @RequestMapping(value = "onebuyhouse", method = RequestMethod.POST)
     public Result oneBuyHouse(Integer id) {
         BuyHouse origBuyHouse = buyHouseService.findById(id);
         if (null == origBuyHouse) {
             return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
         }
         return Result.success().msg("").data(origBuyHouse);
-    }
+    }*/
 
+    /**
+     * 发布买房需求
+     * @param community
+     * @param userId
+     * @param price
+     * @param layout
+     * @param renovation
+     * @param area
+     * @return
+     */
     @RequestMapping(value = "buyhouse", method = RequestMethod.POST)
-    public Result buyHouse(String community, Integer userId, String buyPrice,
+    public Result buyHouse(String community, Integer userId, String price,
                            String layout, String renovation, String area) {
 //        String cutComm = community.substring(1,community.length()-1);
 
@@ -127,7 +147,7 @@ public class BuyHouseApi {
         buyHouse.setCommunity(commUids);
         buyHouse.setUser(userService.findById(userId));
 
-        String[] pri = buyPrice.split("\\|");
+        String[] pri = price.split("\\|");
         if(1 == pri.length){
             buyHouse.setMinPrice(new BigDecimal(pri[0]));
         }else if(!StringUtils.isNotBlank(pri[0])){

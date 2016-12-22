@@ -63,20 +63,20 @@ public class AgentApi {
     public Result login(String mobile, String password) {
         try {
             if (StringUtils.isBlank(mobile) || StringUtils.isBlank(password)) {
-                return Result.success().msg(Error_code.ERROR_CODE_0022).data("用户名或密码为空");
+                return Result.error().msg(Error_code.ERROR_CODE_0022).data(new HashMap<>());
             }
             User user = userService.agentLogin(mobile, password);
             if (user == null) {
-                return Result.success().msg(Error_code.ERROR_CODE_0004).data("用户名或密码错误");
+                return Result.error().msg(Error_code.ERROR_CODE_0004).data(new HashMap<>());
             }
             AgentMaterial agentMaterial = agentMaterialService.findByAgentId(user.getId());
             Map<String,Object> data = new HashMap<String,Object>();
             data.put("user",user);
             data.put("agentMaterial",agentMaterial);
-            return Result.success().data(data);
+            return Result.success().msg("").data(data);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001).data("服务器异常");
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -92,13 +92,13 @@ public class AgentApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0010);
             }
             userService.agentRegister(user,agentMaterial,verifyCode);
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(e.getMessage());
+            return Result.error().msg(e.getMessage()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -112,10 +112,10 @@ public class AgentApi {
     public Result deleteHouse(int houseId) {
         try {
             houseService.agentDeleteHouse(houseId);
-            return Result.success().msg("");
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -128,10 +128,10 @@ public class AgentApi {
     public Result modifyHouse(House house) {
         try {
             houseService.update(house);
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -151,13 +151,13 @@ public class AgentApi {
             Page<House> houses = houseService.pageByAgentId(userId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(houses);
             return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -180,13 +180,13 @@ public class AgentApi {
             Page<House> houses = houseService.pageByCommunityUid(communityUid,status,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(houses);
-            return Result.success().data(dataMap);
+            return Result.success().data(dataMap).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -204,13 +204,13 @@ public class AgentApi {
             status.add(HouseStatus.IN_CONNECT.getCode());
             Page<House> houses = houseService.agentPage(status, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(houses);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -230,13 +230,13 @@ public class AgentApi {
             Page<HouseOrder> page = houseOrderService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -256,13 +256,13 @@ public class AgentApi {
             Page<BuyHouse> page = agentBuyHouseService.pageBuyHouseByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -282,13 +282,13 @@ public class AgentApi {
             Page<SellHouse> page = agentSellHouseService.pageSellHouseByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -309,7 +309,7 @@ public class AgentApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.success().msg(Error_code.ERROR_CODE_0001);
@@ -333,7 +333,7 @@ public class AgentApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.success().msg(Error_code.ERROR_CODE_0001);
@@ -354,25 +354,25 @@ public class AgentApi {
             house.setId(houseId);
             User user = new User();
             user.setId(buyerId);
-            Community community = new Community();
-            community.setUid(communityUid);
+//            Community community = new Community();
+//            community.setUid(communityUid);
 
             HouseOrder houseOrder = new HouseOrder();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setCommunity(community);
+            houseOrder.setCommunity(communityUid);
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setBuyerMobile(toMobile);
 
             houseService.agentPutawayHouse(houseId);
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(e.getMessage());
+            return Result.error().msg(e.getMessage()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -384,13 +384,13 @@ public class AgentApi {
     public Result putawayHouse(Integer houseId) {
         try {
             houseService.agentPutawayHouse(houseId);
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(e.getMessage());
+            return Result.error().msg(e.getMessage()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -402,13 +402,13 @@ public class AgentApi {
     public Result soldOutHouse(Integer houseId) {
         try {
             houseService.agentSoldOutHouse(houseId);
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(e.getMessage());
+            return Result.error().msg(e.getMessage()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -419,7 +419,7 @@ public class AgentApi {
     public Result receiveOrder(Integer demandId,Integer userId,String type) {
         try {
             if(demandId == null || ("10".equals(type) && "20".equals(type))){
-                return Result.success().msg(Error_code.ERROR_CODE_0023);
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             User user = new User();
             user.setId(userId);
@@ -438,10 +438,10 @@ public class AgentApi {
                 agentSellHouse.setSellHouse(sellHouse);
                 agentSellHouseService.save(agentSellHouse);
             }
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -463,10 +463,10 @@ public class AgentApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().data(dataMap);
+            return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.success().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 

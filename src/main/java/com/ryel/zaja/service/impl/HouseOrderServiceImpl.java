@@ -1,9 +1,13 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.config.Error_code;
+import com.ryel.zaja.config.enums.HouseOrderStatus;
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.entity.HouseOrder;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseOrderService;
+import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +41,44 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public List<HouseOrder> list(Integer id) {
         return houseOrderDao.list(id);
+    }
+
+    @Override
+    @Transactional
+    public HouseOrder update(HouseOrder houseOrder) {
+        HouseOrder origHouseOrder = check(houseOrder.getId());
+        ClassUtil.copyProperties(origHouseOrder, houseOrder);
+        return houseOrderDao.save(houseOrder);
+    }
+
+    /**
+     * 确认交接
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @Override
+    @Transactional
+    public HouseOrder confirm(Integer userId, Integer houseOrderId){
+        HouseOrder houseOrder = check(houseOrderId);
+        if(!HouseOrderStatus.WAIT_USER_COMFIRM.getCode().equals(houseOrder.getStatus())){
+            throw new BizException(Error_code.ERROR_CODE_0025);
+        }
+        houseOrder.setStatus(HouseOrderStatus.WAIT_COMMENT.getCode());
+        return update(houseOrder);
+    }
+
+    public HouseOrder check(Integer houseOrderId){
+        HouseOrder houseOrder = findById(houseOrderId);
+        if(null == houseOrder){
+            throw new BizException(Error_code.ERROR_CODE_0025);
+        }
+        return  houseOrder;
+    }
+
+    @Override
+    public Page<HouseOrder> pageByUserId(Integer userId, Pageable pageable) {
+        return houseOrderDao.pageByUserId(userId,pageable);
     }
 
     @Override

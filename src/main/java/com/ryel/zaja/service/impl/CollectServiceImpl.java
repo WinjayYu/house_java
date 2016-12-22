@@ -46,8 +46,8 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     public Collect create(Integer userId, Integer houseId) {
 
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
-        if(null == collect){
-                this.save(collect);
+        if(null != collect){
+                throw new BizException("已收藏过!");
         }else {
 
             collect = new Collect();
@@ -61,7 +61,6 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
             collectDao.save(collect);
             return collect;
         }
-        return null;
     }
 
     @Override

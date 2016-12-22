@@ -18,4 +18,5 @@ public interface CollectService extends ICommonService<Collect>{
     boolean check(Integer userid, Integer houseId);
 
     Page<Collect> pageByUserId(Integer userId, Integer pageNum, Integer pageSize);
+
 }

@@ -75,6 +75,10 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
     }
 
 
+    @Override
+    public Page<Comment> findOneComment(Integer agentId, Pageable pageable) {
+        return commentDao.findOneComment(agentId, pageable);
+    }
 
     @Override
     public Page<Comment> pageByAgentId(Integer agentId, Pageable pageable) {

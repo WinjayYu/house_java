@@ -12,6 +12,13 @@ public interface HouseOrderService extends ICommonService<HouseOrder> {
 
     HouseOrder create(HouseOrder houseOrder);
 
+    HouseOrder update(HouseOrder houseOrder);
+
     List<HouseOrder> list(Integer id);
+
     Page<HouseOrder> pageByAgentId(Integer agentId, Pageable pageable);
+
+    Page<HouseOrder> pageByUserId(Integer agentId, Pageable pageable);
+
+    HouseOrder confirm(Integer userId, Integer houseOrderId);
 }

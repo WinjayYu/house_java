@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public interface FilterDao {
-    List<House> findByFilter(String sellPrice,
+    List<House> findByFilter(String price,
                              String area,
                              String type,
                              String decoration,

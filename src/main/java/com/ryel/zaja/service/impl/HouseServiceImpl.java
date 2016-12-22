@@ -217,16 +217,16 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                     if (1 == arr.length) {
                         BigDecimal bg = new BigDecimal(arr[0]);
                         //double d = Double.parseDouble(arr[0]);
-                        Predicate predicate = cb.lessThan(root.get("sellPrice").as(BigDecimal.class), bg);
+                        Predicate predicate = cb.lessThan(root.get("price").as(BigDecimal.class), bg);
                         predicateList.add(predicate);
                     } else if (!StringUtils.isNotBlank(arr[0])) {
                         BigDecimal bg = new BigDecimal(arr[1]);
-                        Predicate predicate = cb.greaterThan(root.get("sellPrice").as(BigDecimal.class), bg);
+                        Predicate predicate = cb.greaterThan(root.get("price").as(BigDecimal.class), bg);
                         predicateList.add(predicate);
                     } else {
                         BigDecimal bg1 = new BigDecimal(arr[0]);
                         BigDecimal bg2 = new BigDecimal(arr[1]);
-                        Predicate predicate = cb.between(root.get("sellPrice").as(BigDecimal.class), bg1, bg2);
+                        Predicate predicate = cb.between(root.get("price").as(BigDecimal.class), bg1, bg2);
                         predicateList.add(predicate);
                     }
                 }
