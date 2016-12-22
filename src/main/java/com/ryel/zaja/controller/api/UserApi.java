@@ -71,10 +71,10 @@ public class UserApi {
         String origVerCode = valueops.get(user.getMobile());
 //        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
         if (null == origVerCode) {
-            return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
+            return Result.error().msg(Error_code.ERROR_CODE_0010).data("").data(new HashMap<>());
         }
         if (!origVerCode.equals(verCode)) {
-            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object());
+            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object()).data(new HashMap<>());
         }
         try {
             user.setHead("");

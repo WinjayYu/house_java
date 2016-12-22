@@ -40,9 +40,11 @@ public class CollectApi {
 
         try{
             collectService.create(userId, houseId);
-        }catch (RuntimeException e){
-            logger.error(e.getMessage(), e);
+        }catch (BizException be){
             return Result.error().msg(Error_code.ERROR_CODE_0021).data(new HashMap<>());
+        }catch(Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
         return Result.success().msg("").data(new HashMap<>());
     }
@@ -53,7 +55,7 @@ public class CollectApi {
      * @param houseId
      * @return
      */
-    @RequestMapping(value = "cancelCollect")
+    @RequestMapping(value = "cancelcollect")
     public Result cancelCollect(Integer userId, Integer houseId){
         try{
             collectService.cancelCollect(userId, houseId);

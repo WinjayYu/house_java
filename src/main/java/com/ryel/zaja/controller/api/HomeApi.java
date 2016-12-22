@@ -141,6 +141,7 @@ public class HomeApi {
         List<House> sortHouses = new ArrayList<>();
         for (int b = list.size() - 1; b >= 0; b--) {
             sortHouses.add(houses.get(list.get(b)));
+            if(20 == sortHouses.size()) break;
         }
         return sortHouses;
 

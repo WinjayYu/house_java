@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,9 +88,26 @@ public class CommentApi {
             Page<Comment> page = commentService.findByAgentId(userId, pageNum, pageSize);
             if(null != page){
                 Map<String, Object> dataMap = APIFactory.fitting(page);
-                return Result.success().data(dataMap);
+                return Result.success().msg("").data(dataMap);
             }
             return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+    }
+
+    @RequestMapping(value = "findonecomment", method = RequestMethod.POST)
+    public Result findOneComment(Integer userId){
+        try{
+            Page<Comment> page = commentService.findOneComment(userId,
+                    new PageRequest(0, 1, Sort.Direction.DESC, "addTime"));
+            if(null != page){
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                return Result.success().msg("").data(dataMap);
+            }else{
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            }
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());

@@ -23,4 +23,7 @@ public interface CommentDao extends JpaRepository<Comment, Integer>,JpaSpecifica
 
     @Query("select u from Comment u where u.agent.id = ?1")
     Page<Comment> pageByAgentId(Integer agentId, Pageable pageable);
+
+    @Query("select c from Comment c where c.agent.id = ?1")
+     Page<Comment> findOneComment(Integer agentId, Pageable pageable);
 }
