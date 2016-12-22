@@ -164,7 +164,6 @@ public class AgentApi {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
@@ -218,7 +217,6 @@ public class AgentApi {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
 
