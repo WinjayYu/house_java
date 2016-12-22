@@ -23,6 +23,11 @@ public class BizUploadFile {
         return uploadToQiniu(file,bizPath);
     }
 
+    public String uploadUserImageToQiniu(MultipartFile file,Integer userId){
+        String bizPath = "user/" + userId + "/";
+        return uploadToQiniu(file,bizPath);
+    }
+
     private String uploadToQiniu(MultipartFile file, String bizPath) {
         try {
             FileBo fileBo = defaultUploadFile.uploadFile(file.getOriginalFilename(), file.getInputStream());
