@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,6 +67,14 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
         }
         houseOrder.setStatus(HouseOrderStatus.WAIT_COMMENT.getCode());
         return update(houseOrder);
+    }
+
+    /**
+     * 根据房源id查询已经付过款的订单
+     */
+    @Override
+    public List<HouseOrder> findPayedOrderByHouseId(Integer houseId) {
+        return houseOrderDao.findPayedOrderByHouseId(houseId,HouseOrderStatus.getPayedList());
     }
 
     public HouseOrder check(Integer houseOrderId){

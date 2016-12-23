@@ -21,4 +21,6 @@ public interface HouseOrderService extends ICommonService<HouseOrder> {
     Page<HouseOrder> pageByUserId(Integer agentId, Pageable pageable);
 
     HouseOrder confirm(Integer userId, Integer houseOrderId);
+
+    List<HouseOrder> findPayedOrderByHouseId(Integer houseId);
 }

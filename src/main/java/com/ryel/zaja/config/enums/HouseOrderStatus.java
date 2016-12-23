@@ -1,6 +1,8 @@
 package com.ryel.zaja.config.enums;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 //订单状态：10=未接单、20=待支付、30=经济人待确认、40=用户待确认、50=待评价、60=已完成
@@ -28,6 +30,15 @@ public enum HouseOrderStatus {
 
     public String getDesc() {
         return desc;
+    }
+
+    public static List<String> getPayedList() {
+        List<String> status = new ArrayList<String>();
+        status.add(HouseOrderStatus.WAIT_AGENT_COMFIRM.getCode());
+        status.add(HouseOrderStatus.WAIT_USER_COMFIRM.getCode());
+        status.add(HouseOrderStatus.WAIT_COMMENT.getCode());
+        status.add(HouseOrderStatus.FINISHED.getCode());
+        return status;
     }
 
     public static Map<String, String> getEnumMap() {
