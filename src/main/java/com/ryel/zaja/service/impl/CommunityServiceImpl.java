@@ -5,6 +5,9 @@ import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.CommunityService;
+import com.ryel.zaja.utils.ClassUtil;
+import com.ryel.zaja.utils.JsonUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,7 +28,9 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
 
     @Override
     public Community update(Community community) {
-        return community;
+        Community dest  = findByUid(community.getUid());
+        ClassUtil.copyProperties(dest, community);
+        return save(dest);
     }
 
     @Override
@@ -57,6 +62,21 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
     @Override
     public Community findByUid(String uid) {
         return communityDao.findByUid(uid);
+    }
+
+    @Override
+    @Transactional
+    public Community createOrUpdateByUid(Community community) {
+        if(community == null || StringUtils.isBlank(community.getUid())){
+            throw new BizException("","创建/更新小区时，小区信息错误,community:" + JsonUtil.obj2Json(community));
+        }
+        Community temp = findByUid(community.getUid());
+        if(temp == null){
+            create(community);
+        }else {
+            update(community);
+        }
+        return community;
     }
 
     @Override

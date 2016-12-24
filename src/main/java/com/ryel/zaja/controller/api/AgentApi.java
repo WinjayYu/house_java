@@ -2,6 +2,8 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.HouseOrderStatus;
+import com.ryel.zaja.config.enums.HouseOrderType;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
@@ -9,6 +11,7 @@ import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.GetDistanceUtil;
+import com.ryel.zaja.utils.BizUtil;
 import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.MapSortUtils;
 import com.ryel.zaja.utils.bean.FileBo;
@@ -491,13 +494,11 @@ public class AgentApi {
             house.setId(houseId);
             User user = new User();
             user.setId(buyerId);
-//            Community community = new Community();
-//            community.setUid(communityUid);
-
             HouseOrder houseOrder = new HouseOrder();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
             houseOrder.setCommunity(uid);
+            houseOrder.setCommunity(communityService.findByUid(communityUid));
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setBuyerMobile(toMobile);
@@ -682,6 +683,98 @@ public class AgentApi {
             }
         }catch (Exception e){
             logger.error(e.getMessage(),e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    /**
+     * 经济人发布订单
+     */
+    @RequestMapping(value = "agentpublishorder")
+    public Result agentpublishorder(Integer userId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
+                                    String toMobile) {
+        try {
+            HouseOrder houseOrder = new HouseOrder();
+            // 查经济人
+            User agent = userService.findById(userId);
+            if (agent == null) {
+                throw new BizException(Error_code.PARAM_ERROR, "查询用户信息为空");
+            }
+            // 查买房人
+            User user = userService.findByMobile(toMobile);
+            if (user == null) {
+                throw new BizException(Error_code.PARAM_ERROR, "根据toMobile查询user为空");
+            }
+            // 订单类型
+            String type;
+            if (houseId != null) {
+                type = HouseOrderType.FROM_HOUSE.getCode();
+                House house = houseService.findById(houseId);
+                if(house == null){
+                    throw new BizException(Error_code.data_ERROR, "查询到house is null");
+                }
+                List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);
+                if(!CollectionUtils.isEmpty(list)){
+                    throw new BizException(Error_code.house_order_payed, "房源已经存在已支付的订单");
+                }
+                houseOrder.setHouse(house);
+                houseOrder.setCommunity(house.getCommunity());
+                houseOrder.setSeller(house.getSellHouse().getUser());
+            } else {
+                type = HouseOrderType.FROM_CUSTOM.getCode();
+                if (area == null || price == null || community == null
+                        || StringUtils.isBlank(community.getUid()) || StringUtils.isBlank(community.getName())) {
+                    throw new BizException(Error_code.PARAM_ERROR, "houseId为空，且其他信息也为空");
+                }
+                Community origComm = communityService.findByUid(community.getUid());
+                if (null == origComm) {
+                    communityService.create(community);
+                }
+                houseOrder.setCommunity(community);
+                houseOrder.setArea(area);
+                houseOrder.setPrice(price);
+            }
+            // 生产订单号
+            String code = BizUtil.getOrderCode();
+            houseOrder.setAgent(agent);
+            houseOrder.setBuyer(user);
+            houseOrder.setBuyerMobile(toMobile);
+            houseOrder.setStatus(HouseOrderStatus.NO_ORDER.getCode());
+            houseOrder.setType(type);
+            houseOrder.setAddTime(new Date());
+            houseOrder.setCode(code);
+            houseOrderService.save(houseOrder);
+            return Result.success();
+        } catch (BizException e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(e.getCode());
+        }catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    /**
+     * 经济人确定订单
+     */
+    @RequestMapping(value = "agentconfirmorder")
+    public Result agentconfirmorder(Integer userId, Integer orderId){
+        try {
+            if (userId == null || orderId == null) {
+                return Result.error().msg(Error_code.ERROR_CODE_0023);
+            }
+            HouseOrder order = houseOrderService.findById(orderId);
+            if(order == null){
+                return Result.error().msg(Error_code.ERROR_CODE_0025);
+            }
+            if(!HouseOrderStatus.WAIT_AGENT_COMFIRM.getCode().equals(order.getStatus())){
+                return Result.error().msg(Error_code.ERROR_CODE_0025);
+            }
+            order.setStatus(HouseOrderStatus.WAIT_USER_COMFIRM.getCode());
+            houseOrderService.update(order);
+            return Result.success();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }

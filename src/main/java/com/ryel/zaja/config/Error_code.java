@@ -54,4 +54,10 @@ public interface Error_code {
 
     String ERROR_CODE_0025 = "error_25";  // 数据异常，请刷新后重试
 
+    String PARAM_ERROR     = "param_error";  // 必填参数为空或参数错误
+
+    String data_ERROR      = "data_error";   // 数据异常，请刷新后重试
+
+    String house_order_payed = "house_order_payed";   // 房源已经存在已支付的订单
+
 }
