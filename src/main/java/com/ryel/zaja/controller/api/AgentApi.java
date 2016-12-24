@@ -36,7 +36,7 @@ import java.util.*;
  * 经济人相关功能
  */
 @RestController()
-@RequestMapping("/api/agent/")
+@RequestMapping(value = "/api/agent/",produces = "application/json; charset=UTF-8")
 public class AgentApi {
     protected final static Logger logger = LoggerFactory.getLogger(BuyHouseApi.class);
     @Autowired
