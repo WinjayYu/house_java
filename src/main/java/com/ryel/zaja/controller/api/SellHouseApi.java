@@ -108,7 +108,7 @@ public class SellHouseApi {
             sellHouse.setRenovation(renovation);
             sellHouse.setArea(area);
             sellHouse.setStatus(SellHouseStatus.PUBLISHED.getCode());
-            sellHouse.setHouseNum(0);
+//            sellHouse.setHouseNum(0);
             sellHouseService.create(sellHouse);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
