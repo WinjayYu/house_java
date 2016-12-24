@@ -32,8 +32,14 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
     List<House> findByCommunityUid(String uid, List<String> status);
 
+    @Query("select h from House h where h.agent.id = ?1 and h.sellHouse.id = ?2")
+    List<House> findByAgentIdAndSellHouseId(Integer agentId, Integer sellHouseId);
+
     @Query("select h from House h where abs(h.price - ?1) < 100000 or (h.community.uid = ?2 or h.area = ?3 or h.renovation = ?4) order by h.price asc")
     List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation);
+
+    @Query("select h from House h where h.status in ?5 and( abs(h.price - ?1) < 100000 or (h.community.uid = ?2 or h.area = ?3 or h.renovation = ?4))  order by h.price asc")
+    List<House> agentFindSimilar(BigDecimal price, String uid, BigDecimal area, String renovation,List<String> status);
 
     @Query("select b from House b where b.agent.id = ?1")
     Page<House> pageByAgentId(Integer agentId, Pageable pageable);

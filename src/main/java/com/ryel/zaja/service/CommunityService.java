@@ -28,4 +28,6 @@ public interface CommunityService extends ICommonService<Community>{
     List<Community> list();
 
     Page<Community> findByPage(String name, final Integer type, int pageNum, int pageSize);
+
+    List<Community> listByUids(String uids);
 }

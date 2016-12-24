@@ -1,15 +1,21 @@
 package com.ryel.zaja.service.impl;
 
 import com.ryel.zaja.config.Error_code;
+import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.AgentRegisterStatus;
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
+import com.ryel.zaja.dao.AgentMaterialDao;
 import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.AgentMaterial;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.exception.UserException;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.AgentMaterialService;
+import com.ryel.zaja.service.BizUploadFile;
 import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.utils.ClassUtil;
+import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +25,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -40,6 +48,10 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     private UserDao userDao;
     @Autowired
     private AgentMaterialService agentMaterialService;
+    @Autowired
+    private AgentMaterialDao agentMaterialDao;
+    @Autowired
+    private BizUploadFile bizUploadFile;
 
 
     @Autowired
@@ -114,9 +126,10 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Override
     @Transactional
-    public void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode) {
-        // TODO: 2016/12/18 校验经济人图片信息
-        if(user == null 
+    public void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
+                              MultipartFile positive, MultipartFile negative, MultipartFile companyPic) {
+        // 校验参数
+        if(user == null
                 || agentMaterial == null
                 || StringUtils.isBlank(user.getMobile())
                 || StringUtils.isBlank(user.getPassword())
@@ -124,14 +137,42 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
                 || StringUtils.isBlank(agentMaterial.getCompanyName())
                 || StringUtils.isBlank(agentMaterial.getCompanyCode())
                 ){
-            throw new BizException(Error_code.ERROR_CODE_0023);
+            throw new BizException(Error_code.ERROR_CODE_0023, "必填参数为空,user:" + JsonUtil.obj2Json(user)
+                    + ",agentMaterial:" + JsonUtil.obj2Json(agentMaterial));
         }
-        User u = userDao.findByMobile(user.getMobile());
-        if(u != null){
-            throw new BizException(Error_code.ERROR_CODE_0024);
+        if(positive == null || negative == null || companyPic == null){
+            throw new BizException(Error_code.ERROR_CODE_0023, "有图片为空");
         }
+        User agent = userDao.findByMobile(user.getMobile());
+        if(agent != null){
+            throw new BizException(Error_code.ERROR_CODE_0024,"用户已经存在");
+        }
+        List<AgentMaterial> agentMaterialList = agentMaterialDao.findByIdcard(agentMaterial.getIdcard());
+        if(!CollectionUtils.isEmpty(agentMaterialList)){
+            throw new BizException(Error_code.card_exist,"身份证已经存在");
+        }
+        // 保存用户
+        user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态
+        user.setType(UserType.AGENT.getCode());
         create(user);
+        // 上传图片
+        String positivePath = bizUploadFile.uploadUserImageToQiniu(positive,user.getId());
+        if(StringUtils.isBlank(positivePath)){
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+        }
+        String negativePath = bizUploadFile.uploadUserImageToQiniu(negative,user.getId());
+        if(StringUtils.isBlank(negativePath)){
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+        }
+        String companyPicPath = bizUploadFile.uploadUserImageToQiniu(companyPic,user.getId());
+        if(StringUtils.isBlank(companyPicPath)){
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+        }
+        // 保存扩展信息
         agentMaterial.setAgent(user);
+        agentMaterial.setPositive(positivePath);
+        agentMaterial.setNegative(negativePath);
+        agentMaterial.setCompanyPic(companyPicPath);
         agentMaterialService.save(agentMaterial);
     }
 

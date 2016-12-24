@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,24 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
     @Override
     public Page<Community> findByPage(String name, Integer type, int pageNum, int pageSize) {
         return null;
+    }
+
+    /**
+     * 根据uid字符串（uid用|分隔）查询list
+     */
+    @Override
+    public List<Community> listByUids(String uids) {
+        List<Community> list = new ArrayList<Community>();
+        if(StringUtils.isNotBlank(uids)){
+            String[] arr = uids.split("\\|");
+            for(String uid : arr){
+                Community community = findByUid(uid.trim());
+                if(community != null){
+                    list.add(community);
+                }
+            }
+        }
+        return list;
     }
 
     @Override
@@ -81,6 +100,6 @@ public class CommunityServiceImpl extends AbsCommonService<Community> implements
 
     @Override
     public JpaRepository<Community, Integer> getDao() {
-        return null;
+        return communityDao;
     }
 }

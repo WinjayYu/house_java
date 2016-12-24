@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 买房需求
@@ -45,6 +46,9 @@ public class BuyHouse implements Serializable {
     //以字符串的形式存到数据库，因为用户可以发1-5个小区，已"|"隔开
     @Column(name = "community_uid")
     private String community;
+
+    @Transient
+    private List<Community> communityList;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -146,5 +150,13 @@ public class BuyHouse implements Serializable {
 
     public void setLastModifiedTime(Date lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public List<Community> getCommunityList() {
+        return communityList;
+    }
+
+    public void setCommunityList(List<Community> communityList) {
+        this.communityList = communityList;
     }
 }

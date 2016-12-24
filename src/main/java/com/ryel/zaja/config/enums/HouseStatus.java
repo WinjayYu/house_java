@@ -1,6 +1,8 @@
 package com.ryel.zaja.config.enums;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum HouseStatus {
@@ -28,6 +30,14 @@ public enum HouseStatus {
     public String getDesc() {
         return desc;
     }
+
+    public static List<String> getAgentCanSeeStatus() {
+        List<String> status = new ArrayList<String>();
+        status.add(HouseStatus.PUTAWAY_YET.getCode());
+        status.add(HouseStatus.IN_CONNECT.getCode());
+        return status;
+    }
+
 
     public static Map<String, String> getEnumMap() {
         Map<String, String> map = new LinkedHashMap<>();

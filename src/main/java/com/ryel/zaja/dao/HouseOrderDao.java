@@ -28,4 +28,7 @@ public interface HouseOrderDao extends JpaRepository<HouseOrder, Integer> ,JpaSp
     @Query("select h from HouseOrder h where h.buyer.id = ?1")
     Page<HouseOrder> pageByUserId(Integer agentId, Pageable pageable);
 
+    @Query("select h from HouseOrder h where h.agent.id = ?1 and h.status in?2")
+    Page<HouseOrder> findPayedOrderByAgentId(Integer agentId,List<String> status, Pageable pageable);
+
 }

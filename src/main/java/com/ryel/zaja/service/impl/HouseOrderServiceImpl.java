@@ -1,16 +1,20 @@
 package com.ryel.zaja.service.impl;
 
 import com.ryel.zaja.config.Error_code;
+import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseOrderDao;
+import com.ryel.zaja.entity.Comment;
 import com.ryel.zaja.entity.HouseOrder;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +79,13 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public List<HouseOrder> findPayedOrderByHouseId(Integer houseId) {
         return houseOrderDao.findPayedOrderByHouseId(houseId,HouseOrderStatus.getPayedList());
+    }
+
+    @Override
+    public List<HouseOrder> findPayedOrderByAgentId(Integer agentId) {
+        Page<HouseOrder> page = houseOrderDao.findPayedOrderByAgentId(agentId, HouseOrderStatus.getPayedList(),
+                new PageRequest(0, 20, Sort.Direction.DESC, "id"));
+        return page.getContent();
     }
 
     public HouseOrder check(Integer houseOrderId){

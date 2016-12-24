@@ -19,6 +19,8 @@ public interface HouseService extends ICommonService<House> {
 
     List<House> findByCommunityUid(String uid, String type);
 
+    List<House> findByAgentIdAndSellHouseId(Integer agentId,Integer sellHouseId);
+
     List<House> findByCity(String city);
 
     Page<House> findByUid(String uid,String type, Pageable pageable);
@@ -26,6 +28,8 @@ public interface HouseService extends ICommonService<House> {
     List<House> findByLayout(String houseType, String type);
 
     List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation);
+
+    List<House> agentFindSimilar(BigDecimal price, String uid, BigDecimal area, String renovation);
 
     Page<House> filter(int pageNum,
                        int pageSize,

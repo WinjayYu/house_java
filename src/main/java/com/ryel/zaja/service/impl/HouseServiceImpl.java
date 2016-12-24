@@ -134,6 +134,11 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
+    public List<House> findByAgentIdAndSellHouseId(Integer agentId, Integer sellHouseId) {
+        return houseDao.findByAgentIdAndSellHouseId(agentId,sellHouseId);
+    }
+
+    @Override
     public Page<House> findByUid(String uid,String type, Pageable pageable) {
         List<String> list = new ArrayList<>();
         if (UserType.AGENT.getCode().equals(type)) {
@@ -182,6 +187,11 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Override
     public List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation) {
         return houseDao.findSimilar(price, uid, area, renovation);
+    }
+
+    @Override
+    public List<House> agentFindSimilar(BigDecimal price, String uid, BigDecimal area, String renovation) {
+        return houseDao.agentFindSimilar(price, uid, area, renovation,HouseStatus.getAgentCanSeeStatus());
     }
 
     @Override

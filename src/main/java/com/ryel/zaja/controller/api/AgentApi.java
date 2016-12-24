@@ -4,15 +4,14 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.config.enums.HouseOrderType;
-import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.config.enums.HouseStatus;
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.BizUtil;
 import com.ryel.zaja.utils.JsonUtil;
-import com.ryel.zaja.utils.bean.FileBo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,20 +93,23 @@ public class AgentApi {
 
     /**
      * 注册
-     * 待开发
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
-    public Result register(User user, AgentMaterial agentMaterial,String verifyCode) {
+    public Result register(User user, AgentMaterial agentMaterial,String verifycode,
+                           @RequestParam(required = false) MultipartFile positiveFile,
+                           @RequestParam(required = false) MultipartFile negativeFile,
+                           @RequestParam(required = false) MultipartFile companyPicFile) {
         try {
+            // 校验验证码
             Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
-            if (origVerCode == null || StringUtils.isBlank(verifyCode) || !origVerCode.equals(verifyCode)) {
+            if (origVerCode == null || StringUtils.isBlank(verifycode) || !origVerCode.equals(verifycode)) {
                 return Result.error().msg(Error_code.ERROR_CODE_0010);
             }
-            userService.agentRegister(user,agentMaterial,verifyCode);
+            userService.agentRegister(user,agentMaterial,verifycode,positiveFile,negativeFile,companyPicFile);
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(e.getMessage()).data(new HashMap<>());
+            return Result.error().msg(e.getCode()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -202,8 +204,12 @@ public class AgentApi {
         }
     }
 
+    /**
+     * 查房
+     * （可以查询到房屋交接中的房屋）
+     */
     @RequestMapping(value = "houselist", method = RequestMethod.POST)
-    public Result houselist(Integer pageNum, Integer pageSize) {
+    public Result houselist(Integer pageNum, Integer pageSize,BigDecimal longitude,BigDecimal latitude,String cityName) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -319,6 +325,10 @@ public class AgentApi {
             Page<BuyHouse> page = buyHouseService.pageAll(pageNum,pageSize);
             if (null == page) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
+            }
+            for(BuyHouse buyHouse : page.getContent()){
+                List<Community> list = communityService.listByUids(buyHouse.getCommunity());
+                buyHouse.setCommunityList(list);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -480,6 +490,20 @@ public class AgentApi {
     }
 
     /**
+     * 我的佣金 前20条
+     */
+    @RequestMapping(value = "mycommission", method = RequestMethod.POST)
+    public Result mycommission(Integer agentId) {
+        try {
+            List<HouseOrder> list = houseOrderService.findPayedOrderByAgentId(agentId);
+            return Result.success().data(list);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
      * 发布房源
      */
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
@@ -490,57 +514,35 @@ public class AgentApi {
                                String layout,BigDecimal area,String floor,String renovation,String orientation,String purpose,
                                String features) {
         try {
-            if(userId == null || sellhouseId == null || community == null){
+            // 参数校验
+            if(userId == null || community == null){
                 return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("userId或sellhouseId或community为空"));
             }
-            Community origComm = communityService.findByUid(community.getUid());
-            if (null == origComm) {
-                communityService.create(community);
-            }
-            List<String> imagePathList = new ArrayList<String>();
-            if(image1 != null){
-                String path = bizUploadFile.uploadHouseImageToQiniu(image1,sellhouseId);
-                if(StringUtils.isNotBlank(path)){
-                    imagePathList.add(path);
-                }
-            }
-            if(image2 != null){
-                String path = bizUploadFile.uploadHouseImageToQiniu(image2,sellhouseId);
-                if(StringUtils.isNotBlank(path)){
-                    imagePathList.add(path);
-                }
-            }
-            if(image3 != null){
-                String path = bizUploadFile.uploadHouseImageToQiniu(image3,sellhouseId);
-                if(StringUtils.isNotBlank(path)){
-                    imagePathList.add(path);
-                }
-            }
-            if(image4 != null){
-                String path = bizUploadFile.uploadHouseImageToQiniu(image4,sellhouseId);
-                if(StringUtils.isNotBlank(path)){
-                    imagePathList.add(path);
-                }
-            }
-            if(image5 != null){
-                String path = bizUploadFile.uploadHouseImageToQiniu(image5,sellhouseId);
-                if(StringUtils.isNotBlank(path)){
-                    imagePathList.add(path);
-                }
-            }
+            // 小区校验
+            Community origComm = communityService.createOrUpdateByUid(community);
+            // 用户校验
             User agent = userService.findById(userId);
             if(agent == null){
                 throw new BizException("查询到用户为空userId:"+userId);
             }
-            SellHouse sellHouse = sellHouseService.findById(sellhouseId);
-            if(sellHouse == null){
-                throw new BizException("查询到sellHouse为空sellhouseId:"+sellhouseId);
-            }
             House house = new House();
+            // 判断sellhouseId是否存在
+            if(sellhouseId != null){
+                SellHouse sellHouse = sellHouseService.findById(sellhouseId);
+                if(sellHouse == null){
+                    throw new BizException("查询到sellHouse为空sellhouseId:"+sellhouseId);
+                }
+                // 判断经济人是否发布过房源
+                List<House> list = houseService.findByAgentIdAndSellHouseId(agent.getId(),sellhouseId);
+                if(!CollectionUtils.isEmpty(list)){
+                    return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.agent_publish_house_exist));
+                }
+                house.setSellHouse(sellHouse);
+            }
+
             house.setPrice(price);
             house.setAgent(agent);
             house.setCommunity(community);
-            house.setSellHouse(sellHouse);
             house.setStatus(HouseStatus.SAVED.getCode());
             house.setAddTime(new Date());
             house.setArea(area);
@@ -553,8 +555,43 @@ public class AgentApi {
             house.setTags(tags);
             house.setPurpose(purpose);
             house.setPublishTime(new Date());
-            house.setImgs(JsonUtil.obj2Json(imagePathList));
             houseService.create(house);
+
+            // 把图片更新进去
+            Integer houseId = house.getId();
+            List<String> imagePathList = new ArrayList<String>();
+            if(image1 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image1,houseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image2 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image2,houseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image3 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image3,houseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image4 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image4,houseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image5 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image5,houseId);
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            house.setImgs(JsonUtil.obj2Json(imagePathList));
+            houseService.update(house);
             return JsonUtil.obj2ApiJson(Result.success());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
@@ -601,10 +638,10 @@ public class AgentApi {
      * 相似房源
      */
     @RequestMapping(value = "similar", method = RequestMethod.POST)
-    public Result similarHouse(Integer houseId) {
+    public String similarHouse(Integer houseId) {
         House house = houseService.findById(houseId);
         Map<String, Object> similarHouse = new HashMap<String, Object>();
-        List<House> houses = houseService.findSimilar(house.getPrice(),
+        List<House> houses = houseService.agentFindSimilar(house.getPrice(),
                 house.getCommunity().getUid(),
                 house.getArea(),
                 house.getRenovation());
@@ -615,9 +652,9 @@ public class AgentApi {
                 }
             }
             similarHouse.put("list", houses);
-            return Result.success().msg("").data(similarHouse);
+            return JsonUtil.obj2ApiJson(Result.success().msg("").data(similarHouse));
         } else {
-            return Result.success().msg("").data(similarHouse.put("list", recommendService.findByStatus("10")));
+            return JsonUtil.obj2ApiJson(Result.success().msg("").data(similarHouse.put("list", recommendService.findByStatus("10"))));
         }
     }
 

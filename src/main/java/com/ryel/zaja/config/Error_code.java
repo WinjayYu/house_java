@@ -60,4 +60,8 @@ public interface Error_code {
 
     String house_order_payed = "house_order_payed";   // 房源已经存在已支付的订单
 
+    String card_exist = "card_exist";   // 身份证号已经存在了
+
+    String agent_publish_house_exist = "agent_publish_house_exist";   // 经济人已经发布过房源
+
 }
