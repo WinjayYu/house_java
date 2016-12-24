@@ -47,9 +47,6 @@ public class HomeApi {
     @Autowired
     private UserService userService;
 
-//    private final static String MANAGER = "10";
-//    private final static String USER = "20";
-//    private final static String AGENT = "30";
 
 
     @RequestMapping(value = "home", method = RequestMethod.POST)

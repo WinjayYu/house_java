@@ -4,6 +4,7 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.Collect;
+import com.ryel.zaja.entity.House;
 import com.ryel.zaja.service.CollectService;
 import com.ryel.zaja.utils.APIFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class CollectApi {
         try{
             collectService.create(userId, houseId);
         }catch (BizException be){
-            return Result.error().msg(Error_code.ERROR_CODE_0021).data(new HashMap<>());
+            return Result.error().msg(be.getMessage()).data(new HashMap<>());
         }catch(Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
@@ -97,7 +98,7 @@ public class CollectApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<Collect> page = collectService.pageByUserId(userId, pageNum, pageSize);
+            Page<House> page = collectService.pageByUserId(userId, pageNum, pageSize);
             if(null != page) {
                 Map<String, Object> dataMap = APIFactory.fitting(page);
                 return Result.success().data(dataMap);

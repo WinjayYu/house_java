@@ -18,8 +18,8 @@ public class BizUploadFile {
     @Autowired
     private DefaultUploadFile defaultUploadFile;
 
-    public String uploadHouseImageToQiniu(MultipartFile file,Integer houseId){
-        String bizPath = "house/" + houseId + "/";
+    public String uploadHouseImageToQiniu(MultipartFile file, String uid){
+        String bizPath = "house/" + uid + "/";
         return uploadToQiniu(file,bizPath);
     }
 

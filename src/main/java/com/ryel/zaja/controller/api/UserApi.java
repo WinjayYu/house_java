@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.DefaultUploadFile;
 import com.ryel.zaja.service.QiNiuService;
@@ -71,10 +72,10 @@ public class UserApi {
         String origVerCode = valueops.get(user.getMobile());
 //        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
         if (null == origVerCode) {
-            return Result.error().msg(Error_code.ERROR_CODE_0010).data("").data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
         }
         if (!origVerCode.equals(verCode)) {
-            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object()).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
         }
         try {
             user.setHead("");
@@ -87,9 +88,12 @@ public class UserApi {
                 user.setType("10");//用户
             }
             userService.create(user);
-        } catch (Exception e) {
+        } catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());//手机号被占用
+        }catch(Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0006).data("");//手机号被占用
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
 
         return Result.success().msg("").data(user2map(user));
@@ -251,23 +255,23 @@ public class UserApi {
             User user = userService.findByMobile(mobile);
 
             if (null == user) {
-                return Result.error().msg(Error_code.ERROR_CODE_0012);//手机号未注册用户
+                return Result.error().msg(Error_code.ERROR_CODE_0012).data(new HashMap<>());//手机号未注册用户
             }
 
             ValueOperations<String, String> valueops = redisTemplate.opsForValue();
             String origVerCode = valueops.get(mobile);
 
             if (null == origVerCode) {
-                return Result.error().msg(Error_code.ERROR_CODE_0010).data("");
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
             }
             if (!origVerCode.equals(verCode)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new Object());
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
             }
 
             user.setPassword(password);
             userService.update(user);
 
-            return Result.success().msg("").data("");
+            return Result.success().msg("").data(new HashMap<>());
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -308,4 +312,8 @@ public class UserApi {
 
         return Result.success().msg("").data(new HashMap<>());
     }
+
+//    public Result thirdLogin(String openid, ){
+//
+//    }
 }

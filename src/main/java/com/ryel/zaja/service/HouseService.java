@@ -68,4 +68,6 @@ public interface HouseService extends ICommonService<House> {
 
     House findById(Integer id);
 
+    Page<House> findBySellHouse(Integer userId, Pageable pageable);
+
 }
