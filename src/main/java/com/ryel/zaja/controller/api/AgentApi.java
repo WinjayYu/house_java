@@ -236,14 +236,7 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            List<String> status = new ArrayList<String>();
-            status.add(HouseStatus.PUTAWAY_YET.getCode());
-            status.add(HouseStatus.IN_CONNECT.getCode());
-            Page<House> houses = houseService.agentPage(status, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
-            }
-            Map<String, Object> dataMap = APIFactory.fitting(houses);
+            Map<String, Object> dataMap = houseService.agentPage(pageNum,pageSize,longitude,latitude,cityName);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by billyu on 2016/11/28.
@@ -59,7 +60,7 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable);
 
-    Page<House> agentPage(List<String> status, Pageable pageable);
+    Map<String, Object> agentPage(Integer pageNum, Integer pageSize, BigDecimal longitude, BigDecimal latitude, String cityName);
 
     void agentPutawayHouse(Integer houseId);
     void agentSoldOutHouse(Integer houseId);

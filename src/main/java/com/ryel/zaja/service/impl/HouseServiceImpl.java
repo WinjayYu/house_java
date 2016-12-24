@@ -10,6 +10,7 @@ import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.ICommonService;
+import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.ClassUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,9 @@ import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by billyu on 2016/11/28.
@@ -74,15 +77,50 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return houseDao.pageByCommunityUid(uid,status, pageable);
     }
     @Override
-    public Page<House> agentPage(List<String> status, Pageable pageable) {
+    public Map<String, Object> agentPage(Integer pageNum, Integer pageSize,BigDecimal longitude,BigDecimal latitude,String cityName) {
+        Map<String, Object> dataMap = new HashMap<String, Object>();
+        List<String> status = new ArrayList<String>();
+        status.add(HouseStatus.PUTAWAY_YET.getCode());
+        status.add(HouseStatus.IN_CONNECT.getCode());
+        Page<House> page;
+        if(StringUtils.isNotBlank(cityName)){
+            page = houseDao.agentPage(status, cityName, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+        }else {
+            page = houseDao.agentPage(status, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+        }
+
+        if(longitude != null && latitude != null){
             EntityManager em = emf.createEntityManager();
             //定义SQL
-            String sql = "SELECT h.* FROM house h LEFT JOIN user u ON fp.user_id = u.id WHERE fp.forum_id = ?";
-            Query query =  em.createNativeQuery(sql,User.class);
-            List<User> users = query.getResultList();
-            em.close();
+            String sql = "SELECT";
+            sql += "(SELECT ROUND(6378.138*2*ASIN(SQRT(POW(SIN((?*PI()/180-c.latitude*PI()/180)/2),2)+COS(?*PI()/180)*COS(c.latitude*PI()/180)*POW(SIN((?*PI()/180-c.longitude*PI()/180)/2),2))))) AS distance";
+            sql += ",h.* FROM house h INNER JOIN community c";
+            sql += " WHERE h.community_uid = c.uid AND c.latitude IS NOT NULL AND c.longitude IS NOT NULL";
+            sql += " and (h.`status` = ? or h.`status` = ?) ";
+            if(StringUtils.isNotBlank(cityName)){
+                sql += " and h.city = ?";
+            }
+            sql += " ORDER BY distance ASC LIMIT ?,?";
+            Query query;
+            if(StringUtils.isNotBlank(cityName)){
+                query =  em.createNativeQuery(sql,House.class).setParameter(1,latitude).setParameter(2,latitude).setParameter(3,longitude)
+                        .setParameter(4,HouseStatus.PUTAWAY_YET.getCode()).setParameter(5,HouseStatus.IN_CONNECT.getCode())
+                        .setParameter(6,cityName)
+                        .setParameter(7,pageNum - 1).setParameter(8,pageSize);
+            }else {
+                query =  em.createNativeQuery(sql,House.class).setParameter(1,latitude).setParameter(2,latitude).setParameter(3,longitude)
+                        .setParameter(4,HouseStatus.PUTAWAY_YET.getCode()).setParameter(5,HouseStatus.IN_CONNECT.getCode())
+                        .setParameter(6,pageNum - 1).setParameter(7,pageSize);
+            }
 
-        return houseDao.agentPage(status, pageable);
+            List<House> houseList = query.getResultList();
+            em.close();
+            dataMap = APIFactory.fitting(page,houseList);
+        }else {
+            dataMap = APIFactory.fitting(page);
+        }
+
+        return dataMap;
     }
 
     @Override
