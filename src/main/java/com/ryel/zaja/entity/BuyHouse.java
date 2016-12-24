@@ -47,6 +47,8 @@ public class BuyHouse implements Serializable {
     @Column(name = "community_uid")
     private String community;
 
+    private String city;
+
     @Transient
     private List<Community> communityList;
 
@@ -158,5 +160,13 @@ public class BuyHouse implements Serializable {
 
     public void setCommunityList(List<Community> communityList) {
         this.communityList = communityList;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

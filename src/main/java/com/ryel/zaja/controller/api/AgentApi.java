@@ -228,7 +228,7 @@ public class AgentApi {
      * （可以查询到房屋交接中的房屋）
      */
     @RequestMapping(value = "houselist", method = RequestMethod.POST)
-    public Result houselist(Integer pageNum, Integer pageSize,BigDecimal longitude,BigDecimal latitude,String cityName) {
+    public Result houselist(Integer pageNum, Integer pageSize,BigDecimal longitude,BigDecimal latitude,String cityname) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -236,7 +236,7 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Map<String, Object> dataMap = houseService.agentPage(pageNum,pageSize,longitude,latitude,cityName);
+            Map<String, Object> dataMap = houseService.agentPage(pageNum,pageSize,longitude,latitude,cityname);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -326,8 +326,8 @@ public class AgentApi {
     /**
      * 全部买房需求列表
      */
-    @RequestMapping(value = "allbuyhouselist", method = RequestMethod.POST)
-    public Result allbuyhouselist(Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "allbuyhouselist")
+    public Result allbuyhouselist(Integer pageNum, Integer pageSize,Double longitude,Double latitude,String cityname) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -335,13 +335,12 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<BuyHouse> page = buyHouseService.pageAll(pageNum,pageSize);
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
-            }
-            for(BuyHouse buyHouse : page.getContent()){
-                List<Community> list = communityService.listByUids(buyHouse.getCommunity());
-                buyHouse.setCommunityList(list);
+            Page<BuyHouse> page = null;
+            if (null != longitude && null != latitude && null != cityname) {
+                List<String> uids = BizUtil.nearbyCommunity(longitude,latitude,cityname,communityService);
+                page =  buyHouseService.agentPage(pageNum,pageSize,uids);
+            }else {
+                page =  buyHouseService.agentPage(pageNum,pageSize,null);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);

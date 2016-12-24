@@ -1,6 +1,7 @@
 package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.BuyHouse;
+import com.ryel.zaja.entity.House;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,7 +23,10 @@ public interface BuyHouseDao extends JpaRepository<BuyHouse, Integer> ,JpaSpecif
     @Query("select b from BuyHouse b where b.user.id = ?1")
     Page<BuyHouse> findByUserId(Integer userId, Pageable pageable);
 
-    @Query("select b from BuyHouse b")
-    Page<BuyHouse> pageAll(Pageable pageable);
+    @Query("select h from BuyHouse h where h.community in ?1")
+    Page<BuyHouse> findByUidList(List<String> uidList, Pageable pageable);
+
+    @Query("select h from BuyHouse h")
+    Page<BuyHouse> findPage(Pageable pageable);
 
 }
