@@ -313,7 +313,9 @@ public class UserApi {
         return Result.success().msg("").data(new HashMap<>());
     }
 
-//    public Result thirdLogin(String openid, ){
-//
-//    }
+  /* public Result thirdLogin(String openid,String type, String nickname,
+                             @RequestParam(required = true) MultipartFile image){
+
+        if()
+    }*/
 }

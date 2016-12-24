@@ -676,6 +676,8 @@ public class AgentApi {
                 house.getCommunity().getUid(),
                 house.getArea(),
                 house.getRenovation());
+        //删除自己
+        houses.remove(houseService.findById(houseId));
         if (!CollectionUtils.isEmpty(houses)) {
             if (houses.size() > 5) {
                 for (int i = houses.size() - 1; i > 4; i--) {
