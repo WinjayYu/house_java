@@ -22,6 +22,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,6 +39,9 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Autowired
     private HouseDao houseDao;
+
+    @Autowired
+    EntityManagerFactory emf;
 
     @Override
     @Transactional
@@ -69,6 +75,13 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
     @Override
     public Page<House> agentPage(List<String> status, Pageable pageable) {
+            EntityManager em = emf.createEntityManager();
+            //定义SQL
+            String sql = "SELECT h.* FROM house h LEFT JOIN user u ON fp.user_id = u.id WHERE fp.forum_id = ?";
+            Query query =  em.createNativeQuery(sql,User.class);
+            List<User> users = query.getResultList();
+            em.close();
+
         return houseDao.agentPage(status, pageable);
     }
 
