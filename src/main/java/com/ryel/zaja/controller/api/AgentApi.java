@@ -8,7 +8,9 @@ import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
+import com.ryel.zaja.utils.GetDistanceUtil;
 import com.ryel.zaja.utils.JsonUtil;
+import com.ryel.zaja.utils.MapSortUtils;
 import com.ryel.zaja.utils.bean.FileBo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -62,7 +65,6 @@ public class AgentApi {
     private CommunityService communityService;
     @Autowired
     private RecommendService recommendService;
-
 
     /**
      * 登录
@@ -111,6 +113,111 @@ public class AgentApi {
         }
     }
 
+    /**
+     * 发布房源
+     */
+    @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
+    public String publishhouse(@RequestParam(required = false) MultipartFile image1,@RequestParam(required = false) MultipartFile image2,
+                               @RequestParam(required = false) MultipartFile image3,@RequestParam(required = false) MultipartFile image4,
+                               @RequestParam(required = false) MultipartFile image5,
+                               Integer agentId,Integer sellhouseId,String title,BigDecimal price,String tags,Community community,
+                               String layout,BigDecimal area,String floor,String renovation,String orientation,String purpose,
+                               String features) {
+        try {
+            if(agentId == null || community == null){
+                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("userId或sellhouseId或community为空"));
+            }
+            Community origComm = communityService.findByUid(community.getUid());
+            if (null == origComm) {
+                communityService.create(community);
+            }
+            List<String> imagePathList = new ArrayList<String>();
+
+            String path1 = null;
+            if(image1 != null){
+                path1 = bizUploadFile.uploadHouseImageToQiniu(image1,community.getUid());
+                if(StringUtils.isNotBlank(path1)){
+                    imagePathList.add(path1);
+                }
+            }
+            if(image2 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image2,community.getUid());
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image3 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image3,community.getUid());
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image4 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image4,community.getUid());
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            if(image5 != null){
+                String path = bizUploadFile.uploadHouseImageToQiniu(image5,community.getUid());
+                if(StringUtils.isNotBlank(path)){
+                    imagePathList.add(path);
+                }
+            }
+            User agent = userService.findById(agentId);
+            if(agent == null){
+                throw new BizException("查询到用户为空userId:"+agentId);
+            }
+            SellHouse sellHouse = null;
+            if(null != sellhouseId) {
+                 sellHouse = sellHouseService.findById(sellhouseId);
+            }
+//            if(sellHouse == null){
+//                throw new BizException("查询到sellHouse为空sellhouseId:"+sellhouseId);
+//            }
+            House house = new House();
+            house.setCity(community.getCity());
+            house.setViewNum(0);
+            house.setCover(path1);
+            house.setCommission(new BigDecimal(2.5));
+
+            house.setPrice(price);
+            house.setAgent(agent);
+            house.setCommunity(community);
+            house.setSellHouse(sellHouse);
+            house.setStatus(HouseStatus.SAVED.getCode());
+            house.setAddTime(new Date());
+            house.setArea(area);
+            house.setFeature(features);
+            house.setFloor(floor);
+            house.setRenovation(renovation);
+            house.setOrientation(orientation);
+            house.setLayout(layout);
+            house.setTitle(title);
+            house.setTags(tags);
+            house.setPurpose(purpose);
+
+            house.setPublishTime(new Date());
+            house.setLastModifiedTime(new Date());
+            house.setYear(new SimpleDateFormat("yyyy").format(new Date()));
+
+            house.setImgs(JsonUtil.obj2Json(imagePathList));
+
+            if(null == sellHouse){
+                house.setType("20");
+            }else{
+                house.setType("10");
+            }
+            houseService.create(house);
+            return JsonUtil.obj2ApiJson(Result.success());
+        } catch (BizException e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001).data(e.getMessage()));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001));
+        }
+    }
 
     /**
      * 删除房源
@@ -172,10 +279,10 @@ public class AgentApi {
 
     /**
      * 根据小区uid查询访问信息
-     * @param communityUid 小区uid
+     * @param uid 小区uid
      */
     @RequestMapping(value = "houselistbycommunityuid", method = RequestMethod.POST)
-    public Result houselistbycommunityuid(String communityUid, Integer pageNum, Integer pageSize) {
+    public Result houselistbycommunityuid(String uid, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -186,18 +293,38 @@ public class AgentApi {
             List<String> status = new ArrayList<String>();
             status.add(HouseStatus.PUTAWAY_YET.getCode());
             status.add(HouseStatus.IN_CONNECT.getCode());
-            Page<House> houses = houseService.pageByCommunityUid(communityUid,status,
+            Page<House> houses = houseService.pageByCommunityUid(uid,status,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == houses) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(houses);
-            return Result.success().data(dataMap).data(new HashMap<>());
+            return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
+    @RequestMapping(value = "search", method = RequestMethod.POST)
+    public Result search(String uid, Integer pageNum, Integer pageSize) {
+        if (null == pageNum) {
+            pageNum = 1;
+        }
+        if (null == pageSize) {
+            pageSize = 1;
+        }
+        Page<House> houses = houseService.findByUid(uid, UserType.AGENT.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+
+//        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+        if (0 == houses.getSize()) {
+            return Result.error().msg(Error_code.ERROR_CODE_0020);
+        }
+        Map<String, Object> dataMap = APIFactory.fitting(houses);
+        return Result.success().msg("").data(dataMap);
+    }
+
+
 
     @RequestMapping(value = "houselist", method = RequestMethod.POST)
     public Result houselist(Integer pageNum, Integer pageSize) {
@@ -222,6 +349,7 @@ public class AgentApi {
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
 
     /**
      * 我的订单列表
@@ -297,7 +425,7 @@ public class AgentApi {
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -321,7 +449,7 @@ public class AgentApi {
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -345,7 +473,7 @@ public class AgentApi {
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -353,12 +481,12 @@ public class AgentApi {
      * 创建订单
      */
     @RequestMapping(value = "createorder", method = RequestMethod.POST)
-    public Result createorder(Integer userId, Integer houseId, String communityUid, BigDecimal area,BigDecimal price,
+    public Result createorder(Integer agentId, Integer houseId, String uid, BigDecimal area,BigDecimal price,
                               String toMobile,Integer buyerId) {
         try {
 
             User agent = new User();
-            agent.setId(userId);
+            agent.setId(agentId);
             House house = new House();
             house.setId(houseId);
             User user = new User();
@@ -369,7 +497,7 @@ public class AgentApi {
             HouseOrder houseOrder = new HouseOrder();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setCommunity(communityUid);
+            houseOrder.setCommunity(uid);
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setBuyerMobile(toMobile);
@@ -558,5 +686,5 @@ public class AgentApi {
         }
     }
 
-
 }
+

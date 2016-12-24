@@ -22,4 +22,5 @@ public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpec
 
     @Query("select b from SellHouse b")
     Page<SellHouse> pageAll(Pageable pageable);
+
 }

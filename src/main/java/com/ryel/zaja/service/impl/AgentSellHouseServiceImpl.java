@@ -31,4 +31,8 @@ public class AgentSellHouseServiceImpl extends AbsCommonService<AgentSellHouse> 
         return agentSellHouseDao.pageSellHouseByAgentId(agentId,pageable);
     }
 
+    @Override
+    public Long count(Integer agentId) {
+        return agentSellHouseDao.count(agentId);
+    }
 }

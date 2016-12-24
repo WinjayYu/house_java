@@ -1,5 +1,6 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.dao.Impl.CommentDaoImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ryel.zaja.config.Error_code;
@@ -40,6 +41,9 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
 
     @Autowired
     HouseOrderDao houseOrderDao;
+
+    @Autowired
+    CommentDaoImpl commentDaoImpl;
 
     @Transactional
     @Override
@@ -86,4 +90,8 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
     }
 
 
+    @Override
+    public Double average(Integer agentId) {
+        return commentDaoImpl.avg(agentId);
+    }
 }

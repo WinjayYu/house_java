@@ -9,5 +9,6 @@ import org.springframework.data.domain.Pageable;
 public interface AgentSellHouseService extends ICommonService<AgentSellHouse> {
     Page<SellHouse> pageSellHouseByAgentId(Integer agentId, Pageable pageable);
 
+    Long count(Integer agentId);
 
 }

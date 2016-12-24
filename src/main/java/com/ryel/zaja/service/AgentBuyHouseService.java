@@ -9,5 +9,6 @@ public interface AgentBuyHouseService extends ICommonService<AgentBuyHouse> {
     Page<BuyHouse> pageBuyHouseByAgentId(Integer agentId, Pageable pageable);
 
 
+    Long count(Integer agentId);
 
 }

@@ -1,20 +1,14 @@
 package com.ryel.zaja.controller.api;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
-import com.ryel.zaja.dao.BuyHouseDao;
-import com.ryel.zaja.dao.CommunityDao;
-import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.Community;
-import com.ryel.zaja.entity.User;
-import com.ryel.zaja.entity.vo.BuyHouseVo;
 import com.ryel.zaja.service.BuyHouseService;
 import com.ryel.zaja.service.CommunityService;
 import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.utils.APIFactory;
+import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,19 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.criteria.Predicate;
+import javax.management.AttributeList;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by billyu on 2016/11/30.
  * 买房
  */
 @RestController
-@RequestMapping("/api/buyhouse/")
+@RequestMapping(value = "/api/buyhouse/", produces = "application/json; charset=UTF-8")
 public class BuyHouseApi {
     protected final static Logger logger = LoggerFactory.getLogger(BuyHouseApi.class);
 
@@ -60,14 +51,49 @@ public class BuyHouseApi {
                 pageSize = 1;
             }
 
+//            Map<String, Object> comm = new HashMap<>();
+            List<Community> CommunityList = new ArrayList<>();
+            List<Object> list = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
             Page<BuyHouse> page = buyHouseService.findByPage(userId, pageNum, pageSize);
 
-            Map<String, Object> dataMap = APIFactory.fitting(page);
+            if(0 == page.getContent().size()){
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+//                return JsonUtil.obj2Json(result);
+            }
+            for(int i=0; i<page.getContent().size(); i++){
+
+                String [] uids = page.getContent().get(i).getCommunity().split("\\|");
+
+                for(int j=0; j<uids.length; j++) {
+                    CommunityList.add(communityService.findByUid(uids[j]));
+                }
+
+                String str = JsonUtil.obj2Json(page.getContent().get(i));
+                JSONObject obj = new JSONObject(str);
+                obj.append("CommunityList", CommunityList);
+                System.out.println(obj);
+                list.add(obj.toString());
+            }
+
+
+//            comm.put("community", list);
+
+                Map<String, Object> dataMap = new HashMap<>();
+            Map<String, Object> pageMap = new HashMap<String, Object>();
+
+            pageMap.put("totalNum", page.getTotalElements());
+            pageMap.put("totalPage", page.getTotalPages());
+            pageMap.put("currentPage", page.getNumber() + 1);
+
+            dataMap.put("list", list);
+            dataMap.put("page", pageMap);
             return Result.success().msg("").data(dataMap);
+            //return JsonUtil.obj2Json(result);
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+//            return JsonUtil.obj2ApiJson(result);
         }
 
     }

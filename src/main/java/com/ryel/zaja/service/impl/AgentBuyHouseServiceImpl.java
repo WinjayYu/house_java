@@ -32,5 +32,8 @@ public class AgentBuyHouseServiceImpl extends AbsCommonService<AgentBuyHouse> im
     }
 
 
-
+    @Override
+    public Long count(Integer agentId) {
+        return agentBuyHouseDao.count(agentId);
+    }
 }

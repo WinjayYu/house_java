@@ -45,6 +45,7 @@ public class SimilarHouseApi {
                 house.getArea(),
                 house.getRenovation());
 
+        houses.remove(houseService.findById(houseId));
         if (!CollectionUtils.isEmpty(houses)) {
             if(houses.size() > 5){
                 for(int i=houses.size()-1; i>4; i--){

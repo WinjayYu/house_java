@@ -49,4 +49,7 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     @Query("select h from House h order by h.addTime")
     Page<House> findByAddTime(Pageable pageable);
+
+    @Query("select h from House h where h.sellHouse.id = ?1")
+    Page<House> findBySellHouse(Integer userId, Pageable pageable);
 }

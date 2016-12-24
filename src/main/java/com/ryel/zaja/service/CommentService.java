@@ -18,4 +18,6 @@ public interface CommentService extends ICommonService<Comment>{
     Page<Comment> pageByAgentId(Integer agentId, Pageable pageable);
 
     Page<Comment> findOneComment(Integer agentId, Pageable pageable);
+
+    Double average(Integer agentId);
 }

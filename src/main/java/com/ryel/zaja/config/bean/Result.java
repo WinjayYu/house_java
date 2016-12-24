@@ -12,7 +12,7 @@ public class Result implements Serializable {
 
     private String msg ="";
 
-    private Object data = "";
+    private Object data = null;
 
     public Result(int status) {
         this.status = status;

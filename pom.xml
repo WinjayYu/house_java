@@ -45,9 +45,9 @@
         <profile>
             <id>ywj</id>
             <properties>
-                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.url>jdbc:mysql://106.75.93.24:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
                 <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>123456</spring.dataSource.password>
+                <spring.dataSource.password>Za123ja2016</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/zaja</doc.base.url>
                 <pro.upload.path>D:/tomcat-8.5.8/webapps/files/upload</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>

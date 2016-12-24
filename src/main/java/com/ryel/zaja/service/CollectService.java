@@ -1,6 +1,7 @@
 package com.ryel.zaja.service;
 
 import com.ryel.zaja.entity.Collect;
+import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.Recommend;
 import org.springframework.data.domain.Page;
 
@@ -17,6 +18,6 @@ public interface CollectService extends ICommonService<Collect>{
 
     boolean check(Integer userid, Integer houseId);
 
-    Page<Collect> pageByUserId(Integer userId, Integer pageNum, Integer pageSize);
+    Page<House> pageByUserId(Integer userId, Integer pageNum, Integer pageSize);
 
 }

@@ -14,4 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface AgentSellHouseDao extends JpaRepository<AgentSellHouse, Integer>,JpaSpecificationExecutor<AgentSellHouse> {
     @Query("select u.sellHouse from AgentSellHouse u where u.agent.id = ?1")
     Page<SellHouse> pageSellHouseByAgentId(Integer agentId, Pageable pageable);
+
+    @Query("select count(a.agent) from AgentSellHouse a where a.agent.id = ?1")
+    Long count(Integer agentId);
 }

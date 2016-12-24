@@ -4,6 +4,8 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.Comment;
+import com.ryel.zaja.service.AgentBuyHouseService;
+import com.ryel.zaja.service.AgentSellHouseService;
 import com.ryel.zaja.service.CommentService;
 import com.ryel.zaja.utils.APIFactory;
 import org.slf4j.Logger;
@@ -30,6 +32,12 @@ public class CommentApi {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private AgentSellHouseService agentSellHouseService;
+
+    @Autowired
+    private AgentBuyHouseService agentBuyHouseService;
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public Result create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content){
@@ -103,7 +111,18 @@ public class CommentApi {
             Page<Comment> page = commentService.findOneComment(userId,
                     new PageRequest(0, 1, Sort.Direction.DESC, "addTime"));
             if(null != page){
-                Map<String, Object> dataMap = APIFactory.fitting(page);
+//                Map<String, Object> dataMap = APIFactory.fitting(page);
+                Map<String, Object> dataMap = new HashMap<>();
+                dataMap.put("comment", page.getContent());
+
+                long sellHouseCount = agentSellHouseService.count(userId);
+                long buyHouseCount  = agentBuyHouseService.count(userId);
+                long count = sellHouseCount + buyHouseCount;
+                dataMap.put("count", count);
+
+                double average = commentService.average(userId);
+                dataMap.put("avg", average);
+
                 return Result.success().msg("").data(dataMap);
             }else{
                 return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());

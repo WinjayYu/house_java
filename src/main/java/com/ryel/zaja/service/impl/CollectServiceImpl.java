@@ -1,5 +1,6 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CollectDao;
 import com.ryel.zaja.dao.HouseDao;
@@ -47,12 +48,16 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
 
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
         if(null != collect){
-                throw new BizException("已收藏过!");
-        }else {
+            throw new BizException(Error_code.ERROR_CODE_0021);
+        }
 
+        House house = houseDao.findOne(houseId);
+        if(null == house){
+            throw new BizException(Error_code.ERROR_CODE_0016);
+        }
             collect = new Collect();
 
-            House house = houseDao.findOne(houseId);
+
             collect.setHouse(house);
 
             User user = userDao.findOne(userId);
@@ -60,7 +65,7 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
 
             collectDao.save(collect);
             return collect;
-        }
+
     }
 
     @Override
@@ -86,7 +91,7 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     }
 
     @Override
-    public Page<Collect> pageByUserId(Integer userId, Integer pageNum, Integer pageSize) {
+    public Page<House> pageByUserId(Integer userId, Integer pageNum, Integer pageSize) {
         return collectDao.pageByUserId(userId, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id" ));
     }
 

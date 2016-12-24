@@ -49,7 +49,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     @Override
     public User create(User user){
         if(userDao.findByMobile(user.getMobile()) != null ){
-            throw new RuntimeException("手机号已存在！");
+            throw new BizException("手机号已存在！");
         }
         user.setAddTime(new Date());
         this.save(user);
