@@ -145,6 +145,7 @@ public class BuyHouseApi {
             BigDecimal latitude = object3.getBigDecimal("latitude");
             String city = object3.getString("city");
             String address = object3.getString("address");
+            String district = object3.getString("district");
 
             Community origComm = communityService.findByUid(uid);
             if (null == origComm) {
@@ -157,6 +158,7 @@ public class BuyHouseApi {
                     community1.setLatitude(latitude);
                     community1.setCity(city);
                     community1.setAddress(address);
+                    community1.setDistrict(district);
                     communityService.create(community1);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);

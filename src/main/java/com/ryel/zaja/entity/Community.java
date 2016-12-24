@@ -41,6 +41,8 @@ public class Community implements Serializable {
 
     private String adcode;
 
+    private String district;
+
 
     public Community() {
     }
@@ -112,5 +114,13 @@ public class Community implements Serializable {
 
     public void setAdcode(String adcode) {
         this.adcode = adcode;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 }
