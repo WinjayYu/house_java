@@ -150,10 +150,10 @@ public class AgentApi {
 
     /**
      * 获取发布的房源列表
-     * @param userId 经济人id
+     * @param agentId 经济人id
      */
     @RequestMapping(value = "querymypublishlist", method = RequestMethod.POST)
-    public Result querymypublishlist(Integer userId, Integer pageNum, Integer pageSize) {
+    public Result querymypublishlist(Integer agentId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -161,7 +161,7 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<House> houses = houseService.pageByAgentId(userId,
+            Page<House> houses = houseService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == houses) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
@@ -455,13 +455,13 @@ public class AgentApi {
      * 接单
      */
     @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
-    public Result receiveorder(Integer demandId,Integer userId,String type) {
+    public Result receiveorder(Integer demandId,Integer agentId,String type) {
         try {
             if(demandId == null || ("10".equals(type) && "20".equals(type))){
                 return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             User user = new User();
-            user.setId(userId);
+            user.setId(agentId);
             if("10".equals(type)){       // 接买房单
                 AgentBuyHouse agentBuyHouse = new AgentBuyHouse();
                 agentBuyHouse.setAgent(user);
@@ -488,7 +488,7 @@ public class AgentApi {
      * 我的评论
      */
     @RequestMapping(value = "mycomment", method = RequestMethod.POST)
-    public Result mycomment(Integer userId, Integer pageNum, Integer pageSize) {
+    public Result mycomment(Integer agentId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -496,7 +496,7 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<Comment> page = commentService.pageByAgentId(userId,
+            Page<Comment> page = commentService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if (null == page) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
@@ -530,20 +530,20 @@ public class AgentApi {
     public String publishhouse(@RequestParam(required = false) MultipartFile image1,@RequestParam(required = false) MultipartFile image2,
                                @RequestParam(required = false) MultipartFile image3,@RequestParam(required = false) MultipartFile image4,
                                @RequestParam(required = false) MultipartFile image5,
-                               Integer userId,Integer sellhouseId,String title,BigDecimal price,String tags,Community community,
+                               Integer agentId,Integer sellhouseId,String title,BigDecimal price,String tags,Community community,
                                String layout,BigDecimal area,String floor,String renovation,String orientation,String purpose,
                                String features) {
         try {
             // 参数校验
-            if(userId == null || community == null){
-                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("userId或sellhouseId或community为空"));
+            if(agentId == null || community == null){
+                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("agentId或sellhouseId或community为空"));
             }
             // 小区校验
             Community origComm = communityService.createOrUpdateByUid(community);
             // 用户校验
-            User agent = userService.findById(userId);
+            User agent = userService.findById(agentId);
             if(agent == null){
-                throw new BizException("查询到用户为空userId:"+userId);
+                throw new BizException("查询到用户为空userId:"+agentId);
             }
             House house = new House();
             // 判断sellhouseId是否存在
@@ -693,13 +693,13 @@ public class AgentApi {
      * 修改头像
      */
     @RequestMapping(value = "modifyhead")
-    public Result modifyhead(Integer userId, @RequestParam(required = true) MultipartFile image){
+    public Result modifyhead(Integer agentId, @RequestParam(required = true) MultipartFile image){
         try {
-            String path = bizUploadFile.uploadUserImageToQiniu(image,userId);
+            String path = bizUploadFile.uploadUserImageToQiniu(image,agentId);
             if(StringUtils.isNotBlank(path)){
                 Map<String ,String> dataMap = new HashMap<>();
                 dataMap.put("remotePath",path);
-                User user = userService.findById(userId);
+                User user = userService.findById(agentId);
                 user.setHead(path);
                 userService.update(user);
                 return Result.success().msg("").data(dataMap);
@@ -716,12 +716,12 @@ public class AgentApi {
      * 经济人发布订单
      */
     @RequestMapping(value = "agentpublishorder")
-    public Result agentpublishorder(Integer userId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
+    public Result agentpublishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
                                     String toMobile) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
-            User agent = userService.findById(userId);
+            User agent = userService.findById(agentId);
             if (agent == null) {
                 throw new BizException(Error_code.ERROR_CODE_0023, "查询用户信息为空");
             }
@@ -783,9 +783,9 @@ public class AgentApi {
      * 经济人确定订单
      */
     @RequestMapping(value = "agentconfirmorder")
-    public Result agentconfirmorder(Integer userId, Integer orderId){
+    public Result agentconfirmorder(Integer agentId, Integer orderId){
         try {
-            if (userId == null || orderId == null) {
+            if (agentId == null || orderId == null) {
                 return Result.error().msg(Error_code.ERROR_CODE_0023);
             }
             HouseOrder order = houseOrderService.findById(orderId);
