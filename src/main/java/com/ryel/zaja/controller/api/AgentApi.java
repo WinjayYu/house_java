@@ -497,8 +497,7 @@ public class AgentApi {
             HouseOrder houseOrder = new HouseOrder();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setCommunity(uid);
-            houseOrder.setCommunity(communityService.findByUid(communityUid));
+            houseOrder.setCommunity(communityService.findByUid(uid));
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setBuyerMobile(toMobile);
