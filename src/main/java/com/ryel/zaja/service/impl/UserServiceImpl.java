@@ -149,7 +149,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         }
         List<AgentMaterial> agentMaterialList = agentMaterialDao.findByIdcard(agentMaterial.getIdcard());
         if(!CollectionUtils.isEmpty(agentMaterialList)){
-            throw new BizException(Error_code.card_exist,"身份证已经存在");
+            throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
         }
         // 保存用户
         user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态

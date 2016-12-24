@@ -54,14 +54,10 @@ public interface Error_code {
 
     String ERROR_CODE_0025 = "error_25";  // 数据异常，请刷新后重试
 
-    String PARAM_ERROR     = "param_error";  // 必填参数为空或参数错误
+    String ERROR_CODE_0026 = "error_26";   // 发布房源时，房源已经存在已支付的订单
 
-    String data_ERROR      = "data_error";   // 数据异常，请刷新后重试
+    String ERROR_CODE_0027 = "error_27";   // 经济人注册时，身份证号已经存在了
 
-    String house_order_payed = "house_order_payed";   // 房源已经存在已支付的订单
-
-    String card_exist = "card_exist";   // 身份证号已经存在了
-
-    String agent_publish_house_exist = "agent_publish_house_exist";   // 经济人已经发布过房源
+    String ERROR_CODE_0028 = "error_28";   // 经济人已经发布过房源，不能重复发布
 
 }

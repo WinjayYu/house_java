@@ -555,7 +555,7 @@ public class AgentApi {
                 // 判断经济人是否发布过房源
                 List<House> list = houseService.findByAgentIdAndSellHouseId(agent.getId(),sellhouseId);
                 if(!CollectionUtils.isEmpty(list)){
-                    return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.agent_publish_house_exist));
+                    return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0028));
                 }
                 house.setSellHouse(sellHouse);
             }
@@ -723,12 +723,12 @@ public class AgentApi {
             // 查经济人
             User agent = userService.findById(userId);
             if (agent == null) {
-                throw new BizException(Error_code.PARAM_ERROR, "查询用户信息为空");
+                throw new BizException(Error_code.ERROR_CODE_0023, "查询用户信息为空");
             }
             // 查买房人
             User user = userService.findByMobile(toMobile);
             if (user == null) {
-                throw new BizException(Error_code.PARAM_ERROR, "根据toMobile查询user为空");
+                throw new BizException(Error_code.ERROR_CODE_0023, "根据toMobile查询user为空");
             }
             // 订单类型
             String type;
@@ -736,11 +736,11 @@ public class AgentApi {
                 type = HouseOrderType.FROM_HOUSE.getCode();
                 House house = houseService.findById(houseId);
                 if(house == null){
-                    throw new BizException(Error_code.data_ERROR, "查询到house is null");
+                    throw new BizException(Error_code.ERROR_CODE_0025, "查询到house is null");
                 }
                 List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);
                 if(!CollectionUtils.isEmpty(list)){
-                    throw new BizException(Error_code.house_order_payed, "房源已经存在已支付的订单");
+                    throw new BizException(Error_code.ERROR_CODE_0026, "房源已经存在已支付的订单");
                 }
                 houseOrder.setHouse(house);
                 houseOrder.setCommunity(house.getCommunity());
@@ -749,7 +749,7 @@ public class AgentApi {
                 type = HouseOrderType.FROM_CUSTOM.getCode();
                 if (area == null || price == null || community == null
                         || StringUtils.isBlank(community.getUid()) || StringUtils.isBlank(community.getName())) {
-                    throw new BizException(Error_code.PARAM_ERROR, "houseId为空，且其他信息也为空");
+                    throw new BizException(Error_code.ERROR_CODE_0023, "houseId为空，且其他信息也为空");
                 }
                 Community origComm = communityService.findByUid(community.getUid());
                 if (null == origComm) {
