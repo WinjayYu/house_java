@@ -1,5 +1,11 @@
 package com.ryel.zaja.utils;
 
+import com.ryel.zaja.entity.Community;
+import com.ryel.zaja.service.CommunityService;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by billyu on 2016/12/9.
  */
@@ -32,6 +38,40 @@ public class GetDistanceUtil {
         s = s * EARTH_RADIUS;
         //s = Math.round(s * 10000) / 10000;
         return s;
+    }
+
+    /**
+     * 根据经纬度查询附近的小区信息
+     * @param lon1 经度
+     * @param lat1 纬度
+     * @return 返回的附近所有的小区信息
+     * */
+    public static List<String> nearbyCommunity(double lon1, double lat1, List<Community> communityBycity) {
+        List<Community> communities5 = new ArrayList<Community>();
+        List<Community> communities10 = new ArrayList<Community>();
+        List<Community> communities20 = new ArrayList<Community>();
+
+        List<String> uids = new ArrayList<>();
+        for (Community community : communityBycity) {
+            double lon2 = community.getLongitude().doubleValue();
+            double lat2 = community.getLatitude().doubleValue();
+            //计算两个点之间的距离
+            double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
+            if (distance <= 5000) {
+                communities5.add(community);
+            }else if (distance > 5000 && distance <= 10000)
+            {
+                communities10.add(community);
+            }else
+            {
+                communities20.add(community);
+            }
+            //if(6 == houses.size()) break;
+        }
+        for(Community community : communities5){
+            uids.add(community.getUid());
+        }
+        return uids;
     }
 
 }

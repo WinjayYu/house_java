@@ -124,7 +124,10 @@ public class DiscoveryApi {
     }
 
     public List<String> nearbyCommunity(double lon1, double lat1, String city) {
-        List<Community> communities = new ArrayList<Community>();
+        List<Community> communities5 = new ArrayList<Community>();
+        List<Community> communities10 = new ArrayList<Community>();
+        List<Community> communities20 = new ArrayList<Community>();
+
         List<Community> communityBycity = communityService.findByCity(city);
         List<String> uids = new ArrayList<>();
         for (Community community : communityBycity) {
@@ -133,11 +136,17 @@ public class DiscoveryApi {
             //计算两个点之间的距离
             double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
             if (distance <= 5000) {
-                communities.add(community);
+                communities5.add(community);
+            }else if (distance > 5000 && distance <= 10000)
+            {
+                communities10.add(community);
+            }else
+            {
+                communities20.add(community);
             }
             //if(6 == houses.size()) break;
         }
-        for(Community community : communities){
+        for(Community community : communities5){
             uids.add(community.getUid());
         }
         return uids;
