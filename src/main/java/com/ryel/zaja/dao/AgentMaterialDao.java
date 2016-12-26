@@ -16,5 +16,5 @@ public interface AgentMaterialDao extends JpaRepository<AgentMaterial, Integer>,
     AgentMaterial findByAgentId(Integer agentId);
 
     @Query("select u from AgentMaterial u where u.idcard = ?1")
-    List<AgentMaterial> findByIdcard(String idcard);
+    AgentMaterial findByIdcard(String idcard);
 }

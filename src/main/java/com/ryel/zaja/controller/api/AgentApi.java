@@ -79,6 +79,12 @@ public class AgentApi {
             User user = userService.agentLogin(mobile, password);
             if (user == null) {
                 return Result.error().msg(Error_code.ERROR_CODE_0004).data(new HashMap<>());
+            }else{
+                //判断是否为用户
+                if(UserType.USER.getCode().equals(user.getType()))
+                {
+                    return Result.error().msg(Error_code.ERROR_CODE_0029).data(new HashMap<>());
+                }
             }
             AgentMaterial agentMaterial = agentMaterialService.findByAgentId(user.getId());
             Map<String,Object> data = new HashMap<String,Object>();
@@ -102,9 +108,13 @@ public class AgentApi {
         try {
             // 校验验证码
             Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
-            if (origVerCode == null || StringUtils.isBlank(verifycode) || !origVerCode.equals(verifycode)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0010);
+            if (null == origVerCode) {
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
             }
+            if (!origVerCode.equals(verifycode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+            }
+
             userService.agentRegister(user,agentMaterial,verifycode,positiveFile,negativeFile,companyPicFile);
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
@@ -234,7 +244,7 @@ public class AgentApi {
                 pageNum = 1;
             }
             if (null == pageSize) {
-                pageSize = 1;
+                pageSize = 10;
             }
             Map<String, Object> dataMap = houseService.agentPage(pageNum,pageSize,longitude,latitude,cityname);
             return Result.success().msg("").data(dataMap);

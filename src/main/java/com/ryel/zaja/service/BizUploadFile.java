@@ -28,6 +28,12 @@ public class BizUploadFile {
         return uploadToQiniu(file,bizPath);
     }
 
+    public String uploadAgentImageToLocal(MultipartFile file,Integer userId)
+    {
+        String bizPath = "agent/" + userId + "/";
+        return uploadToLocal(file,bizPath);
+    }
+
     private String uploadToQiniu(MultipartFile file, String bizPath) {
         try {
             FileBo fileBo = defaultUploadFile.uploadFile(file.getOriginalFilename(), file.getInputStream());
@@ -46,4 +52,14 @@ public class BizUploadFile {
         }
     }
 
+    private String uploadToLocal(MultipartFile file, String bizPath)
+    {
+        try {
+            FileBo fileBo = defaultUploadFile.saveFile(bizPath + file.getOriginalFilename(), file.getInputStream());
+            return fileBo.getName();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BizException("保存失败",e);
+        }
+    }
 }

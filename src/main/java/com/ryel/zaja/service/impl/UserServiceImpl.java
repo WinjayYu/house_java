@@ -145,10 +145,16 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         }
         User agent = userDao.findByMobile(user.getMobile());
         if(agent != null){
-            throw new BizException(Error_code.ERROR_CODE_0024,"用户已经存在");
+            if (UserType.AGENT.getCode().equals(agent.getType()))
+            {
+                throw new BizException(Error_code.ERROR_CODE_0024,"用户已经存在");
+            }else
+            {
+                throw new BizException(Error_code.ERROR_CODE_0031,"用户为普通用户，请走用户端申请流程");
+            }
         }
-        List<AgentMaterial> agentMaterialList = agentMaterialDao.findByIdcard(agentMaterial.getIdcard());
-        if(!CollectionUtils.isEmpty(agentMaterialList)){
+        AgentMaterial idagent = agentMaterialDao.findByIdcard(agentMaterial.getIdcard());
+        if(idagent != null){
             throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
         }
         // 保存用户
@@ -156,15 +162,15 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         user.setType(UserType.AGENT.getCode());
         create(user);
         // 上传图片
-        String positivePath = bizUploadFile.uploadUserImageToQiniu(positive,user.getId());
+        String positivePath = bizUploadFile.uploadAgentImageToLocal(positive,user.getId());
         if(StringUtils.isBlank(positivePath)){
             throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
         }
-        String negativePath = bizUploadFile.uploadUserImageToQiniu(negative,user.getId());
+        String negativePath = bizUploadFile.uploadAgentImageToLocal(negative,user.getId());
         if(StringUtils.isBlank(negativePath)){
             throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
         }
-        String companyPicPath = bizUploadFile.uploadUserImageToQiniu(companyPic,user.getId());
+        String companyPicPath = bizUploadFile.uploadAgentImageToLocal(companyPic,user.getId());
         if(StringUtils.isBlank(companyPicPath)){
             throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
         }
