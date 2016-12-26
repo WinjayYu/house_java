@@ -41,6 +41,25 @@ public class DefaultUploadFile {
         }
     }
 
+    /**
+     * 保存文件到本地
+     * @param originalFileName
+     * @param inputStream
+     * @return
+     */
+
+    public FileBo saveFile(String originalFileName, InputStream inputStream)
+    {
+        try {
+            FileBo fileBo = FileUtil.save(originalFileName,inputStream,path,"");
+            fileBo.setName(url + fileBo.getName());
+            return fileBo;
+        }catch (Exception e){
+            throw new FileUploadException("文件保存失败!");
+        }
+    }
+
+
 
     /**
      * 自定义文件名
