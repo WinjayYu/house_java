@@ -4,12 +4,11 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
+import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.ThirdUser;
 import com.ryel.zaja.entity.User;
-import com.ryel.zaja.service.DefaultUploadFile;
-import com.ryel.zaja.service.QiNiuService;
-import com.ryel.zaja.service.ThirdUserService;
-import com.ryel.zaja.service.UserService;
+import com.ryel.zaja.service.*;
+import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.ryel.zaja.utils.bean.FileBo;;
@@ -19,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +61,9 @@ public class UserApi {
 
     @Autowired
     private ThirdUserService thirdUserService;
+
+    @Autowired
+    private HouseService houseService;
 
     private static int EXPIRES = 10 * 60; //超时时间10min
     private static int captchaW = 200;
@@ -403,6 +408,30 @@ public class UserApi {
             logger.error(e.getMessage(), e);
             Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
             return JsonUtil.obj2ApiJson(result);
+        }
+    }
+
+    /**
+     * 获取经纪人发布的房源列表
+     * @param userId
+     */
+    @RequestMapping(value = "queryagentpublishlist", method = RequestMethod.POST)
+    public Result querymypublishlist(Integer userId, Integer pageNum, Integer pageSize) {
+        try {
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
+            Page<House> houses = houseService.pageByAgentId2(userId,
+                    new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+
+            Map<String, Object> dataMap = APIFactory.fitting(houses);
+            return Result.success().data(dataMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 }

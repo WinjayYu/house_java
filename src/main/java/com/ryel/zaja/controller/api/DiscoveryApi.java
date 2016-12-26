@@ -91,10 +91,21 @@ public class DiscoveryApi {
         return Result.success().msg("").data(dataMap);
     }
 
+    /**
+     *
+     * @param lon1
+     * @param lat1
+     * @param city
+     * @param type 用户类型
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
     @RequestMapping(value = "dis", method = RequestMethod.POST)
     public Result discovery(@RequestParam(value = "longitude", required = false) Double lon1,
                             @RequestParam(value = "latitude", required = false) Double lat1,
                             String city,
+                            String type,
                             Integer pageNum,
                             Integer pageSize) {
         if (null == pageNum) {
@@ -103,23 +114,20 @@ public class DiscoveryApi {
         if (null == pageSize) {
             pageSize = 1;
         }
+        type = type == null ? UserType.USER.getCode() : type;
 
         if (null != lon1 && null != lat1 && null != city) {
-            List<String> uids = nearbyCommunity(lon1,lat1,city);
-            if(!uids.isEmpty() && null!= uids){
-                Page<House> page =  houseService.findByCommunities(uids, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
-                Map<String, Object> dataMap = APIFactory.fitting(page);
-                return Result.success().msg("").data(dataMap);
-            }else{
-                Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
+            List<String> uids = nearbyCommunity(lon1, lat1, city);
+            if (!uids.isEmpty() && null != uids) {
+                Page<House> page = houseService.findByUids(uids, type, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
                 Map<String, Object> dataMap = APIFactory.fitting(page);
                 return Result.success().msg("").data(dataMap);
             }
-        }else{
-            Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "addTime"));
-            Map<String, Object> dataMap = APIFactory.fitting(page);
-            return Result.success().msg("").data(dataMap);
         }
+        Page<House> page = houseService.findByAddTime(type, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC));
+        Map<String, Object> dataMap = APIFactory.fitting(page);
+        return Result.success().msg("").data(dataMap);
+
 
     }
 

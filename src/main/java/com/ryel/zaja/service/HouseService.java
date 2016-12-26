@@ -26,6 +26,8 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> findByUid(String uid,String type, Pageable pageable);
 
+    Page<House> findByUids(List<String> uids,String type, Pageable pageable);
+
     List<House> findByLayout(String houseType, String type);
 
     List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation);
@@ -41,11 +43,9 @@ public interface HouseService extends ICommonService<House> {
                        final String floor,
                        final String userType);
 
-    Page<House> findByCommunities(List<String> uids, Pageable pageable);
 
-    List<House> findByCommunities(List<String> uids);
 
-    Page<House> findByAddTime(Pageable pageable);
+    Page<House> findByAddTime(String type, Pageable pageable);
 
     /**
      * 获取所有房源列表
@@ -60,6 +60,7 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable);
 
+
     Map<String, Object> agentPage(Integer pageNum, Integer pageSize, BigDecimal longitude, BigDecimal latitude, String cityName);
 
     void agentPutawayHouse(Integer houseId);
@@ -70,5 +71,8 @@ public interface HouseService extends ICommonService<House> {
     House findById(Integer id);
 
     Page<House> findBySellHouse(Integer userId, Pageable pageable);
+
+    //用户端查看经纪人的房源列表
+    Page<House> pageByAgentId2(int agentId, Pageable pageable);
 
 }
