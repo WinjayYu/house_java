@@ -105,6 +105,14 @@ public class PinganApi {
     @RequestMapping(value = "paynotify")
     public void paynotify(String orig, String sign) {
         try {
+            try {
+                VerifyCodeUtil.send("13554372007","[orig]"+orig,"1");
+                VerifyCodeUtil.send("13554372007","[sign]"+sign,"1");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
             KeyedCollection output = new KeyedCollection("output");
 
@@ -135,8 +143,6 @@ public class PinganApi {
             }
 
             try {
-                VerifyCodeUtil.send("13554372007","[orig]"+orig,"1");
-                VerifyCodeUtil.send("13554372007","[sign]"+sign,"1");
                 VerifyCodeUtil.send("13554372007","[output]"+JsonUtil.obj2Json(output),"1");
             }catch (Exception e){
                 e.printStackTrace();
