@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -66,13 +68,24 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
     }
 
     @Override
-    public  Page<BuyHouse> agentPage(Integer pageNum, Integer pageSize, List<String> uids) {
+    public  Page<BuyHouse> agentPage(Integer agentId, Integer pageNum, Integer pageSize, List<String> uids) {
         Page<BuyHouse> page;
         if(!CollectionUtils.isEmpty(uids)){
             page = buyHouseDao.findByUidList(uids, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
         }else {
             page = buyHouseDao.findPage(new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
         }
+
+
+//        page = buyHouseDao.findAll(new Specification<BuyHouse>() {
+//            @Override
+//            public Predicate toPredicate(Root<BuyHouse> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+//                Path<Object> communitys = root.get("community");
+//
+//                return null;
+//            }
+//        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+
         return page;
     }
 }

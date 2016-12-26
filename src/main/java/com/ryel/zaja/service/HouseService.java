@@ -44,6 +44,9 @@ public interface HouseService extends ICommonService<House> {
                        final String userType);
 
 
+    Page<House> findByCommunitiesStatus(List<String> status,List<String> uidList, Pageable pageable);
+
+    List<House> findByCommunities(List<String> uids);
 
     Page<House> findByAddTime(String type, Pageable pageable);
 
