@@ -2,11 +2,15 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
+import com.ryel.zaja.entity.ThirdUser;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.DefaultUploadFile;
 import com.ryel.zaja.service.QiNiuService;
+import com.ryel.zaja.service.ThirdUserService;
 import com.ryel.zaja.service.UserService;
+import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.ryel.zaja.utils.bean.FileBo;;
 import org.json.JSONException;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * app 客户端用户登入,注册等功能.
  */
 @RestController()
-@RequestMapping("/api/user/")
+@RequestMapping(value = "/api/user/", produces = "application/json; charset=UTF-8")
 public class UserApi {
     protected final static Logger logger = LoggerFactory.getLogger(UserApi.class);
 
@@ -51,6 +56,9 @@ public class UserApi {
 
     @Autowired
     private QiNiuService qiNiuService;
+
+    @Autowired
+    private ThirdUserService thirdUserService;
 
     private static int EXPIRES = 10 * 60; //超时时间10min
     private static int captchaW = 200;
@@ -88,10 +96,10 @@ public class UserApi {
                 user.setType("10");//用户
             }
             userService.create(user);
-        } catch (BizException be){
+        } catch (BizException be) {
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());//手机号被占用
-        }catch(Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
@@ -112,15 +120,19 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public Result login(String mobile, String password) {
+    public String login(String mobile, String password) {
         User origUser = userService.login(mobile, password);
-        if (origUser == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
-        } else {
-            origUser.setPassword("");
-            return Result.success().msg("").data(user2map(origUser));
+        if(null == origUser) {
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
+            return JsonUtil.obj2ApiJson(result);
         }
-
+        if(null == origUser.getPassword()){
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0030);//未设置密码
+            return JsonUtil.obj2ApiJson(result);
+        }
+            origUser.setPassword("");
+            Result result = Result.success().msg("").data(user2map(origUser));
+            return JsonUtil.obj2ApiJson(result);
     }
 
     /**
@@ -139,9 +151,9 @@ public class UserApi {
     public Result update(Integer userId, String nickname, String sex) {
         User user = new User();
         user.setId(userId);
-        if(null != nickname) {
+        if (null != nickname) {
             user.setNickname(nickname);
-        }else{
+        } else {
             user.setSex(sex);
         }
         userService.update(user);
@@ -185,7 +197,7 @@ public class UserApi {
         String bodyString = null;
         try {
             bodyString = qiNiuService.upload(path, key.toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
 
@@ -197,8 +209,8 @@ public class UserApi {
 
         user.setHead(remotePath.toString());
         userService.update(user);
-        Map<String ,String> dataMap = new HashMap<>();
-        dataMap.put("remotePath",remotePath.toString());
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("remotePath", remotePath.toString());
         return Result.success().msg("").data(dataMap);
     }
 
@@ -272,16 +284,17 @@ public class UserApi {
             userService.update(user);
 
             return Result.success().msg("").data(new HashMap<>());
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
     /**
      * 发送验证码
+     *
      * @param mobile
-     * @param type 1=注册，2=修改密码
+     * @param type   1=注册，2=修改密码
      * @return
      */
     @RequestMapping(value = "sendverifycode", method = RequestMethod.POST)
@@ -292,20 +305,20 @@ public class UserApi {
         //redisTemplate.opsForValue().set(mobile, verCode);
         redisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
-        String textEntity = VerifyCodeUtil.send(mobile,verCode,type);
+        String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
 
         try {
             JSONObject jsonObj = new JSONObject(textEntity);
             int error_code = jsonObj.getInt("error");
             String error_msg = jsonObj.getString("msg");
-            if(error_code==0){
+            if (error_code == 0) {
                 System.out.println("Send message success.");
-            }else{
-                System.out.println("Send message failed,code is "+error_code+",msg is "+error_msg);
+            } else {
+                System.out.println("Send message failed,code is " + error_code + ",msg is " + error_msg);
                 return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
             }
         } catch (JSONException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
 
         }
@@ -313,9 +326,83 @@ public class UserApi {
         return Result.success().msg("").data(new HashMap<>());
     }
 
-  /* public Result thirdLogin(String openid,String type, String nickname,
-                             @RequestParam(required = true) MultipartFile image){
+    @RequestMapping(value = "thiredlogin", method = RequestMethod.POST)
+    public Result thirdLogin(String openid, String type, String nickname,
+                             String headUrl) {
+        try {
+            ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
+            if (null != thirdUser) {
+                if (null != thirdUser.getUser()) {
+                    String mobile = thirdUser.getUser().getMobile();
+                    User user = userService.findByMobile(mobile);
+                    return Result.success().msg("").data(user);
+                } else {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("status", "0");//"0"代表没有绑定手机号
+                    return Result.success().msg("").data(map);
+                }
 
-        if()
-    }*/
+            } else {
+                ThirdUser thirdUser1 = thirdUserService.create(type, openid, headUrl, nickname);
+                return Result.success().msg("").data(thirdUser1);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 第三方登陆绑定手机号
+     * @param mobile
+     * @param openid
+     * @param verCode
+     * @return
+     */
+    @RequestMapping(value = "bindmobile", method = RequestMethod.POST)
+    public String bindMobile(String mobile, String openid, String verCode) {
+        try {
+            ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+            String origVerCode = valueops.get(mobile);
+
+            if (null == origVerCode) {
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0010);
+                return JsonUtil.obj2ApiJson(result);
+            }
+            if (!origVerCode.equals(verCode)) {
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0009);
+                return JsonUtil.obj2ApiJson(result);
+            }
+
+            ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
+            if (null == thirdUser) {
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0029);
+                return JsonUtil.obj2ApiJson(result);
+            }
+            User user = new User();
+            user.setHead(thirdUser.getHead());
+            user.setNickname(thirdUser.getNickname());
+            user.setType(UserType.USER.getCode());
+            user.setSex("30");//"30"表示未设置性别
+            user.setMobile(mobile);
+
+            userService.create(user);
+
+            //将userId存到第三方表中
+            User origUser = userService.findByMobile(mobile);
+            thirdUser.setUser(origUser);
+            thirdUserService.update(thirdUser);
+
+            Result result = Result.success().msg("");
+            return JsonUtil.obj2ApiJson(result);
+        } catch (BizException be){
+            logger.error(be.getMessage(), be);
+            Result result =  Result.error().msg(Error_code.ERROR_CODE_0006);
+            return JsonUtil.obj2ApiJson(result);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
+            return JsonUtil.obj2ApiJson(result);
+        }
+    }
 }

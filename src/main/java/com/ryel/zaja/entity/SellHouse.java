@@ -50,6 +50,9 @@ public class SellHouse implements Serializable {
 
     private double area;
 
+    @Column(name = "house_num")
+    private Integer houseNum;
+
     public SellHouse() {
     }
 
@@ -133,4 +136,11 @@ public class SellHouse implements Serializable {
         this.area = area;
     }
 
+    public Integer getHouseNum() {
+        return houseNum;
+    }
+
+    public void setHouseNum(Integer houseNum) {
+        this.houseNum = houseNum;
+    }
 }

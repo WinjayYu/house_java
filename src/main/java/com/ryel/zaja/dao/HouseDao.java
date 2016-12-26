@@ -20,8 +20,6 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select h from House h where h.layout = ?1 and h.status in ?2")
     List<House> findByHouseLayout(String layout, List<String> status);
     List<House> findByCommunityName(String communityName);
-    List<House> findByLayout(String layout, List<String> status);
-
     List<House> findByCommunityAddress(String communityAddress);
 
     List<House> findByCity(String city);

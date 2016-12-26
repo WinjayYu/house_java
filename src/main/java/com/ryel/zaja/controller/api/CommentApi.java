@@ -8,6 +8,7 @@ import com.ryel.zaja.service.AgentBuyHouseService;
 import com.ryel.zaja.service.AgentSellHouseService;
 import com.ryel.zaja.service.CommentService;
 import com.ryel.zaja.utils.APIFactory;
+import com.ryel.zaja.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +27,7 @@ import java.util.Map;
  * Created by billyu on 2016/12/19.
  */
 @RestController
-@RequestMapping(value = "/api/comment/")
+@RequestMapping(value = "/api/comment/",produces = "application/json; charset=UTF-8")
 public class CommentApi {
     protected final static Logger logger = LoggerFactory.getLogger(CommentApi.class);
 
@@ -91,17 +93,20 @@ public class CommentApi {
      * @return
      */
     @RequestMapping(value = "listcomment")
-    public Result listComment(Integer userId, Integer pageNum, Integer pageSize){
+    public String listComment(Integer userId, Integer pageNum, Integer pageSize){
         try{
             Page<Comment> page = commentService.findByAgentId(userId, pageNum, pageSize);
-            if(null != page){
+            if(0 != page.getContent().size()){
                 Map<String, Object> dataMap = APIFactory.fitting(page);
-                return Result.success().msg("").data(dataMap);
+                Result result = Result.success().msg("").data(dataMap);
+                return JsonUtil.obj2ApiJson(result);
             }
-            return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0014);
+            return JsonUtil.obj2ApiJson(result);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
+            return JsonUtil.obj2ApiJson(result,"houseOrder");
         }
     }
 
@@ -115,12 +120,17 @@ public class CommentApi {
                 Map<String, Object> dataMap = new HashMap<>();
                 dataMap.put("comment", page.getContent());
 
-                long sellHouseCount = agentSellHouseService.count(userId);
-                long buyHouseCount  = agentBuyHouseService.count(userId);
-                long count = sellHouseCount + buyHouseCount;
+                Long sellHouseCount = agentSellHouseService.count(userId);
+                Long buyHouseCount  = agentBuyHouseService.count(userId);
+                Long count = sellHouseCount + buyHouseCount;
+                if(null == count) {
+                    count = 0L;
+                }
+
                 dataMap.put("count", count);
 
-                double average = commentService.average(userId);
+                Double average = commentService.average(userId);
+                average = average == null ?  0.0 :  1.0;
                 dataMap.put("avg", average);
 
                 return Result.success().msg("").data(dataMap);

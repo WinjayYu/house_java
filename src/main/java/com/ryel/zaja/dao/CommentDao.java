@@ -17,7 +17,8 @@ public interface CommentDao extends JpaRepository<Comment, Integer>,JpaSpecifica
     @Query("select c from Comment c where c.houseOrder.id = ?1")
     Comment findByHouseOrderId(Integer houseOrderId);
 
-    @Query("select c from Comment c where c.agent.id = ?1")
+    @Query("select c.id, c.user.id, c.agent.id, c.houseOrder.id, c.content, c.star" +
+            " from Comment c where c.agent.id = ?1")
     Page<Comment> findByAgentId(Integer anentId, Pageable pageable);
 
     @Query("select u from Comment u where u.agent.id = ?1")
@@ -25,10 +26,6 @@ public interface CommentDao extends JpaRepository<Comment, Integer>,JpaSpecifica
 
     @Query("select c from Comment c where c.agent.id = ?1")
      Page<Comment> findOneComment(Integer agentId, Pageable pageable);
-/*
 
-    @Query("select avg (c.star) from Comment c where c.agnet.id = ?1")
-    Double average(Integer agentId);
-*/
 
 }

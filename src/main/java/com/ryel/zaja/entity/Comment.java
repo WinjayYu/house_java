@@ -33,7 +33,7 @@ public class Comment implements Serializable {
     private User agent;
 
     // 订单
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "house_order_id")
     private HouseOrder houseOrder;
 

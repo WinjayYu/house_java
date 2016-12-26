@@ -60,4 +60,8 @@ public interface Error_code {
 
     String ERROR_CODE_0028 = "error_28";   // 经济人已经发布过房源，不能重复发布
 
+    String ERROR_CODE_0029 = "error_29";   // 此openid还未注册过
+
+    String ERROR_CODE_0030 = "error_30";   // 未设置密码
+
 }
