@@ -60,4 +60,9 @@ public interface Error_code {
 
     String ERROR_CODE_0028 = "error_28";   // 经济人已经发布过房源，不能重复发布
 
+    String ERROR_CODE_0029 = "error_29";   // 【登录】该账号不是经纪人账号
+
+    String ERROR_CODE_0030 = "error_30";   // 【注册】该手机号已经绑定相应的身份证信息
+
+    String ERROR_CODE_0031 = "error_31";   // 【注册】该手机号为用户账号，请走用户申请流程
 }

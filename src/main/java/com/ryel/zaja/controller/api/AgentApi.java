@@ -11,6 +11,7 @@ import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.BizUtil;
+import com.ryel.zaja.utils.GetDistanceUtil;
 import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -79,6 +80,12 @@ public class AgentApi {
             User user = userService.agentLogin(mobile, password);
             if (user == null) {
                 return Result.error().msg(Error_code.ERROR_CODE_0004).data(new HashMap<>());
+            }else{
+                //判断是否为用户
+                if(UserType.USER.getCode().equals(user.getType()))
+                {
+                    return Result.error().msg(Error_code.ERROR_CODE_0029).data(new HashMap<>());
+                }
             }
             AgentMaterial agentMaterial = agentMaterialService.findByAgentId(user.getId());
             Map<String,Object> data = new HashMap<String,Object>();
@@ -102,9 +109,13 @@ public class AgentApi {
         try {
             // 校验验证码
             Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
-            if (origVerCode == null || StringUtils.isBlank(verifycode) || !origVerCode.equals(verifycode)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0010);
+            if (null == origVerCode) {
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
             }
+            if (!origVerCode.equals(verifycode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+            }
+
             userService.agentRegister(user,agentMaterial,verifycode,positiveFile,negativeFile,companyPicFile);
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
@@ -178,8 +189,8 @@ public class AgentApi {
      * 根据小区uid查询访问信息
      * @param uid 小区uid
      */
-    @RequestMapping(value = "houselistbycommunityuid", method = RequestMethod.POST)
-    public Result houselistbycommunityuid(String uid, Integer pageNum, Integer pageSize) {
+    @RequestMapping(value = "search", method = RequestMethod.POST)
+    public Result searchbycommunityuid(String uid, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -192,9 +203,7 @@ public class AgentApi {
             status.add(HouseStatus.IN_CONNECT.getCode());
             Page<House> houses = houseService.pageByCommunityUid(uid,status,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
-            }
+
             Map<String, Object> dataMap = APIFactory.fitting(houses);
             return Result.success().data(dataMap);
         } catch (Exception e) {
@@ -203,32 +212,13 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "search", method = RequestMethod.POST)
-    public Result search(String uid, Integer pageNum, Integer pageSize) {
-        if (null == pageNum) {
-            pageNum = 1;
-        }
-        if (null == pageSize) {
-            pageSize = 1;
-        }
-        Page<House> houses = houseService.findByUid(uid, UserType.AGENT.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
-
-//        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
-        if (0 == houses.getSize()) {
-            return Result.error().msg(Error_code.ERROR_CODE_0020);
-        }
-        Map<String, Object> dataMap = APIFactory.fitting(houses);
-        return Result.success().msg("").data(dataMap);
-    }
-
-
 
     /**
      * 查房
      * （可以查询到房屋交接中的房屋）
      */
     @RequestMapping(value = "houselist", method = RequestMethod.POST)
-    public Result houselist(Integer pageNum, Integer pageSize,BigDecimal longitude,BigDecimal latitude,String cityname) {
+    public Result houselist(Integer pageNum, Integer pageSize,Double longitude,Double latitude,String city) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -236,8 +226,28 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Map<String, Object> dataMap = houseService.agentPage(pageNum,pageSize,longitude,latitude,cityname);
-            return Result.success().msg("").data(dataMap);
+            List<String> status = new ArrayList<String>();
+            status.add(HouseStatus.PUTAWAY_YET.getCode());
+            status.add(HouseStatus.IN_CONNECT.getCode());
+
+            if (null != longitude && null != latitude && null != city) {
+
+                List<Community> communityBycity = communityService.findByCity(city);
+                List<String> uids = GetDistanceUtil.nearbyCommunity(longitude,latitude,communityBycity);
+                if(!uids.isEmpty() && null!= uids){
+                    Page<House> page =  houseService.findByCommunitiesStatus(status, uids, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
+                    Map<String, Object> dataMap = APIFactory.fitting(page);
+                    return Result.success().msg("").data(dataMap);
+                }else{
+                    Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
+                    Map<String, Object> dataMap = APIFactory.fitting(page);
+                    return Result.success().msg("").data(dataMap);
+                }
+            }else{
+                Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "addTime"));
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                return Result.success().msg("").data(dataMap);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -327,7 +337,7 @@ public class AgentApi {
      * 全部买房需求列表
      */
     @RequestMapping(value = "allbuyhouselist")
-    public Result allbuyhouselist(Integer pageNum, Integer pageSize,Double longitude,Double latitude,String cityname) {
+    public Result allbuyhouselist(Integer agentId, Integer pageNum, Integer pageSize,Double longitude,Double latitude,String city) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -336,11 +346,11 @@ public class AgentApi {
                 pageSize = 1;
             }
             Page<BuyHouse> page = null;
-            if (null != longitude && null != latitude && null != cityname) {
-                List<String> uids = BizUtil.nearbyCommunity(longitude,latitude,cityname,communityService);
-                page =  buyHouseService.agentPage(pageNum,pageSize,uids);
+            if (null != longitude && null != latitude && null != city) {
+                List<String> uids = BizUtil.nearbyCommunity(longitude,latitude,city,communityService);
+                page =  buyHouseService.agentPage(agentId,pageNum,pageSize,uids);
             }else {
-                page =  buyHouseService.agentPage(pageNum,pageSize,null);
+                page =  buyHouseService.agentPage(agentId,pageNum,pageSize,null);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);

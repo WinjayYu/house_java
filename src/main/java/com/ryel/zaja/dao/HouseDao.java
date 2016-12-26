@@ -47,9 +47,6 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select b from House b where b.community.uid = ?1 and b.status in ?2")
     Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable);
 
-    @Query("select b from House b where b.status in ?1 and b.city = ?2")
-    Page<House> agentPage(List<String> status,String city, Pageable pageable);
-
     @Query("select b from House b where b.status in ?1 ")
     Page<House> agentPage(List<String> status, Pageable pageable);
 
@@ -61,4 +58,7 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     @Query("select h from House h where h.sellHouse.id = ?1")
     Page<House> findBySellHouse(Integer userId, Pageable pageable);
+
+    @Query("select b from House b where b.status in ?1 and b.community.uid in ?2")
+    Page<House> findByCommunitiesStatus(List<String> status,List<String> uidList, Pageable pageable);
 }

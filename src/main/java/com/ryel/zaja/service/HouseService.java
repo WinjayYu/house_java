@@ -43,6 +43,8 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> findByCommunities(List<String> uids, Pageable pageable);
 
+    Page<House> findByCommunitiesStatus(List<String> status,List<String> uidList, Pageable pageable);
+
     List<House> findByCommunities(List<String> uids);
 
     Page<House> findByAddTime(Pageable pageable);
@@ -60,7 +62,6 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable);
 
-    Map<String, Object> agentPage(Integer pageNum, Integer pageSize, BigDecimal longitude, BigDecimal latitude, String cityName);
 
     void agentPutawayHouse(Integer houseId);
     void agentSoldOutHouse(Integer houseId);
