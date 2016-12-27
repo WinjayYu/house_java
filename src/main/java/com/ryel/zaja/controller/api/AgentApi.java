@@ -2,10 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
-import com.ryel.zaja.config.enums.HouseOrderStatus;
-import com.ryel.zaja.config.enums.HouseOrderType;
-import com.ryel.zaja.config.enums.HouseStatus;
-import com.ryel.zaja.config.enums.UserType;
+import com.ryel.zaja.config.enums.*;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
@@ -273,7 +270,34 @@ public class AgentApi {
             if (null == page) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             }
-            Map<String, Object> dataMap = APIFactory.fitting(page);
+
+            List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+
+            for(HouseOrder order : page.getContent())
+            {
+                Map neworder = new HashMap<String,Object>();
+                //说明是二次编辑的房源信息
+                if (HouseType.FIRST.getCode().equals(order.getType()))
+                {
+                    neworder.put("house",order.getHouse());
+                }else
+                {
+                    neworder.put("community",order.getCommunity());
+                    neworder.put("area",order.getArea());
+                    neworder.put("price",order.getPrice());
+                    neworder.put("commission",order.getCommission());
+                }
+
+                neworder.put("id",order.getId());
+                neworder.put("code",order.getId());
+                neworder.put("buyer",order.getBuyer());
+                neworder.put("status",order.getStatus());
+                neworder.put("type",order.getType());
+
+                list.add(neworder);
+            }
+
+            Map<String, Object> dataMap = APIFactory.fitting(page,list);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -396,39 +420,6 @@ public class AgentApi {
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
-
-    /**
-     * 创建订单
-     */
-    @RequestMapping(value = "createorder", method = RequestMethod.POST)
-    public Result createorder(Integer agentId, Integer houseId, String uid, BigDecimal area,BigDecimal price,
-                              String toMobile,Integer buyerId) {
-        try {
-
-            User agent = new User();
-            agent.setId(agentId);
-            House house = new House();
-            house.setId(houseId);
-            User user = new User();
-            user.setId(buyerId);
-            HouseOrder houseOrder = new HouseOrder();
-            houseOrder.setAgent(agent);
-            houseOrder.setBuyer(user);
-            houseOrder.setCommunity(communityService.findByUid(uid));
-            houseOrder.setArea(area);
-            houseOrder.setPrice(price);
-            houseOrder.setBuyerMobile(toMobile);
-
-            houseService.agentPutawayHouse(houseId);
-            return Result.success().msg("").data(new HashMap<>());
-        } catch (BizException e) {
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(e.getMessage()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
