@@ -53,7 +53,7 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     public HouseOrder update(HouseOrder houseOrder) {
         HouseOrder origHouseOrder = check(houseOrder.getId());
         ClassUtil.copyProperties(origHouseOrder, houseOrder);
-        return houseOrderDao.save(houseOrder);
+        return houseOrderDao.save(origHouseOrder);
     }
 
     /**
@@ -104,5 +104,10 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public Page<HouseOrder> pageByAgentId(Integer agentId, Pageable pageable) {
         return houseOrderDao.pageByAgentId(agentId,pageable);
+    }
+
+    @Override
+    public HouseOrder findByBuyerIdAndOrderId(Integer buyerId, Integer houseOrderId) {
+        return houseOrderDao.findByBuyerIdAndOrderId(buyerId, houseOrderId);
     }
 }

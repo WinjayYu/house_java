@@ -43,14 +43,10 @@ public class BuyHouse implements Serializable {
 
     private String renovation;
 
-    //以字符串的形式存到数据库，因为用户可以发1-5个小区，已"|"隔开
-    @Column(name = "community_uid")
-    private String community;
+    @ManyToOne
+    @JoinColumn(name = "community_uid", referencedColumnName = "uid")
+    private Community community;
 
-    private String city;
-
-    @Transient
-    private List<Community> communityList;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -130,11 +126,11 @@ public class BuyHouse implements Serializable {
         this.renovation = renovation;
     }
 
-    public String getCommunity() {
+    public Community getCommunity() {
         return community;
     }
 
-    public void setCommunity(String community) {
+    public void setCommunity(Community community) {
         this.community = community;
     }
 
@@ -154,19 +150,5 @@ public class BuyHouse implements Serializable {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public List<Community> getCommunityList() {
-        return communityList;
-    }
 
-    public void setCommunityList(List<Community> communityList) {
-        this.communityList = communityList;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
 }

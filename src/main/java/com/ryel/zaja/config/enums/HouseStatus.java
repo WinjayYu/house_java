@@ -38,6 +38,24 @@ public enum HouseStatus {
         return status;
     }
 
+    public static List<String> getUserCanSeeStatus() {
+        List<String> status = new ArrayList<String>();
+        status.add(HouseStatus.PUTAWAY_YET.getCode());
+        return status;
+    }
+
+    public static List<String> getManagerCanSeeStatus() {
+        List<String> status = new ArrayList<String>();
+        status.add(HouseStatus.SAVED.getCode());
+        status.add(HouseStatus.ENABLED.getCode());
+        status.add(HouseStatus.PUTAWAY_YET.getCode());
+        status.add(HouseStatus.SOLD_OUT_YET.getCode());
+        status.add(HouseStatus.IN_CONNECT.getCode());
+        status.add(HouseStatus.CLOSED.getCode());
+
+        return status;
+    }
+
 
     public static Map<String, String> getEnumMap() {
         Map<String, String> map = new LinkedHashMap<>();

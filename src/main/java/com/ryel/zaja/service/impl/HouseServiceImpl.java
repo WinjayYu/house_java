@@ -8,11 +8,9 @@ import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.entity.House;
+import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.entity.User;
-import com.ryel.zaja.service.AbsCommonService;
-import com.ryel.zaja.service.CommunityService;
-import com.ryel.zaja.service.HouseService;
-import com.ryel.zaja.service.ICommonService;
+import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.ClassUtil;
 import com.ryel.zaja.utils.GetDistanceUtil;
@@ -53,9 +51,19 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Autowired
     EntityManagerFactory emf;
 
+    @Autowired
+    SellHouseService sellHouseService;
+
     @Override
     @Transactional
     public House create(House house) {
+
+        //经纪人从已有的sellHouse编辑房源，则sellHouse的house_num加1
+        if(null != house.getSellHouse()){
+            SellHouse sellHouse = house.getSellHouse();
+            sellHouse.setHouseNum(sellHouse.getHouseNum() + 1);
+            sellHouseService.save(sellHouse);
+        }
         return houseDao.save(house);
     }
 
@@ -172,6 +180,28 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
+    public Page<House> findByUids(List<String> uids,String type, Pageable pageable) {
+        List<String> list = new ArrayList<>();
+        if (UserType.AGENT.getCode().equals(type)) {
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            return houseDao.findByUids(uids, list, pageable);
+        }else if(UserType.USER.getCode().equals(type)){
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            return houseDao.findByUids(uids, list, pageable);
+        }else{
+            list.add(HouseStatus.SAVED.getCode());
+            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.SOLD_OUT_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            list.add(HouseStatus.CLOSED.getCode());
+            return houseDao.findByUids(uids, list, pageable);
+        }
+    }
+
+
+    @Override
     public List<House> findByCity(String city) {
         return houseDao.findByCity(city);
     }
@@ -198,7 +228,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     public List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation) {
-        return houseDao.findSimilar(price, uid, area, renovation);
+        return houseDao.findSimilar(price, uid, area, renovation,HouseStatus.getUserCanSeeStatus());
     }
 
     @Override
@@ -206,9 +236,27 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return houseDao.agentFindSimilar(price, uid, area, renovation,HouseStatus.getAgentCanSeeStatus());
     }
 
+
     @Override
-    public Page<House> findByCommunities(List<String> uids, Pageable pageable) {
-        return houseDao.findByCommunities(uids, pageable);
+    public Page<House> findByAddTime(String type, Pageable pageable) {
+        List<String> list = new ArrayList<>();
+        if (UserType.AGENT.getCode().equals(type)) {
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            return houseDao.findByAddTime(list, pageable);
+        }else if(UserType.USER.getCode().equals(type)){
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            return houseDao.findByAddTime(list, pageable);
+        }else{
+            list.add(HouseStatus.SAVED.getCode());
+            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.PUTAWAY_YET.getCode());
+            list.add(HouseStatus.SOLD_OUT_YET.getCode());
+            list.add(HouseStatus.IN_CONNECT.getCode());
+            list.add(HouseStatus.CLOSED.getCode());
+            return houseDao.findByAddTime(list, pageable);
+        }
+
     }
 
     @Override
@@ -216,15 +264,6 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return houseDao.findByCommunitiesStatus(status, uidList, pageable);
     }
 
-    @Override
-    public Page<House> findByAddTime(Pageable pageable) {
-        return houseDao.findByAddTime(pageable);
-    }
-
-    @Override
-    public List<House> findByCommunities(List<String> uids) {
-        return null;
-    }
 
     @Override
     public Page<House> findBySellHouse(Integer userId, Pageable pageable) {
@@ -312,6 +351,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
                     Expression<String> exp = root.get("status").as(String.class);
                     predicateList.add(exp.in(list));
+
                 }
 
                 if (predicateList.size() > 0) {
@@ -357,4 +397,12 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     public JpaRepository<House, Integer> getDao() {
         return houseDao;
     }
+
+    //用户端查看经纪人发布的房源
+    @Override
+    public Page<House> pageByAgentId2(int agentId, Pageable pageable) {
+        return houseDao.pageByAgentId2(agentId, HouseStatus.PUTAWAY_YET.getCode(), pageable);
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
@@ -86,7 +87,7 @@ public class OrderApi {
     }
 
     /**
-     * 确认房屋交接
+     * 确认房屋交接，状态值从"40"变成"50"
      * @param userId
      * @param houseOrderId
      * @return
@@ -104,5 +105,33 @@ public class OrderApi {
         }
     }
 
+
+    /**
+     * 申请退款,状态值从"30"变成"31"
+     * @param buyerId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "rebate", method = RequestMethod.POST)
+    public Result rebate(@RequestParam(value = "userId") Integer buyerId, Integer houseOrderId){
+        try{
+            if(null == buyerId || null == houseOrderId){
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(buyerId, houseOrderId);
+            if(null == houseOrder){
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            }
+            //如果订单状态不是“经济人待确认”，则是非法操作
+            if(!HouseOrderStatus.WAIT_AGENT_COMFIRM.getCode().equals(houseOrder.getStatus())){
+                return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+            }
+            houseOrder.setStatus(HouseOrderStatus.APPLY_REBATE.getCode());
+            return Result.success().msg("").data(houseOrderService.update(houseOrder));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+    }
 
 }

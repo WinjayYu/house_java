@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface CommentService extends ICommonService<Comment>{
 
-    void create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content);
+    Comment create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content);
 
     Comment findByHouseOrderId(Integer houseOrderId);
 

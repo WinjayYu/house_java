@@ -23,10 +23,13 @@ public interface BuyHouseDao extends JpaRepository<BuyHouse, Integer> ,JpaSpecif
     @Query("select b from BuyHouse b where b.user.id = ?1")
     Page<BuyHouse> findByUserId(Integer userId, Pageable pageable);
 
-    @Query("select h from BuyHouse h where h.community in ?1")
-    Page<BuyHouse> findByUidList(List<String> uidList, Pageable pageable);
+    @Query("select h from BuyHouse h where h.community.uid in ?1 and h.id not in ?2")
+    Page<BuyHouse> findByUidList(List<String> uidList, List<Integer> list, Pageable pageable);
 
     @Query("select h from BuyHouse h")
     Page<BuyHouse> findPage(Pageable pageable);
+
+    @Query("select b.id from BuyHouse b where b.user.id = ?1")
+    List<Integer> findByUserIdAsId(Integer userId);
 
 }

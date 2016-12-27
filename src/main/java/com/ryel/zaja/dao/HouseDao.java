@@ -19,15 +19,14 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     @Query("select h from House h where h.layout = ?1 and h.status in ?2")
     List<House> findByHouseLayout(String layout, List<String> status);
-    List<House> findByCommunityName(String communityName);
-    List<House> findByLayout(String layout, List<String> status);
-
-    List<House> findByCommunityAddress(String communityAddress);
 
     List<House> findByCity(String city);
 
     @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
     Page<House> findByUid(String uid, List<String> status, Pageable pageable);
+
+    @Query("select h from House h where h.community.uid in ?1 and h.status in ?2")
+    Page<House> findByUids(List<String> uid, List<String> status, Pageable pageable);
 
     @Query("select h from House h where h.community.uid = ?1 and h.status in ?2")
     List<House> findByCommunityUid(String uid, List<String> status);
@@ -35,8 +34,8 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select h from House h where h.agent.id = ?1 and h.sellHouse.id = ?2")
     List<House> findByAgentIdAndSellHouseId(Integer agentId, Integer sellHouseId);
 
-    @Query("select h from House h where abs(h.price - ?1) < 100000 or (h.community.uid = ?2 or h.area = ?3 or h.renovation = ?4) order by h.price asc")
-    List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation);
+    @Query("select h from House h where h.status in ?5 and abs(h.price - ?1) < 100000 or (h.community.uid = ?2 or h.area = ?3 or h.renovation = ?4) order by h.price asc")
+    List<House> findSimilar(BigDecimal price, String uid, BigDecimal area, String renovation,List<String> status);
 
     @Query("select h from House h where h.status in ?5 and( abs(h.price - ?1) < 100000 or (h.community.uid = ?2 or h.area = ?3 or h.renovation = ?4))  order by h.price asc")
     List<House> agentFindSimilar(BigDecimal price, String uid, BigDecimal area, String renovation,List<String> status);
@@ -44,17 +43,18 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select b from House b where b.agent.id = ?1")
     Page<House> pageByAgentId(Integer agentId, Pageable pageable);
 
+    //用户端查看经纪人发布的房源
+    @Query("select b from House b where b.agent.id = ?1 and b.status = ?2" )
+    Page<House> pageByAgentId2(Integer agentId, String status, Pageable pageable);
+
     @Query("select b from House b where b.community.uid = ?1 and b.status in ?2")
     Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable);
 
     @Query("select b from House b where b.status in ?1 ")
     Page<House> agentPage(List<String> status, Pageable pageable);
 
-    @Query("select h from House h where h.community.uid in ?1")
-    Page<House> findByCommunities(List<String> uidList, Pageable pageable);
-
-    @Query("select h from House h order by h.addTime")
-    Page<House> findByAddTime(Pageable pageable);
+    @Query("select h from House h where h.status in ?1 order by h.addTime")
+    Page<House> findByAddTime(List<String> list, Pageable pageable);
 
     @Query("select h from House h where h.sellHouse.id = ?1")
     Page<House> findBySellHouse(Integer userId, Pageable pageable);

@@ -49,7 +49,7 @@
                 <spring.dataSource.username>root</spring.dataSource.username>
                 <spring.dataSource.password>Za123ja2016</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/zaja</doc.base.url>
-                <pro.upload.path>D:/tomcat-8.5.8/webapps/files/upload</pro.upload.path>
+                <pro.upload.path>D:/tomcat-8.5.8/webapps/files/upload/</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>

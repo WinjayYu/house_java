@@ -3,6 +3,7 @@ package com.ryel.zaja.dao;
 import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.SellHouse;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -23,4 +24,9 @@ public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpec
     @Query("select b from SellHouse b")
     Page<SellHouse> pageAll(Pageable pageable);
 
+    @Query("select s from SellHouse s where s.community.uid in ?1 and s.id not in ?2")
+    Page<SellHouse> agentPage(List<String> uids, List<Integer> list, Pageable pageable);
+
+    @Query("select s.id from SellHouse s where s.user.id = ?1")
+    List<Integer> findByUserIdAsId(Integer userId);
 }
