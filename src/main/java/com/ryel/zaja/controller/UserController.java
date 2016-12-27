@@ -4,14 +4,17 @@ package com.ryel.zaja.controller;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.UserService;
+import com.ryel.zaja.utils.DataTableFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * Created by burgl on 2016/8/28.
@@ -30,7 +33,19 @@ public class UserController  extends BaseController{
         return "用户列表";
     }
 
+    @RequestMapping("/agentIndex")
+    public String agentIndex(){
+        return "经济人列表";
+    }
 
+    @RequestMapping("/agentList")
+    @ResponseBody
+    public Map list(Integer draw, Integer start, Integer length, String name) {
+        int pageNum = getPageNum(start, length);
+        Page<User> page = userService.pageAgent(pageNum, length, name);
+        Map<String, Object> result = DataTableFactory.fitting(draw, page);
+        return result;
+    }
 
 
 

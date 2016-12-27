@@ -125,6 +125,34 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     }
 
     @Override
+    public Page<User> pageAgent(int pageNum, int pageSize,final String name) {
+        Page<User> page = userDao.findAll(new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicateList = new ArrayList<Predicate>();
+                Predicate result = null;
+                {
+                    Predicate predicate = cb.equal(root.get("type").as(String.class), UserType.AGENT.getCode());
+                    predicateList.add(predicate);
+                }
+                if(StringUtils.isNotBlank(name)){
+                    Predicate predicate = cb.like(root.get("name").as(String.class), "%"+name+"%");
+                    predicateList.add(predicate);
+                }
+                if (predicateList.size() > 0) {
+                    result = cb.and(predicateList.toArray(new Predicate[]{}));
+                }
+                if (result != null) {
+                    query.where(result);
+                }
+                return query.getRestriction();
+            }
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+
+        return page;
+    }
+
+    @Override
     @Transactional
     public void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
                               MultipartFile positive, MultipartFile negative, MultipartFile companyPic) {
