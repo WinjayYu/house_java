@@ -239,12 +239,12 @@ public class AgentApi {
                     Map<String, Object> dataMap = APIFactory.fitting(page);
                     return Result.success().msg("").data(dataMap);
                 }else{
-                    Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
+                    Page<House> page = houseService.findByAddTime(UserType.AGENT.getCode(), new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC));
                     Map<String, Object> dataMap = APIFactory.fitting(page);
                     return Result.success().msg("").data(dataMap);
                 }
             }else{
-                Page<House> page = houseService.findByAddTime(new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "addTime"));
+                Page<House> page = houseService.findByAddTime(UserType.AGENT.getCode(), new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "addTime"));
                 Map<String, Object> dataMap = APIFactory.fitting(page);
                 return Result.success().msg("").data(dataMap);
             }
@@ -320,11 +320,11 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
+
+
             Page<SellHouse> page = agentSellHouseService.pageSellHouseByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
-            }
+
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
@@ -346,11 +346,17 @@ public class AgentApi {
                 pageSize = 1;
             }
             Page<BuyHouse> page = null;
+
+            List<Integer> list = agentBuyHouseService.findBuyHouseByAgentId(agentId);
+            list.addAll(buyHouseService.findByUserIdAsId(agentId));
+            //给一个默认值，防止list为null的时候sql报错
+            list.add(-1);
+
             if (null != longitude && null != latitude && null != city) {
                 List<String> uids = BizUtil.nearbyCommunity(longitude,latitude,city,communityService);
-                page =  buyHouseService.agentPage(agentId,pageNum,pageSize,uids);
+                page =  buyHouseService.agentPage(agentId,pageNum,pageSize,uids,list);
             }else {
-                page =  buyHouseService.agentPage(agentId,pageNum,pageSize,null);
+                page =  buyHouseService.agentPage(agentId,pageNum,pageSize,null,list);
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -364,7 +370,7 @@ public class AgentApi {
      * 全部卖房需求列表
      */
     @RequestMapping(value = "allsellhouselist", method = RequestMethod.POST)
-    public Result allsellhouselist(Integer pageNum, Integer pageSize) {
+    public Result allsellhouselist(Integer agentId, Integer pageNum, Integer pageSize,Double longitude,Double latitude,String city) {
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -372,7 +378,19 @@ public class AgentApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<SellHouse> page = sellHouseService.pageAll(pageNum,pageSize);
+
+            Page<SellHouse> page;
+            List<Integer> list = agentSellHouseService.findSellHouseByAgentId(agentId);
+            list.addAll(sellHouseService.findByUserIdAsId(agentId));
+            //给一个默认值，防止list为null的时候sql报错
+            list.add(-1);
+
+            if(null != longitude && null != latitude && null != city){
+                List<String> uids = BizUtil.nearbyCommunity(longitude,latitude,city,communityService);
+                page =  sellHouseService.agentPage(pageNum,pageSize,uids,list);
+            }else{
+                page =  sellHouseService.agentPage(pageNum,pageSize,null,list);
+            }
             if (null == page) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
             }
@@ -459,7 +477,7 @@ public class AgentApi {
     @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
     public Result receiveorder(Integer demandId,Integer agentId,String type) {
         try {
-            if(demandId == null || ("10".equals(type) && "20".equals(type))){
+            if(demandId == null){
                 return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             User user = new User();
@@ -467,22 +485,29 @@ public class AgentApi {
             if("10".equals(type)){       // 接买房单
                 AgentBuyHouse agentBuyHouse = new AgentBuyHouse();
                 agentBuyHouse.setAgent(user);
-                BuyHouse buyHouse = new BuyHouse();
-                buyHouse.setId(demandId);
+                BuyHouse buyHouse = buyHouseService.findById(demandId);
+                if(buyHouse.getUser().getId().equals(agentId)){
+                    return Result.error().msg(Error_code.ERROR_CODE_0033).data(new HashMap<>());
+                }
                 agentBuyHouse.setBuyHouse(buyHouse);
-                agentBuyHouseService.save(agentBuyHouse);
+                agentBuyHouseService.create(agentBuyHouse);
             }else{                      // 接卖房单
                 AgentSellHouse agentSellHouse = new AgentSellHouse();
                 agentSellHouse.setAgent(user);
-                SellHouse sellHouse = new SellHouse();
-                sellHouse.setId(demandId);
+                SellHouse sellHouse = sellHouseService.findById(demandId);
+                if(sellHouse.getUser().getId().equals(agentId)){
+                    return Result.error().msg(Error_code.ERROR_CODE_0033).data(new HashMap<>());
+                }
                 agentSellHouse.setSellHouse(sellHouse);
-                agentSellHouseService.save(agentSellHouse);
+                agentSellHouseService.create(agentSellHouse);
             }
             return Result.success().msg("").data(new HashMap<>());
-        } catch (Exception e) {
+        }catch(BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(be.getMessage()).data(new HashMap<>());
+        }catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
     }
 
@@ -748,7 +773,11 @@ public class AgentApi {
                 }
                 houseOrder.setHouse(house);
                 houseOrder.setCommunity(house.getCommunity());
-                houseOrder.setSeller(house.getSellHouse().getUser());
+                if(null != house.getSellHouse()) {
+                    houseOrder.setSeller(house.getSellHouse().getUser());
+                }else {
+                    houseOrder.setSeller(userService.findById(agentId));
+                }
             } else {
                 type = HouseOrderType.FROM_CUSTOM.getCode();
                 if (area == null || price == null || community == null
@@ -773,7 +802,7 @@ public class AgentApi {
             houseOrder.setAddTime(new Date());
             houseOrder.setCode(code);
             houseOrderService.save(houseOrder);
-            return Result.success();
+            return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(e.getCode());

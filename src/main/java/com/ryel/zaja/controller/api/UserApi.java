@@ -4,6 +4,7 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
+import com.ryel.zaja.entity.AgentMaterial;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.ThirdUser;
 import com.ryel.zaja.entity.User;
@@ -429,6 +430,36 @@ public class UserApi {
 
             Map<String, Object> dataMap = APIFactory.fitting(houses);
             return Result.success().data(dataMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+
+    /**
+     * 申请成为经纪人
+     */
+    @RequestMapping(value = "apply", method = RequestMethod.POST)
+    public Result register(User user, AgentMaterial agentMaterial, String verifycode,
+                           @RequestParam(required = false) MultipartFile positiveFile,
+                           @RequestParam(required = false) MultipartFile negativeFile,
+                           @RequestParam(required = false) MultipartFile companyPicFile) {
+        try {
+            // 校验验证码
+            Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
+            if (null == origVerCode) {
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
+            }
+            if (!origVerCode.equals(verifycode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+            }
+
+            userService.agentRegister(user,agentMaterial,verifycode,positiveFile,negativeFile,companyPicFile);
+            return Result.success().msg("").data(new HashMap<>());
+        } catch (BizException e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(e.getCode()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());

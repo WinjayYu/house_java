@@ -68,10 +68,10 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
     }
 
     @Override
-    public  Page<BuyHouse> agentPage(Integer agentId, Integer pageNum, Integer pageSize, List<String> uids) {
+    public  Page<BuyHouse> agentPage(Integer agentId, Integer pageNum, Integer pageSize, List<String> uids, List<Integer> list) {
         Page<BuyHouse> page;
         if(!CollectionUtils.isEmpty(uids)){
-            page = buyHouseDao.findByUidList(uids, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+            page = buyHouseDao.findByUidList(uids, list, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
         }else {
             page = buyHouseDao.findPage(new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
         }
@@ -87,5 +87,10 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
 //        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
 
         return page;
+    }
+
+    @Override
+    public List<Integer> findByUserIdAsId(Integer userId) {
+        return buyHouseDao.findByUserIdAsId(userId);
     }
 }

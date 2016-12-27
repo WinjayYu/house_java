@@ -1,6 +1,10 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.dao.Impl.CommentDaoImpl;
+import com.ryel.zaja.entity.HouseOrder;
+import com.ryel.zaja.service.HouseOrderService;
+import com.ryel.zaja.service.HouseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ryel.zaja.config.Error_code;
@@ -45,9 +49,12 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
     @Autowired
     CommentDaoImpl commentDaoImpl;
 
+    @Autowired
+    HouseOrderService houseOrderService;
+
     @Transactional
     @Override
-    public void create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content) {
+    public Comment create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content) {
         try{
             Comment comment = new Comment();
             comment.setAddTime(new Date());
@@ -56,9 +63,14 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
             comment.setHouseOrder(houseOrderDao.findOne(houseOrderId));
             comment.setContent(content);
             comment.setStar(star);
-            commentDao.save(comment);
+
+            HouseOrder houseOrder = comment.getHouseOrder();
+            houseOrder.setStatus(HouseOrderStatus.FINISHED.getCode());
+            houseOrderService.update(houseOrder);
+
+            return commentDao.save(comment);
         }catch (BizException be){
-            new BizException(Error_code.ERROR_CODE_0019);
+           throw new BizException(Error_code.ERROR_CODE_0019);
         }
     }
 

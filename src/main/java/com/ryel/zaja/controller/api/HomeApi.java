@@ -62,7 +62,7 @@ public class HomeApi {
         HomeCoverUrl homeCoverUrl = homeCoverUrlService.find(1);
         home.put("homeCoverUrl", homeCoverUrl);
 
-        String type = "10";//用户类型,默认为用户
+        String type = UserType.USER.getCode();//用户类型,默认为用户
 
         //如果有userId，则调用recommend方法，zaja推荐
         if (null != userId) {
@@ -161,15 +161,16 @@ public class HomeApi {
             List<House> houses = new ArrayList<House>();
 
             //加上小区一样的房源
-            if (-1 != bh.getCommunity().indexOf("|")) {
+            /*if (-1 != bh.getCommunity().indexOf("|")) {
                 String[] str = bh.getCommunity().split("\\|");
-//                int j = new Random().nextInt(str.length);
+                int j = new Random().nextInt(str.length);
                 for (int i = 0; i < str.length; i++) {
                     houses.addAll(houseService.findByCommunityUid(str[i], type));
                 }
-            } else {
-                houses = houseService.findByCommunityUid(bh.getCommunity(), type);
-            }
+            } else {*/
+
+            houses = houseService.findByCommunityUid(bh.getCommunity().getUid(), type);
+
             //加上户型一样的房源
             houses.addAll(houseService.findByLayout(bh.getLayout(), type));
 

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -50,4 +51,15 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
         return sellHouseDao.pageAll(new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
     }
 
+
+    @Override
+    public Page<SellHouse> agentPage(Integer pageNum, Integer pageSize, List<String> uids, List<Integer> list) {
+
+        return sellHouseDao.agentPage(uids, list, new PageRequest(pageNum-1,pageSize, Sort.Direction.DESC, "id"));
+    }
+
+    @Override
+    public List<Integer> findByUserIdAsId(Integer userId) {
+        return sellHouseDao.findByUserIdAsId(userId);
+    }
 }

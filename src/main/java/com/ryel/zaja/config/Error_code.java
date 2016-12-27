@@ -65,4 +65,9 @@ public interface Error_code {
     String ERROR_CODE_0030 = "error_30";   // 【注册】该手机号已经绑定相应的身份证信息
 
     String ERROR_CODE_0031 = "error_31";   // 【注册】该手机号为用户账号，请走用户申请流程
+
+    String ERROR_CODE_0032 = "error_32";   // 【接单】您已接过此单，不能重复接单
+
+    String ERROR_CODE_0033 = "error_33";   // 【接单】不能接收自己发布的订单
+
 }

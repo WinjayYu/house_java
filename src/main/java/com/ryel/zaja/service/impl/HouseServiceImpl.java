@@ -8,11 +8,9 @@ import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.entity.Community;
 import com.ryel.zaja.entity.House;
+import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.entity.User;
-import com.ryel.zaja.service.AbsCommonService;
-import com.ryel.zaja.service.CommunityService;
-import com.ryel.zaja.service.HouseService;
-import com.ryel.zaja.service.ICommonService;
+import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.ClassUtil;
 import com.ryel.zaja.utils.GetDistanceUtil;
@@ -53,9 +51,19 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     @Autowired
     EntityManagerFactory emf;
 
+    @Autowired
+    SellHouseService sellHouseService;
+
     @Override
     @Transactional
     public House create(House house) {
+
+        //经纪人从已有的sellHouse编辑房源，则sellHouse的house_num加1
+        if(null != house.getSellHouse()){
+            SellHouse sellHouse = house.getSellHouse();
+            sellHouse.setHouseNum(sellHouse.getHouseNum() + 1);
+            sellHouseService.save(sellHouse);
+        }
         return houseDao.save(house);
     }
 
@@ -248,18 +256,12 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             list.add(HouseStatus.CLOSED.getCode());
             return houseDao.findByAddTime(list, pageable);
         }
-    public Page<House> findByCommunities(List<String> uids, Pageable pageable) {
-        return houseDao.findByCommunities(uids, pageable);
+
     }
 
     @Override
     public Page<House> findByCommunitiesStatus(List<String> status, List<String> uidList, Pageable pageable) {
         return houseDao.findByCommunitiesStatus(status, uidList, pageable);
-    }
-
-    @Override
-    public Page<House> findByAddTime(Pageable pageable) {
-        return houseDao.findByAddTime(pageable);
     }
 
 
@@ -380,4 +382,6 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     public Page<House> pageByAgentId2(int agentId, Pageable pageable) {
         return houseDao.pageByAgentId2(agentId, HouseStatus.PUTAWAY_YET.getCode(), pageable);
     }
+
+
 }
