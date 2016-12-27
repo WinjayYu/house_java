@@ -3,9 +3,9 @@ package com.ryel.zaja.config.enums;
 import java.util.LinkedHashMap;
 import java.util.Map;
 public enum AgentRegisterStatus {
-    APPROVE_APPLY    ("10", "申请审核"),
-    APPROVE_PASS     ("20", "审核通过"),
-    APPROVE_REJECT   ("30", "审核驳回"),
+    APPROVE_APPLY    ("10", "待审核"),
+    APPROVE_PASS     ("20", "通过"),
+    APPROVE_REJECT   ("30", "驳回"),
     OTHER            ("-1", "其他"),
     ;
 

@@ -136,7 +136,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             return houseDao.findByCommunityUid(uid, list);
         }else{
             list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.REJECT.getCode());
             list.add(HouseStatus.PUTAWAY_YET.getCode());
             list.add(HouseStatus.SOLD_OUT_YET.getCode());
             list.add(HouseStatus.IN_CONNECT.getCode());
@@ -162,7 +162,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             return houseDao.findByUid(uid, list, pageable);
         }else{
             list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.REJECT.getCode());
             list.add(HouseStatus.PUTAWAY_YET.getCode());
             list.add(HouseStatus.SOLD_OUT_YET.getCode());
             list.add(HouseStatus.IN_CONNECT.getCode());
@@ -187,7 +187,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             return houseDao.findByHouseLayout(houseType, list);
         }else{
             list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.REJECT.getCode());
             list.add(HouseStatus.PUTAWAY_YET.getCode());
             list.add(HouseStatus.SOLD_OUT_YET.getCode());
             list.add(HouseStatus.IN_CONNECT.getCode());
@@ -313,6 +313,27 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                     Expression<String> exp = root.get("status").as(String.class);
                     predicateList.add(exp.in(list));
                 }
+
+                if (predicateList.size() > 0) {
+                    result = cb.and(predicateList.toArray(new Predicate[]{}));
+                }
+                if (result != null) {
+                    query.where(result);
+                }
+                return query.getRestriction();
+            }
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+
+        return page;
+    }
+
+    @Override
+    public Page<House> mgtPageHouse(int pageNum, int pageSize) {
+        Page<House> page = houseDao.findAll(new Specification<House>() {
+            @Override
+            public Predicate toPredicate(Root<House> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicateList = new ArrayList<Predicate>();
+                Predicate result = null;
 
                 if (predicateList.size() > 0) {
                     result = cb.and(predicateList.toArray(new Predicate[]{}));

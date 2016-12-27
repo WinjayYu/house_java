@@ -6,7 +6,7 @@
     <%@ include file="inc/meta.jsp" %>
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>经济人列表</title>
+    <title>房源列表</title>
     <%@ include file="inc/css.jsp" %>
 </head>
 
@@ -19,7 +19,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">经济人列表</h1>
+                <h1 class="page-header">房源列表</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -43,10 +43,10 @@
                                 </colgroup>
                                 <thead>
                                 <tr>
-                                    <th>昵称</th>
-                                    <th>手机号</th>
+                                    <th>ID</th>
+                                    <th>标题</th>
+                                    <th>户型</th>
                                     <th>状态</th>
-                                    <th>创建时间</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -270,9 +270,9 @@
 
 <script type="text/javascript">
 
-    var userList = {
+    var _this = {
         v: {
-            id: "userList",
+            id: "_this",
             list: [],
             dTable: null
         },
@@ -284,7 +284,7 @@
                 self.dataTableInit();
 
                 $("#c_search").click(function () {
-                    userList.v.dTable.ajax.reload();
+                    _this.v.dTable.ajax.reload();
                 })
 
                 $("#batchDelete").click(function(){
@@ -302,20 +302,20 @@
                 })
             },
             dataTableInit: function () {
-                userList.v.dTable = $health.dataTable($('#dataTables'), {
+                _this.v.dTable = $health.dataTable($('#dataTables'), {
                     "processing": true,
                     "serverSide": true,
                     "searching":false,
                     "ordering": false,
                     "ajax": {
-                        "url": "mgt/user/agentList",
+                        "url": "mgt/house/list",
                         "type": "POST"
                     },
                     "columns": [
-                        {"data": "nickname"},
-                        {"data": "mobile"},
-                        {"data": "agentStatus"},
-                        {"data": "addTime"},
+                        {"data": "id"},
+                        {"data": "title"},
+                        {"data": "layout"},
+                        {"data": "status"},
                         {"data": ""}
                     ],
                     "columnDefs": [
@@ -327,14 +327,20 @@
                     ],
                     "createdRow": function (row, data, index) {
                         var status = "";
-                        if(data.agentStatus=="10"){
+                        if(data.status=="10"){
                             status="待审核";
-                        }else if(data.agentStatus=="20"){
-                            status="通过";
-                        }else if(data.agentStatus=="30"){
-                            status="驳回";
+                        }else if(data.status=="20"){
+                            status="审核驳回";
+                        }else if(data.status=="30"){
+                            status="已上架";
+                        }else if(data.status=="30"){
+                            status="已下架";
+                        }else if(data.status=="30"){
+                            status="交接中";
+                        }else if(data.status=="30"){
+                            status="已关闭";
                         }
-                        $('td', row).eq(2).html(status);
+                        $('td', row).eq(3).html(status);
                         var btnHtml = "<button   title='通过'  class='btn btn-primary btn-circle pass'>" +
                                 "<i class='fa fa-edit'></i>" +
                                 "</button>" +
@@ -342,20 +348,20 @@
                                 "<button  title='驳回'  class='btn btn-default btn-circle reject'>" +
                                 "<i class='fa fa-close'></i>" +
                                 "</button>";
-                        if(data.agentStatus != "20" && data.agentStatus != "30"){
+                        if(data.status == "10"){
                             $('td', row).last().html(btnHtml);
                         }
 
                     },
                     "footerCallback": function( tfoot, data, start, end, display ) {
-                        userList.v.list=data
+                        _this.v.list=data
                     },
                     "rowCallback": function (row, data) {
                         $('td', row).last().find(".pass").click(function(){
-                            userList.fn.approve(data.id,"0");
+                            _this.fn.approve(data.id,"0");
                         });
                         $('td', row).last().find(".reject").click(function(){
-                            userList.fn.approve(data.id,"1");
+                            _this.fn.approve(data.id,"1");
                         });
                     },
                     "fnServerParams": function (aoData) {
@@ -379,7 +385,7 @@
                 }
             },
             userDetail: function (item) {
-                userList.fn.showModal("userDetailModal", "用户详情");
+                _this.fn.showModal("userDetailModal", "用户详情");
                 for (var key in item) {
                     var element = $("#userDetailModal span[_name=" + key + "]")
                     var text = item[key];
@@ -400,7 +406,7 @@
                 if (ids.length > 0) {
                     $health.optNotify(function () {
                         $health.ajax("user/delete", {ids:JSON.stringify(ids)}, function (result) {
-                            userList.fn.responseComplete(result);
+                            _this.fn.responseComplete(result);
                         })
                     },"你确定要删除吗？","确定");
                 }
@@ -411,14 +417,14 @@
                     btn = "驳回";
                 }
                 $health.optNotify(function () {
-                    $health.ajax("mgt/user/agentApprove", {id:id,type:type}, function (result) {
-                        userList.fn.responseComplete(result,true);
+                    $health.ajax("mgt/house/approve", {id:id,type:type}, function (result) {
+                        _this.fn.responseComplete(result,true);
                     })
                 },"你确定要"+btn+"吗？","确定");
             },
             edit: function (id) {
-                userList.fn.showModal("userModal","修改用户");
-                var items = userList.v.list;
+                _this.fn.showModal("userModal","修改用户");
+                var items = _this.v.list;
                 $.each(items, function (index, item) {
                     if (item.id == id) {
                         for (var key in item) {
@@ -428,9 +434,9 @@
                             }
                             if (key == "imgUrl") {
                                 if (item.imgUrl) {
-                                    userList.fn.viewImage(item.imgUrl);
+                                    _this.fn.viewImage(item.imgUrl);
                                 } else {
-                                    userList.fn.clearImageView();
+                                    _this.fn.clearImageView();
                                 }
                             }
                             if(key == "description"){
@@ -447,7 +453,7 @@
                 $("#userForm").ajaxSubmit({
                     dataType: "json",
                     success: function (result) {
-                        userList.fn.responseComplete(result,true,$("#userModal"));
+                        _this.fn.responseComplete(result,true,$("#userModal"));
                     },
                     error:function(result){
                         $health.errCallBack(result);
@@ -460,9 +466,9 @@
                         modal.modal("hide");
                     }
                     if(action){
-                        userList.v.dTable.ajax.reload(null, false);
+                        _this.v.dTable.ajax.reload(null, false);
                     }else{
-                        userList.v.dTable.ajax.reload();
+                        _this.v.dTable.ajax.reload();
                     }
                     $health.notify(result.msg, "success");
                 } else {
@@ -480,7 +486,7 @@
     }
 
     $(document).ready(function () {
-        userList.fn.init();
+        _this.fn.init();
     });
 
 

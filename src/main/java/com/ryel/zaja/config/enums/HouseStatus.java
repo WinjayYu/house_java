@@ -7,7 +7,7 @@ import java.util.Map;
 
 public enum HouseStatus {
     SAVED         ("10", "待审核"),
-    ENABLED       ("20", "审核驳回"),
+    REJECT        ("20", "审核驳回"),
     PUTAWAY_YET   ("30", "已上架"),
     SOLD_OUT_YET  ("40", "已下架"),
     IN_CONNECT    ("50", "交接中"),

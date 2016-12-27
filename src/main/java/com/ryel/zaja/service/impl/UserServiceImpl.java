@@ -125,7 +125,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     }
 
     @Override
-    public Page<User> pageAgent(int pageNum, int pageSize,final String name) {
+    public Page<User> mgtPageAgent(int pageNum, int pageSize,final String name) {
         Page<User> page = userDao.findAll(new Specification<User>() {
             @Override
             public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
