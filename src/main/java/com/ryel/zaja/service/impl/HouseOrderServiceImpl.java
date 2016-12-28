@@ -3,12 +3,16 @@ package com.ryel.zaja.service.impl;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
+import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
+import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.entity.Comment;
+import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.HouseOrder;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseOrderService;
+import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +34,12 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
 
     @Autowired
     private HouseOrderDao houseOrderDao;
+
+    @Autowired
+    private HouseDao houseDao;
+
+    @Autowired
+    private HouseService houseService;
 
     @Override
     @Transactional
@@ -70,6 +80,16 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
             throw new BizException(Error_code.ERROR_CODE_0025);
         }
         houseOrder.setStatus(HouseOrderStatus.WAIT_COMMENT.getCode());
+        if(null != houseOrder.getHouse()) {
+            if (null != houseOrder.getHouse().getSellHouse()) {
+                List<House> houses = houseDao.listBySellHouse(houseOrder.getHouse().getSellHouse().getId());
+                for (House house : houses) {
+                    house.setStatus(HouseStatus.CLOSED.getCode());
+                    houseService.update(house);
+                }
+
+            }
+        }
         return update(houseOrder);
     }
 
@@ -109,5 +129,26 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public HouseOrder findByBuyerIdAndOrderId(Integer buyerId, Integer houseOrderId) {
         return houseOrderDao.findByBuyerIdAndOrderId(buyerId, houseOrderId);
+    }
+
+    @Override
+    @Transactional
+    public HouseOrder payment(Integer userId, Integer houseOrderId) {
+        HouseOrder houseOrder = check(houseOrderId);
+        if(!HouseOrderStatus.WAIT_PAYMENT.getCode().equals(houseOrder.getStatus())){
+            throw new BizException(Error_code.ERROR_CODE_0034);
+        }
+        houseOrder.setStatus(HouseOrderStatus.IN_CONNECT.getCode());//房屋交接中
+        if(null != houseOrder.getHouse()) {
+            if (null != houseOrder.getHouse().getSellHouse()) {
+                List<House> houses = houseDao.listBySellHouse(houseOrder.getHouse().getSellHouse().getId());
+                for (House house : houses) {
+                    house.setStatus(HouseStatus.IN_CONNECT.getCode());
+                    houseService.update(house);
+                }
+
+            }
+        }
+        return update(houseOrder);
     }
 }

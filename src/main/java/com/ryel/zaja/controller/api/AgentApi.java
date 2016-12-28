@@ -820,7 +820,7 @@ public class AgentApi {
             if (order == null) {
                 return Result.error().msg(Error_code.ERROR_CODE_0025);
             }
-            if (!HouseOrderStatus.WAIT_AGENT_COMFIRM.getCode().equals(order.getStatus())) {
+            if (!HouseOrderStatus.IN_CONNECT.getCode().equals(order.getStatus())) {
                 return Result.error().msg(Error_code.ERROR_CODE_0025);
             }
             order.setStatus(HouseOrderStatus.WAIT_USER_COMFIRM.getCode());
