@@ -288,7 +288,7 @@ public class AgentApi {
                 }
 
                 neworder.put("id", order.getId());
-                neworder.put("code", order.getId());
+                neworder.put("code", order.getCode());
                 neworder.put("buyer", order.getBuyer());
                 neworder.put("status", order.getStatus());
                 neworder.put("type", order.getType());
@@ -810,7 +810,7 @@ public class AgentApi {
     /**
      * 经济人确定订单
      */
-    @RequestMapping(value = "agentconfirmorder")
+    @RequestMapping(value = "confirmorder")
     public Result agentconfirmorder(Integer agentId, Integer orderId) {
         try {
             if (agentId == null || orderId == null) {
@@ -824,6 +824,31 @@ public class AgentApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0025);
             }
             order.setStatus(HouseOrderStatus.WAIT_USER_COMFIRM.getCode());
+            houseOrderService.update(order);
+            return Result.success();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    /**
+     * 经济人确定申请退款
+     */
+    @RequestMapping(value = "refundorder")
+    public Result agentrefundorder(Integer agentId, Integer orderId) {
+        try {
+            if (agentId == null || orderId == null) {
+                return Result.error().msg(Error_code.ERROR_CODE_0023);
+            }
+            HouseOrder order = houseOrderService.findById(orderId);
+            if (order == null) {
+                return Result.error().msg(Error_code.ERROR_CODE_0025);
+            }
+            if (!HouseOrderStatus.APPLY_REBATE.getCode().equals(order.getStatus())) {
+                return Result.error().msg(Error_code.ERROR_CODE_0025);
+            }
+            order.setStatus(HouseOrderStatus.AGENT_COMFIRM_REBATE.getCode());
             houseOrderService.update(order);
             return Result.success();
         } catch (Exception e) {
