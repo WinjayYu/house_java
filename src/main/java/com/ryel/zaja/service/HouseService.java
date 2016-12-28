@@ -45,8 +45,6 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> mgtPageHouse(int pageNum, int pageSize);
 
-    Page<House> findByCommunities(List<String> uids, Pageable pageable);
-
     Page<House> findByCommunitiesStatus(List<String> status,List<String> uidList, Pageable pageable);
 
 

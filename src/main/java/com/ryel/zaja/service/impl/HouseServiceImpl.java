@@ -191,7 +191,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             return houseDao.findByUids(uids, list, pageable);
         }else{
             list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.REJECT.getCode());
             list.add(HouseStatus.PUTAWAY_YET.getCode());
             list.add(HouseStatus.SOLD_OUT_YET.getCode());
             list.add(HouseStatus.IN_CONNECT.getCode());
@@ -249,7 +249,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             return houseDao.findByAddTime(list, pageable);
         }else{
             list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.ENABLED.getCode());
+            list.add(HouseStatus.REJECT.getCode());
             list.add(HouseStatus.PUTAWAY_YET.getCode());
             list.add(HouseStatus.SOLD_OUT_YET.getCode());
             list.add(HouseStatus.IN_CONNECT.getCode());
