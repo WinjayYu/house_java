@@ -52,7 +52,9 @@ public class UserController  extends BaseController{
     @RequestMapping("/agentDetail")
     public ModelAndView agentDetail(Integer agentId) {
         ModelAndView modelAndView = new ModelAndView("经济人详情");
+        User user = userService.findById(agentId);
         AgentMaterial agentMaterial = agentMaterialService.findByAgentId(agentId);
+        modelAndView.addObject("user",user);
         modelAndView.addObject("agentMaterial",agentMaterial);
         return modelAndView;
     }
