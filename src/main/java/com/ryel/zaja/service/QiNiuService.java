@@ -2,10 +2,12 @@ package com.ryel.zaja.service;
 
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
+import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Configuration;
 import com.qiniu.util.Auth;
+import com.ryel.zaja.core.exception.BizException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -41,6 +43,9 @@ public class QiNiuService {
 
     UploadManager uploadManager = new UploadManager(c);
 
+    //实例化一个BucketManager对象
+    BucketManager bucketManager = new BucketManager(auth,c);
+
     //简单上传，使用默认策略，只需要设置上传的空间名就可以了
     public String getUpToken() {
         return auth.uploadToken(bucketname);
@@ -60,16 +65,8 @@ public class QiNiuService {
 
         } catch (QiniuException e) {
             Response r = e.response;
-            // 请求失败时打印的异常的信息
-            System.out.println(r.toString());
-            try {
-                //响应的文本信息
-                System.out.println(r.bodyString());
-            } catch (QiniuException e1) {
-                //ignore
-            }
+            throw new BizException(r.toString());
         }
-        return null;
     }
 
     public String getFileName(){
@@ -88,6 +85,15 @@ public class QiNiuService {
     }
 
 
+    //删除单个文件
+    public void deleteOneFile(String key){
+        try {
+            bucketManager.delete(bucketname, key);
+        }catch (QiniuException e){
+            Response r = e.response;
+            throw new BizException(r.toString());
+        }
+    }
 
     public  String getDomain() {
         return domain;

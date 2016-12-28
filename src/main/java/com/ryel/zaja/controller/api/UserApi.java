@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +56,7 @@ public class UserApi {
     private DefaultUploadFile defaultUploadFile;
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     private QiNiuService qiNiuService;
@@ -66,9 +67,15 @@ public class UserApi {
     @Autowired
     private HouseService houseService;
 
-    private static int EXPIRES = 10 * 60; //超时时间10min
-    private static int captchaW = 200;
-    private static int captchaH = 60;
+    @Resource
+    private BizUploadFile bizUploadFile;
+
+
+
+
+//    private static int EXPIRES = 10 * 60; //超时时间10min
+//    private static int captchaW = 200;
+//    private static int captchaH = 60;
 
     /**
      * @api {post} /api/user/register 1.APP用户注册
@@ -82,7 +89,7 @@ public class UserApi {
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public Result register(User user, @RequestParam("verCode") String verCode) {
-        ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+        ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
         String origVerCode = valueops.get(user.getMobile());
 //        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
         if (null == origVerCode) {
@@ -189,35 +196,29 @@ public class UserApi {
     public Result headUpload(Integer userId,
                              @RequestParam(required = true) MultipartFile image) throws Exception {
 
-        User user = userService.findById(userId);
-        FileBo fileBo = defaultUploadFile.uploadFile(image.getOriginalFilename(), image.getInputStream());
-
-        StringBuffer key = new StringBuffer();
-//        key.append(qiNiuService.getDomain());
-        key.append("user/" + userId + "/");
-        key.append(qiNiuService.getFileName());
-
-        String fileName = fileBo.getName();
-        String path = fileBo.getFile().toString();
-
-        String bodyString = null;
         try {
-            bodyString = qiNiuService.upload(path, key.toString());
-        } catch (Exception e) {
+
+            User user = userService.findById(userId);
+            if(null != user.getHead()){
+                String head = user.getHead();
+                String filename = head.substring(head.indexOf("user"));
+                qiNiuService.deleteOneFile(filename);
+            }
+
+            String path = bizUploadFile.uploadUserImageToQiniu(image, userId);
+            user.setId(userId);
+            user.setHead(path);
+            userService.update(user);
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("remotePath", path);
+            return Result.success().msg("").data(dataMap);
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
-
-        StringBuffer remotePath = new StringBuffer();
-        if (null != bodyString) {
-            remotePath.append(qiNiuService.getDomain());
-            remotePath.append(bodyString.substring(bodyString.indexOf("key") + 6, bodyString.length() - 2));
-        }
-
-        user.setHead(remotePath.toString());
-        userService.update(user);
-        Map<String, String> dataMap = new HashMap<>();
-        dataMap.put("remotePath", remotePath.toString());
-        return Result.success().msg("").data(dataMap);
     }
 
     /**
@@ -276,7 +277,7 @@ public class UserApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0012).data(new HashMap<>());//手机号未注册用户
             }
 
-            ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+            ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
             String origVerCode = valueops.get(mobile);
 
             if (null == origVerCode) {
@@ -306,10 +307,10 @@ public class UserApi {
     @RequestMapping(value = "sendverifycode", method = RequestMethod.POST)
     public Result verifyCode(String mobile, String type) {
         String verCode = VerifyCodeUtil.getVerCode();
-        ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+        ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
         valueops.set(mobile, verCode);
         //redisTemplate.opsForValue().set(mobile, verCode);
-        redisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
 
@@ -368,7 +369,7 @@ public class UserApi {
     @RequestMapping(value = "bindmobile", method = RequestMethod.POST)
     public String bindMobile(String mobile, String openid, String verCode) {
         try {
-            ValueOperations<String, String> valueops = redisTemplate.opsForValue();
+            ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
             String origVerCode = valueops.get(mobile);
 
             if (null == origVerCode) {
@@ -447,7 +448,7 @@ public class UserApi {
                            @RequestParam(required = false) MultipartFile companyPicFile) {
         try {
             // 校验验证码
-            Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
+            Object origVerCode = stringRedisTemplate.opsForValue().get(user.getMobile());
             if (null == origVerCode) {
                 return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
             }

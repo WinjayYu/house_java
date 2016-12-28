@@ -3,6 +3,7 @@ package com.ryel.zaja.controller.api;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
+import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
@@ -92,6 +93,7 @@ public class OrderApi {
      * @param houseOrderId
      * @return
      */
+    @RequestMapping(value = "confirm", method = RequestMethod.POST)
     public Result confirm(Integer userId, Integer houseOrderId){
         try{
             houseOrderService.confirm(userId, houseOrderId);
@@ -114,24 +116,96 @@ public class OrderApi {
      */
     @RequestMapping(value = "rebate", method = RequestMethod.POST)
     public Result rebate(@RequestParam(value = "userId") Integer buyerId, Integer houseOrderId){
+        return changeStatus(buyerId, houseOrderId,HouseOrderStatus.APPLY_REBATE.getCode());
+    }
+
+    /**
+     * 用户确认接单,状态值从"10"变成"20"
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
+    public Result receiveOrder(Integer userId, Integer houseOrderId){
+        return changeStatus(userId, houseOrderId,HouseOrderStatus.WAIT_PAYMENT.getCode());
+    }
+
+
+    /**
+     * 用户支付,状态值从"20"变成"30"
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "payment", method = RequestMethod.POST)
+    public Result payment(Integer userId, Integer houseOrderId){
+
         try{
-            if(null == buyerId || null == houseOrderId){
-                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
-            }
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(buyerId, houseOrderId);
-            if(null == houseOrder){
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
-            }
-            //如果订单状态不是“经济人待确认”，则是非法操作
-            if(!HouseOrderStatus.WAIT_AGENT_COMFIRM.getCode().equals(houseOrder.getStatus())){
-                return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
-            }
-            houseOrder.setStatus(HouseOrderStatus.APPLY_REBATE.getCode());
-            return Result.success().msg("").data(houseOrderService.update(houseOrder));
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
+            houseOrderService.payment(userId, houseOrderId);
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+
+    }
+
+    /**
+     * 用户拒绝接收订单,状态值从"10"变成"11"
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "rejectorder", method = RequestMethod.POST)
+    public Result reject(Integer userId, Integer houseOrderId){
+
+        return changeStatus(userId, houseOrderId,HouseOrderStatus.REJECT.getCode());
+
+    }
+
+
+
+    /**
+     * 用户投诉,状态值从"10"变成"12"
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "complain", method = RequestMethod.POST)
+    public Result complain(Integer userId, Integer houseOrderId){
+
+        return changeStatus(userId, houseOrderId,HouseOrderStatus.COMPLAIN.getCode());
+
+    }
+
+
+
+
+    /**
+     * 更改房屋的状态值
+     * @param userId
+     * @param houseOrderId
+     * @param status
+     * @return
+     */
+    public Result changeStatus(Integer userId, Integer houseOrderId, String status){
+        try{
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
+
+            houseOrder.setStatus(status);
+            houseOrderService.update(houseOrder);
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
 
 }

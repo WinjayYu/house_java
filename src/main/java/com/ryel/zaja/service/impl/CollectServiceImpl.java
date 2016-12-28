@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,9 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
 
     @Autowired
     CollectDao collectDao;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     @Override
     public Integer countByHouseId(Integer id) {
@@ -88,6 +92,12 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
             }else{
                 return true;//已收藏
             }
+
+
+            /*if(null == stringRedisTemplate.opsForValue().get(houseId)) {
+                stringRedisTemplate.opsForList().
+            }*/
+
     }
 
     @Override

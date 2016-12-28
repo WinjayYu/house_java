@@ -140,22 +140,6 @@ public class AgentApi {
     }
 
     /**
-     * 经纪人编辑房源
-     *
-     * @param house 房源信息
-     */
-    @RequestMapping(value = "modifyhouse", method = RequestMethod.POST)
-    public Result modifyhouse(House house) {
-        try {
-            houseService.update(house);
-            return Result.success().msg("").data(new HashMap<>());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
-
-    /**
      * 获取发布的房源列表
      *
      * @param agentId 经济人id
@@ -288,7 +272,7 @@ public class AgentApi {
                 }
 
                 neworder.put("id", order.getId());
-                neworder.put("code", order.getId());
+                neworder.put("code", order.getCode());
                 neworder.put("buyer", order.getBuyer());
                 neworder.put("status", order.getStatus());
                 neworder.put("type", order.getType());
@@ -545,6 +529,98 @@ public class AgentApi {
     }
 
     /**
+     * 更新房源
+     */
+    @RequestMapping(value = "updatehouse", method = RequestMethod.POST)
+    public String updatehouse(@RequestParam(required = false) MultipartFile image1, @RequestParam(required = false) MultipartFile image2,
+                               @RequestParam(required = false) MultipartFile image3, @RequestParam(required = false) MultipartFile image4,
+                               @RequestParam(required = false) MultipartFile image5,
+                               Integer agentId, Integer houseId, String title, BigDecimal price, String tags, Community community,
+                               String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
+                               String features) {
+        try {
+            // 参数校验
+            if (agentId == null || community == null) {
+                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("agentId或sellhouseId或community为空"));
+            }
+            // 小区校验
+            Community origComm = communityService.createOrUpdateByUid(community);
+            // 用户校验
+            User agent = userService.findById(agentId);
+            if (agent == null) {
+                throw new BizException("查询到用户为空userId:" + agentId);
+            }
+            House house = houseService.findById(houseId);
+
+            if (house == null)
+            {
+                throw new BizException("查询到用户为空houseId:" + houseId);
+            }
+
+            house.setCity(community.getCity());
+            house.setPrice(price);
+            house.setCommission(price.multiply(BigDecimal.valueOf(250)));
+            house.setCommunity(community);
+            house.setStatus(HouseStatus.SAVED.getCode());
+            house.setArea(area);
+            house.setFeature(features);
+            house.setFloor(floor);
+            house.setRenovation(renovation);
+            house.setOrientation(orientation);
+            house.setLayout(layout);
+            house.setTitle(title);
+            house.setTags(tags);
+            house.setPurpose(purpose);
+            house.setLastModifiedTime(new Date());
+
+
+            // 把图片更新进去
+            List<String> imagePathList = new ArrayList<String>();
+            if (image1 != null) {
+                String path = bizUploadFile.uploadHouseImageToQiniu(image1, houseId.toString());
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+                house.setCover(path);
+            }
+            if (image2 != null) {
+                String path = bizUploadFile.uploadHouseImageToQiniu(image2, houseId.toString());
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image3 != null) {
+                String path = bizUploadFile.uploadHouseImageToQiniu(image3, houseId.toString());
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image4 != null) {
+                String path = bizUploadFile.uploadHouseImageToQiniu(image4, houseId.toString());
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image5 != null) {
+                String path = bizUploadFile.uploadHouseImageToQiniu(image5, houseId.toString());
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            house.setImgs(JsonUtil.obj2Json(imagePathList));
+            houseService.update(house);
+            return JsonUtil.obj2ApiJson(Result.success());
+        } catch (BizException e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001).data(e.getMessage()));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001));
+        }
+    }
+
+
+    /**
      * 发布房源
      */
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
@@ -584,7 +660,7 @@ public class AgentApi {
             house.setCity(community.getCity());
             house.setViewNum(0);
             house.setPrice(price);
-            house.setCommission(new BigDecimal(2.5));
+            house.setCommission(price.multiply(BigDecimal.valueOf(250)));
             house.setAgent(agent);
             house.setCommunity(community);
             house.setStatus(HouseStatus.SAVED.getCode());
@@ -786,6 +862,7 @@ public class AgentApi {
                 houseOrder.setCommunity(community);
                 houseOrder.setArea(area);
                 houseOrder.setPrice(price);
+                houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
             }
             // 生产订单号
             String code = BizUtil.getOrderCode();
@@ -810,7 +887,7 @@ public class AgentApi {
     /**
      * 经济人确定订单
      */
-    @RequestMapping(value = "agentconfirmorder")
+    @RequestMapping(value = "confirmorder")
     public Result agentconfirmorder(Integer agentId, Integer orderId) {
         try {
             if (agentId == null || orderId == null) {
@@ -820,10 +897,35 @@ public class AgentApi {
             if (order == null) {
                 return Result.error().msg(Error_code.ERROR_CODE_0025);
             }
-            if (!HouseOrderStatus.WAIT_AGENT_COMFIRM.getCode().equals(order.getStatus())) {
+            if (!HouseOrderStatus.IN_CONNECT.getCode().equals(order.getStatus())) {
                 return Result.error().msg(Error_code.ERROR_CODE_0025);
             }
             order.setStatus(HouseOrderStatus.WAIT_USER_COMFIRM.getCode());
+            houseOrderService.update(order);
+            return Result.success();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
+    /**
+     * 经济人确定申请退款
+     */
+    @RequestMapping(value = "refundorder")
+    public Result agentrefundorder(Integer agentId, Integer orderId) {
+        try {
+            if (agentId == null || orderId == null) {
+                return Result.error().msg(Error_code.ERROR_CODE_0023);
+            }
+            HouseOrder order = houseOrderService.findById(orderId);
+            if (order == null) {
+                return Result.error().msg(Error_code.ERROR_CODE_0025);
+            }
+            if (!HouseOrderStatus.APPLY_REBATE.getCode().equals(order.getStatus())) {
+                return Result.error().msg(Error_code.ERROR_CODE_0025);
+            }
+            order.setStatus(HouseOrderStatus.AGENT_COMFIRM_REBATE.getCode());
             houseOrderService.update(order);
             return Result.success();
         } catch (Exception e) {

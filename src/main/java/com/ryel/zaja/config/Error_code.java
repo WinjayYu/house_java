@@ -70,4 +70,8 @@ public interface Error_code {
 
     String ERROR_CODE_0033 = "error_33";   // 【接单】不能接收自己发布的订单
 
+    String ERROR_CODE_0034 = "error_34";   //  非法操作
+
+
+
 }
