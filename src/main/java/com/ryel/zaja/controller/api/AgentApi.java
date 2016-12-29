@@ -146,7 +146,7 @@ public class AgentApi {
      *
      * @param agentId 经济人id
      */
-    @RequestMapping(value = "querymypublishlist", method = RequestMethod.POST)
+    @RequestMapping(value = "mypublishlist", method = RequestMethod.POST)
     public Result querymypublishlist(Integer agentId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
@@ -418,8 +418,8 @@ public class AgentApi {
      *
      * @param houseId 房源id
      */
-    @RequestMapping(value = "putawayhouse", method = RequestMethod.POST)
-    public Result putawayhouse(Integer houseId) {
+    @RequestMapping(value = "putuphouse", method = RequestMethod.POST)
+    public Result putuphouse(Integer agentId, Integer houseId) {
         try {
             houseService.agentPutawayHouse(houseId);
             return Result.success().msg("").data(new HashMap<>());
@@ -437,8 +437,8 @@ public class AgentApi {
      *
      * @param houseId 房源id
      */
-    @RequestMapping(value = "soldouthouse", method = RequestMethod.POST)
-    public Result soldouthouse(Integer houseId) {
+    @RequestMapping(value = "putdownhouse", method = RequestMethod.POST)
+    public Result putdownhouse(Integer agentId, Integer houseId) {
         try {
             houseService.agentSoldOutHouse(houseId);
             return Result.success().msg("").data(new HashMap<>());
@@ -508,7 +508,21 @@ public class AgentApi {
             if (null == page) {
                 return Result.error().msg(Error_code.ERROR_CODE_0014);
             }
-            Map<String, Object> dataMap = APIFactory.fitting(page);
+
+            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+            for (Comment comment : page.getContent()) {
+                Map newcomment = new HashMap<String, Object>();
+
+                newcomment.put("content", comment.getContent());
+                newcomment.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(comment.getAddTime()));
+                newcomment.put("user", comment.getUser());
+                newcomment.put("id", comment.getId());
+                newcomment.put("star", comment.getStar());
+                newcomment.put("orderId", comment.getHouseOrder().getId());
+                list.add(newcomment);
+            }
+            Map<String, Object> dataMap = APIFactory.fitting(page,list);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -817,8 +831,8 @@ public class AgentApi {
     /**
      * 经济人发布订单
      */
-    @RequestMapping(value = "agentpublishorder")
-    public Result agentpublishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
+    @RequestMapping(value = "publishorder")
+    public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
                                     String toMobile) {
         try {
             HouseOrder houseOrder = new HouseOrder();
@@ -862,9 +876,6 @@ public class AgentApi {
                     communityService.create(community);
                 }
                 houseOrder.setCommunity(community);
-                houseOrder.setArea(area);
-                houseOrder.setPrice(price);
-                houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
             }
             // 生产订单号
             String code = BizUtil.getOrderCode();
@@ -875,6 +886,10 @@ public class AgentApi {
             houseOrder.setType(type);
             houseOrder.setAddTime(new Date());
             houseOrder.setCode(code);
+            houseOrder.setArea(area);
+            houseOrder.setPrice(price);
+            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
+
             houseOrderService.save(houseOrder);
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
