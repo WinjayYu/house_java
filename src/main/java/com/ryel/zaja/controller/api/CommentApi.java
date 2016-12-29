@@ -113,6 +113,11 @@ public class CommentApi {
         }
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
     @RequestMapping(value = "findonecomment", method = RequestMethod.POST)
     public Result findOneComment(Integer userId){
         try{
@@ -133,7 +138,7 @@ public class CommentApi {
                 dataMap.put("count", count);
 
                 Double average = commentService.average(userId);
-                average = average == null ?  0.0 :  1.0;
+                average = average == null ?  0.0 : average;
                 dataMap.put("avg", average);
 
                 return Result.success().msg("").data(dataMap);

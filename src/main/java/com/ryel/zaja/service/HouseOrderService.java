@@ -29,4 +29,6 @@ public interface HouseOrderService extends ICommonService<HouseOrder> {
     HouseOrder findByBuyerIdAndOrderId(Integer BuyerId, Integer houseOrderId);
 
     HouseOrder payment(Integer userId, Integer houseOrderId);
+
+    Long count(Integer agentId);
 }

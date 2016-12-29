@@ -934,5 +934,34 @@ public class AgentApi {
         }
     }
 
+    @RequestMapping(value = "count", method = RequestMethod.POST)
+    public Result count(Integer agentId){
+        try{
+
+            Map<String, Long> dataMap = new HashMap<>();
+
+            //接单总数
+            Long sellHouseSum = agentSellHouseService.count(agentId);
+            Long buyHouseSum  = agentBuyHouseService.count(agentId);
+            Long orderSum = sellHouseSum + buyHouseSum;
+
+            //房源总数
+            Long houseSum  = houseService.count(agentId);
+
+            //佣金总数
+            Long commissionSum  = houseOrderService.count(agentId);
+
+            dataMap.put("orderSum", orderSum);
+            dataMap.put("houseSum", houseSum);
+            dataMap.put("commissionSum", commissionSum);
+
+            return Result.success().msg("").data(dataMap);
+
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
 }
 

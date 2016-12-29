@@ -404,5 +404,8 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return houseDao.pageByAgentId2(agentId, HouseStatus.PUTAWAY_YET.getCode(), pageable);
     }
 
-
+    @Override
+    public Long count(Integer agentId) {
+        return houseDao.countByAgentId(agentId);
+    }
 }

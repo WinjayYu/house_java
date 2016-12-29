@@ -10,6 +10,7 @@ import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.CollectService;
+import com.ryel.zaja.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 /**
  * Created by billyu on 2016/12/14.
@@ -38,7 +43,8 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     CollectDao collectDao;
 
     @Autowired
-    StringRedisTemplate stringRedisTemplate;
+    private RedisService redisService;
+
 
     @Override
     public Integer countByHouseId(Integer id) {
@@ -87,16 +93,12 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     @Override
     public boolean check(Integer userId, Integer houseId) {
             Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
+
             if(null == collect){
                 return false;//未收藏
             }else{
                 return true;//已收藏
             }
-
-
-            /*if(null == stringRedisTemplate.opsForValue().get(houseId)) {
-                stringRedisTemplate.opsForList().
-            }*/
 
     }
 

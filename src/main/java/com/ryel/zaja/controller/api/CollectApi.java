@@ -6,6 +6,7 @@ import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.Collect;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.service.CollectService;
+import com.ryel.zaja.service.RedisService;
 import com.ryel.zaja.utils.APIFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,9 @@ public class CollectApi {
 
     @Autowired
     CollectService collectService;
+
+    @Autowired
+    RedisService redisService;
 
     /**
      * 收藏
@@ -70,8 +74,16 @@ public class CollectApi {
     //点击房源详情的时候调用此接口，检查是否收藏
     @RequestMapping(value = "check", method = RequestMethod.POST)
     public Result check(Integer userId, Integer houseId){
+
+        if(null == redisService.findOne("house", houseId)){
+
+            redisService.insert("house", houseId, 1);
+        }else {
+            redisService.incrementLong("house", houseId, 1);
+        }
+
         Map<String, String> map = new HashMap<String,String>();
-        String status = "0";
+        String status = "1";
         if(collectService.check(userId, houseId)){
             status = "0";//已收藏
         }else{
