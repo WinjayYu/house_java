@@ -36,6 +36,10 @@ public class HouseTagImpl extends AbsCommonService<HouseTag> implements HouseTag
     @Override
     public void upDateTagNum(String tag) {
         HouseTag houseTag = tagDao.findByTag(tag);
+        if(null == houseTag)
+        {
+            throw new BizException("房屋标签不存在");
+        }
         houseTag.setTagNum(houseTag.getTagNum()+1);
         save(houseTag);
     }

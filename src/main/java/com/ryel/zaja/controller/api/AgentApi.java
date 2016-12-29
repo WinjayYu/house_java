@@ -700,6 +700,13 @@ public class AgentApi {
             }
             houseService.create(house);
 
+            //保存房屋标签数据
+            String[] tagList= tags.split("\\|");
+            for (String tag : tagList)
+            {
+                tagService.upDateTagNum(tag);
+            }
+
             // 把图片更新进去
             Integer houseId = house.getId();
             List<String> imagePathList = new ArrayList<String>();
@@ -973,7 +980,7 @@ public class AgentApi {
     public Result count(Integer agentId){
         try{
 
-            Map<String, Long> dataMap = new HashMap<>();
+            Map<String, Object> dataMap = new HashMap<>();
 
             //接单总数
             Long sellHouseSum = agentSellHouseService.count(agentId);
@@ -983,12 +990,12 @@ public class AgentApi {
             //房源总数
             Long houseSum  = houseService.count(agentId);
 
-            //佣金总数
-            Long commissionSum  = houseOrderService.count(agentId);
-
+            //评分
+            Double average = commentService.average(agentId);
+            average = average == null ?  0.0 : average;
+            dataMap.put("avg", average);
             dataMap.put("orderSum", orderSum);
             dataMap.put("houseSum", houseSum);
-            dataMap.put("commissionSum", commissionSum);
 
             return Result.success().msg("").data(dataMap);
 
