@@ -326,6 +326,8 @@
                         }
                     ],
                     "createdRow": function (row, data, index) {
+                        var mobileHtml = '<a target="_blank" href="mgt/house/detail?id='+data.id+'">'+data.id+'</a>';
+                        $('td', row).eq(0).html(mobileHtml);
                         var status = "";
                         if(data.status=="10"){
                             status="待审核";

@@ -38,7 +38,7 @@
                 <spring.dataSource.username>root</spring.dataSource.username>
                 <spring.dataSource.password>1234</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/zaja</doc.base.url>
-                <pro.upload.path>D:/developer/apache-tomcat-8.0.36/webapps/files/upload/</pro.upload.path>
+                <pro.upload.path>D:/work/tomcat/apache-tomcat-7.0.65/webapps/files/upload/</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>

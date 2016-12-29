@@ -326,6 +326,8 @@
                         }
                     ],
                     "createdRow": function (row, data, index) {
+                        var mobileHtml = '<a target="_blank" href="mgt/user/agentDetail?agentId='+data.id+'">'+data.mobile+'</a>';
+                        $('td', row).eq(1).html(mobileHtml);
                         var status = "";
                         if(data.agentStatus=="10"){
                             status="待审核";
