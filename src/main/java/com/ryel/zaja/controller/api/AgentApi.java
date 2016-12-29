@@ -63,6 +63,8 @@ public class AgentApi {
     private CommunityService communityService;
     @Autowired
     private RecommendService recommendService;
+    @Autowired
+    private HouseTagService tagService;
 
     /**
      * 登录
@@ -933,6 +935,24 @@ public class AgentApi {
             return Result.error().msg(Error_code.ERROR_CODE_0001);
         }
     }
+
+    /**
+     * 获取房屋的tag标签
+     */
+    @RequestMapping(value = "listtags")
+    public Result getlisttags()
+    {
+        try {
+
+            Map<String, Object> tags = new HashMap<String, Object>();
+            tags.put("list",tagService.findAll());
+            return Result.success().data(tags);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001);
+        }
+    }
+
 
     @RequestMapping(value = "count", method = RequestMethod.POST)
     public Result count(Integer agentId){

@@ -72,6 +72,7 @@ public interface Error_code {
 
     String ERROR_CODE_0034 = "error_34";   //  非法操作
 
+    String ERROR_CODE_0035 = "error_35";   //  【删除房源】经纪人与房屋信息不匹配
 
 
 }

@@ -57,9 +57,9 @@ public interface HouseService extends ICommonService<House> {
      */
     List<House> list();
 
-    void agentDeleteHouse(int houseId);
+    void agentDeleteHouse(Integer houseId, Integer agentId);
 
-    Page<House> pageByAgentId(int agentId, Pageable pageable);
+    Page<House> pageByAgentId(Integer agentId, Pageable pageable);
 
     Page<House> pageByCommunityUid(String uid,List<String> status, Pageable pageable);
 
