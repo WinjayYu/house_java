@@ -131,9 +131,9 @@ public class AgentApi {
      * @param houseId 房源id
      */
     @RequestMapping(value = "deletehouse", method = RequestMethod.POST)
-    public Result deletehouse(int houseId) {
+    public Result deletehouse(Integer agentId, Integer houseId) {
         try {
-            houseService.agentDeleteHouse(houseId);
+            houseService.agentDeleteHouse(houseId,agentId);
             return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
