@@ -76,4 +76,5 @@ public interface HouseService extends ICommonService<House> {
     //用户端查看经纪人的房源列表
     Page<House> pageByAgentId2(int agentId, Pageable pageable);
 
+    Long count(Integer agentId);
 }

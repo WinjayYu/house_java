@@ -151,4 +151,9 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
         }
         return update(houseOrder);
     }
+
+    @Override
+    public Long count(Integer agentId) {
+        return houseOrderDao.countByAgentId(agentId);
+    }
 }
