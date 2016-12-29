@@ -12,6 +12,7 @@ public enum HouseStatus {
     SOLD_OUT_YET  ("40", "已下架"),
     IN_CONNECT    ("50", "交接中"),
     CLOSED        ("60", "已关闭"),
+    DELETE         ("99", "删除"),
     OTHER         ("-1", "其他"),
     ;
 
@@ -38,12 +39,14 @@ public enum HouseStatus {
         return status;
     }
 
+
     public static List<String> getUserCanSeeStatus() {
         List<String> status = new ArrayList<String>();
         status.add(HouseStatus.PUTAWAY_YET.getCode());
         return status;
     }
 
+    //我的房源信息可以看到的状态
     public static List<String> getManagerCanSeeStatus() {
         List<String> status = new ArrayList<String>();
         status.add(HouseStatus.SAVED.getCode());

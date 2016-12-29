@@ -40,8 +40,8 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select h from House h where h.status in ?5 and( abs(h.price - ?1) < 100000 or (h.community.uid = ?2 or h.area = ?3 or h.renovation = ?4))  order by h.price asc")
     List<House> agentFindSimilar(BigDecimal price, String uid, BigDecimal area, String renovation,List<String> status);
 
-    @Query("select b from House b where b.agent.id = ?1")
-    Page<House> pageByAgentId(Integer agentId, Pageable pageable);
+    @Query("select b from House b where b.agent.id = ?1 and b.status in ?2")
+    Page<House> pageByAgentId(Integer agentId,List<String> status, Pageable pageable);
 
     //用户端查看经纪人发布的房源
     @Query("select b from House b where b.agent.id = ?1 and b.status = ?2" )

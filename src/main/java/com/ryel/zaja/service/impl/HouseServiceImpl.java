@@ -1,6 +1,7 @@
 package com.ryel.zaja.service.impl;
 
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.HouseType;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.enums.HouseStatus;
@@ -74,17 +75,22 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     @Transactional
-    public void agentDeleteHouse(int houseId) {
+    public void agentDeleteHouse(Integer houseId, Integer agentId) {
         House house = this.findById(houseId);
         if (house == null) {
             throw new BizException("房源信息已经不存在");
         }
-        this.deleteById(houseId);
+        if (!agentId.equals(house.getAgent().getId()))
+        {
+            throw new BizException(Error_code.ERROR_CODE_0035);
+        }
+        house.setStatus(HouseStatus.DELETE.getCode());
+        update(house);
     }
 
     @Override
-    public Page<House> pageByAgentId(int agentId, Pageable pageable) {
-        return houseDao.pageByAgentId(agentId, pageable);
+    public Page<House> pageByAgentId(Integer agentId, Pageable pageable) {
+        return houseDao.pageByAgentId(agentId,HouseStatus.getManagerCanSeeStatus(), pageable);
     }
 
     @Override
