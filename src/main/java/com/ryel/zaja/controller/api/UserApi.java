@@ -341,7 +341,8 @@ public class UserApi {
             ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
             if (null != thirdUser) {
                 if (null != thirdUser.getUser()) {
-                    User user = thirdUser.getUser();
+                    String mobile = thirdUser.getUser().getMobile();
+                    User user = userService.findByMobile(mobile);
                     Result result = Result.success().msg("").data(user);
                     return JsonUtil.obj2ApiJson(result);
                 } else {

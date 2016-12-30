@@ -129,7 +129,15 @@ public class CommentApi {
             if(null != page){
 //                Map<String, Object> dataMap = APIFactory.fitting(page);
                 Map<String, Object> dataMap = new HashMap<>();
-                dataMap.put("comment", page.getContent());
+                Map<String, Object> comment = new HashMap<>();
+
+                comment.put("id", page.getContent().get(0).getId());
+                comment.put("agent", page.getContent().get(0).getAgent());
+                comment.put("content", page.getContent().get(0).getContent());
+                comment.put("star", page.getContent().get(0).getStar());
+
+                dataMap.put("comment",comment);
+
 
                 //接单总数
                 Long sellHouseCount = agentSellHouseService.count(userId);
