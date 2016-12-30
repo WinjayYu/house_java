@@ -75,12 +75,6 @@ public class CollectApi {
     @RequestMapping(value = "check", method = RequestMethod.POST)
     public Result check(Integer userId, Integer houseId){
 
-        if(null == redisService.findOne("house", houseId)){
-
-            redisService.insert("house", houseId, 1);
-        }else {
-            redisService.incrementLong("house", houseId, 1);
-        }
 
         Map<String, String> map = new HashMap<String,String>();
         String status = "1";

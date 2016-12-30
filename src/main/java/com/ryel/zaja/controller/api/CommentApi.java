@@ -7,6 +7,7 @@ import com.ryel.zaja.entity.Comment;
 import com.ryel.zaja.service.AgentBuyHouseService;
 import com.ryel.zaja.service.AgentSellHouseService;
 import com.ryel.zaja.service.CommentService;
+import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +43,9 @@ public class CommentApi {
     @Autowired
     private AgentBuyHouseService agentBuyHouseService;
 
+    @Autowired
+    private HouseService houseService;
+
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public Result create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content){
         if(null == userId
@@ -53,9 +58,8 @@ public class CommentApi {
 
             Comment comment = commentService.create(userId, agentId, houseOrderId, star, content);
 //            Comment comment = commentService.findByHouseOrderId(houseOrderId);
-            Map<String, Object> map = new HashMap<>();
-            map.put("comment", comment);
-            return Result.success().data(map);
+
+            return Result.success().msg("").data(new HashMap<>());
         }catch (BizException e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
@@ -104,11 +108,11 @@ public class CommentApi {
                 Result result = Result.success().msg("").data(dataMap);
                 return JsonUtil.obj2ApiJson(result);
             }
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0014);
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
             return JsonUtil.obj2ApiJson(result);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
             return JsonUtil.obj2ApiJson(result,"houseOrder");
         }
     }
@@ -126,8 +130,17 @@ public class CommentApi {
             if(null != page){
 //                Map<String, Object> dataMap = APIFactory.fitting(page);
                 Map<String, Object> dataMap = new HashMap<>();
-                dataMap.put("comment", page.getContent());
+                Map<String, Object> comment = new HashMap<>();
 
+                comment.put("id", page.getContent().get(0).getId());
+                comment.put("user", page.getContent().get(0).getUser());
+                comment.put("content", page.getContent().get(0).getContent());
+                comment.put("star", page.getContent().get(0).getStar());
+                comment.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(page.getContent().get(0).getAddTime()));
+                dataMap.put("comment",comment);
+
+
+                //接单总数
                 Long sellHouseCount = agentSellHouseService.count(userId);
                 Long buyHouseCount  = agentBuyHouseService.count(userId);
                 Long count = sellHouseCount + buyHouseCount;
@@ -137,9 +150,14 @@ public class CommentApi {
 
                 dataMap.put("count", count);
 
+                //评分的平均分
                 Double average = commentService.average(userId);
                 average = average == null ?  0.0 : average;
                 dataMap.put("avg", average);
+
+                //房源总数
+                Long houseCount  = houseService.count(userId);
+                dataMap.put("houseCount", houseCount);
 
                 return Result.success().msg("").data(dataMap);
             }else{

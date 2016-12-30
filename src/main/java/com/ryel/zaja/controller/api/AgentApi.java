@@ -84,6 +84,11 @@ public class AgentApi {
                 if (UserType.USER.getCode().equals(user.getType())) {
                     return Result.error().msg(Error_code.ERROR_CODE_0029).data(new HashMap<>());
                 }
+                //没有审核通过
+                if(!AgentRegisterStatus.APPROVE_PASS.getCode().equals(user.getAgentStatus()))
+                {
+                    return Result.error().msg(Error_code.ERROR_CODE_0036).data(new HashMap<>());
+                }
             }
             AgentMaterial agentMaterial = agentMaterialService.findByAgentId(user.getId());
             Map<String, Object> data = new HashMap<String, Object>();
@@ -593,32 +598,32 @@ public class AgentApi {
             // 把图片更新进去
             List<String> imagePathList = new ArrayList<String>();
             if (image1 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image1, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image1, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
                 house.setCover(path);
             }
             if (image2 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image2, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image2, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image3 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image3, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image3, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image4 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image4, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image4, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image5 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image5, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image5, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
@@ -698,7 +703,6 @@ public class AgentApi {
             } else {
                 house.setType("20");
             }
-            houseService.create(house);
 
             //保存房屋标签数据
             String[] tagList= tags.split("\\|");
@@ -706,6 +710,8 @@ public class AgentApi {
             {
                 tagService.upDateTagNum(tag);
             }
+
+            houseService.create(house);
 
             // 把图片更新进去
             Integer houseId = house.getId();

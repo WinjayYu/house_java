@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserDao extends JpaRepository<User, Integer>,JpaSpecificationExecutor<User> {
 
-    @Query("select u from User u where u.mobile = ?1")
     User findByMobile(String mobile);
 
     User findByMobileAndPassword(String mobile, String password);
