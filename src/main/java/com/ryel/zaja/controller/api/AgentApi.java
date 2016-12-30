@@ -711,32 +711,32 @@ public class AgentApi {
             Integer houseId = house.getId();
             List<String> imagePathList = new ArrayList<String>();
             if (image1 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image1, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image1, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
                 house.setCover(path);
             }
             if (image2 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image2, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image2, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image3 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image3, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image3, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image4 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image4, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image4, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image5 != null) {
-                String path = bizUploadFile.uploadHouseImageToQiniu(image5, houseId.toString());
+                String path = bizUploadFile.uploadHouseImageToLocal(image5, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }

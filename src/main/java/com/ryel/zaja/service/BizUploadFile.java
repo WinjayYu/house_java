@@ -41,6 +41,12 @@ public class BizUploadFile {
         return uploadToLocal(file,bizPath);
     }
 
+    public String uploadHouseImageToLocal(MultipartFile file,Integer houseId)
+    {
+        String bizPath = "house/" + houseId + "/";
+        return uploadToLocal(file,bizPath);
+    }
+
     private String uploadToQiniu(MultipartFile file, String bizPath) {
         try {
             FileBo fileBo = defaultUploadFile.uploadFile(file.getOriginalFilename(), file.getInputStream());
