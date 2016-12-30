@@ -341,8 +341,8 @@ public class UserApi {
             ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
             if (null != thirdUser) {
                 if (null != thirdUser.getUser()) {
-                    String mobile = thirdUser.getUser().getMobile();
-                    User user = userService.findByMobile(mobile);
+                    int id = thirdUser.getUser();
+                    User user = userService.findById(id);
                     Result result = Result.success().msg("").data(user);
                     return JsonUtil.obj2ApiJson(result);
                 } else {
@@ -396,7 +396,7 @@ public class UserApi {
 
 
             if(null != userService.findByMobile(mobile)){
-                thirdUser.setUser(userService.findByMobile(mobile));
+                thirdUser.setUser(userService.findByMobile(mobile).getId());
                 ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
 
                 Result result = Result.success().msg("").data(thirdUser1);
@@ -415,7 +415,7 @@ public class UserApi {
 
             //将userId存到第三方表中
             User origUser = userService.findByMobile(mobile);
-            thirdUser.setUser(origUser);
+            thirdUser.setUser(origUser.getId());
             ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
             Result result = Result.success().msg("").data(thirdUser2);
@@ -465,14 +465,6 @@ public class UserApi {
                            @RequestParam(required = false) MultipartFile negativeFile,
                            @RequestParam(required = false) MultipartFile companyPicFile) {
         try {
-            // 校验验证码
-            Object origVerCode = stringRedisTemplate.opsForValue().get(user.getMobile());
-            if (null == origVerCode) {
-                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
-            }
-            if (!origVerCode.equals(verifycode)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
-            }
 
             userService.agentRegister(user,agentMaterial,verifycode,positiveFile,negativeFile,companyPicFile);
             return Result.success().msg("").data(new HashMap<>());
