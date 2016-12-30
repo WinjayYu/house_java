@@ -74,5 +74,6 @@ public interface Error_code {
 
     String ERROR_CODE_0035 = "error_35";   //  【删除房源】经纪人与房屋信息不匹配
 
+    String ERROR_CODE_0036 = "error_36";   //  【登录】此账号没审核通过
 
 }
