@@ -43,7 +43,7 @@ public interface HouseService extends ICommonService<House> {
                        final String floor,
                        final String userType);
 
-    Page<House> mgtPageHouse(int pageNum, int pageSize);
+    Page<House> mgtPageHouse(int pageNum, int pageSize,String title,String status);
 
     Page<House> findByCommunitiesStatus(List<String> status,List<String> uidList, Pageable pageable);
 

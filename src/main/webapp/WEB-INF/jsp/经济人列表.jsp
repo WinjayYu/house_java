@@ -338,7 +338,7 @@
                         }
                         $('td', row).eq(2).html(status);
                         var btnHtml = "<button   title='通过'  class='btn btn-primary btn-circle pass'>" +
-                                "<i class='fa fa-edit'></i>" +
+                                "<i class='fa fa-check'></i>" +
                                 "</button>" +
                                 "&nbsp;&nbsp;" +
                                 "<button  title='驳回'  class='btn btn-default btn-circle reject'>" +

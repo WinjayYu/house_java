@@ -35,72 +35,84 @@
                             <div class="col-lg-12">
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">标题:</label>
+                                        <label class="col-sm-3 control-label">标题:</label>
                                         <span _name="name">${house.title}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">小区:</label>
+                                        <label class="col-sm-3 control-label">小区:</label>
                                         <span _name="name">${house.community.name}</span>
                                     </p>
                                 </div>
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">户型:</label>
+                                        <label class="col-sm-3 control-label">户型:</label>
                                         <span _name="name">${house.layout}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">用途:</label>
+                                        <label class="col-sm-3 control-label">用途:</label>
                                         <span _name="name">${house.purpose}</span>
                                     </p>
                                 </div>
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">面积:</label>
+                                        <label class="col-sm-3 control-label">面积:</label>
                                         <span _name="name">${house.area}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">价格:</label>
+                                        <label class="col-sm-3 control-label">价格:</label>
                                         <span _name="name">${house.price}</span>
                                     </p>
                                 </div>
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">楼层:</label>
+                                        <label class="col-sm-3 control-label">楼层:</label>
                                         <span _name="name">${house.floor}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">朝向:</label>
+                                        <label class="col-sm-3 control-label">朝向:</label>
                                         <span _name="name">${house.orientation}</span>
                                     </p>
                                 </div>
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">装修程度:</label>
+                                        <label class="col-sm-3 control-label">装修程度:</label>
                                         <span _name="name">${house.renovation}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">经济人:</label>
+                                        <label class="col-sm-3 control-label">经济人:</label>
                                         <span _name="name">${house.agent.nickname}</span>
                                     </p>
                                 </div>
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">年份:</label>
+                                        <label class="col-sm-3 control-label">发布时间:</label>
                                         <span _name="name">${house.year}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">标签:</label>
+                                        <label class="col-sm-3 control-label">标签:</label>
                                         <span _name="name">${house.tags}</span>
                                     </p>
                                 </div>
                                 <div class="row">
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">核心:</label>
+                                        <label class="col-sm-3 control-label">房屋特色-核心卖点:</label>
                                         <span _name="name">${feature.core}</span>
                                     </p>
                                     <p class="col-sm-6">
-                                        <label class="col-sm-2 control-label">税收:</label>
+                                        <label class="col-sm-3 control-label">房屋特色-交通出行:</label>
                                         <span _name="name">${feature.traffic}</span>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <p class="col-sm-12">
+                                        <label class="col-sm-2 control-label">房屋图片:</label>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <p class="col-sm-12">
+                                        <c:forEach items="${imageList}" var="image">
+                                            <span _name="name"><img src="${image}" width="190" height="190"/></span>
+                                        </c:forEach>
                                     </p>
                                 </div>
                             </div>

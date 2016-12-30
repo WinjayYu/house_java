@@ -48,16 +48,17 @@ public class HouseController extends BaseController{
     private HouseService houseService;
 
     @RequestMapping("/index")
-    public String index(HttpServletRequest request,
-                        HttpServletResponse response){
-        return "房源列表";
+    public ModelAndView index(){
+        ModelAndView modelAndView = new ModelAndView("房源列表");
+        modelAndView.addObject("statusList",HouseStatus.getAllStatusOptionHtml(true));
+        return modelAndView;
     }
 
     @RequestMapping("/list")
     @ResponseBody
-    public Map list(Integer draw, Integer start, Integer length) {
+    public Map list(Integer draw, Integer start, Integer length,String title,String status) {
         int pageNum = getPageNum(start, length);
-        Page<House> page = houseService.mgtPageHouse(pageNum, length);
+        Page<House> page = houseService.mgtPageHouse(pageNum, length,title,status);
         Map<String, Object> result = DataTableFactory.fitting(draw, page);
         return result;
     }
@@ -69,6 +70,12 @@ public class HouseController extends BaseController{
         if(StringUtils.isNotBlank(house.getFeature())){
             Feature feature = JsonUtil.json2Obj(house.getFeature(),Feature.class);
             modelAndView.addObject("feature",feature);
+        }
+        if(StringUtils.isNotBlank(house.getImgs())){
+            List<String> imageList = JsonUtil.json2Obj(house.getImgs(),List.class);
+            if(!CollectionUtils.isEmpty(imageList)){
+                modelAndView.addObject("imageList",imageList);
+            }
         }
         modelAndView.addObject("house",house);
         return modelAndView;

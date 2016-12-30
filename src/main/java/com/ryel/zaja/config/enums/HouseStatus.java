@@ -59,6 +59,17 @@ public enum HouseStatus {
         return status;
     }
 
+    public static String getAllStatusOptionHtml(Boolean hasAll) {
+        HouseStatus[] values = values();
+        String html = "";
+        if(hasAll){
+            html += "<option value=\"\">全部</option>";
+        }
+        for (HouseStatus item : values) {
+            html += "<option value=\"" + item.code + "\">" + item.desc + "</option>";
+        }
+        return html;
+    }
 
     public static Map<String, String> getEnumMap() {
         Map<String, String> map = new LinkedHashMap<>();
@@ -69,7 +80,7 @@ public enum HouseStatus {
         return map;
     }
 
-    public static HouseStatus getByCode(Long code) {
+    public static HouseStatus getByCode(String code) {
         HouseStatus[] values = values();
         for (HouseStatus item : values) {
             if (item.getCode().equals(code)) {
@@ -79,7 +90,7 @@ public enum HouseStatus {
         return null;
     }
 
-    public static String getDescByCode(Long code) {
+    public static String getDescByCode(String code) {
         HouseStatus[] values = values();
         for (HouseStatus item : values) {
             if (item.getCode().equals(code)) {
