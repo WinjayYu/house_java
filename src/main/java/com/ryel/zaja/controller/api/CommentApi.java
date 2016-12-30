@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -132,10 +133,10 @@ public class CommentApi {
                 Map<String, Object> comment = new HashMap<>();
 
                 comment.put("id", page.getContent().get(0).getId());
-                comment.put("agent", page.getContent().get(0).getAgent());
+                comment.put("user", page.getContent().get(0).getUser());
                 comment.put("content", page.getContent().get(0).getContent());
                 comment.put("star", page.getContent().get(0).getStar());
-
+                comment.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(page.getContent().get(0).getAddTime()));
                 dataMap.put("comment",comment);
 
 

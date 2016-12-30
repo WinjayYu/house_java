@@ -703,7 +703,6 @@ public class AgentApi {
             } else {
                 house.setType("20");
             }
-            houseService.create(house);
 
             //保存房屋标签数据
             String[] tagList= tags.split("\\|");
@@ -711,6 +710,8 @@ public class AgentApi {
             {
                 tagService.upDateTagNum(tag);
             }
+
+            houseService.create(house);
 
             // 把图片更新进去
             Integer houseId = house.getId();
