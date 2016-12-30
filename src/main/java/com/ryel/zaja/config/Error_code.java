@@ -8,15 +8,9 @@ public interface Error_code {
 
     String ERROR_CODE_0002 = "error_02";  //【通用】参数错误
 
-    String ERROR_CODE_0003 = "error_03";  //【通用】用户不存在
-
     String ERROR_CODE_0004 = "error_04";  //【登录】用户名或密码错误
 
-    String ERROR_CODE_0005 = "error_05";  //【通用】用户被禁用
-
     String ERROR_CODE_0006 = "error_06";  //【注册】手机号被占用
-
-    String ERROR_CODE_0007 = "error_07";  //【更改昵称】昵称被占用
 
     String ERROR_CODE_0008 = "error_08";  //【验证码】验证码发送失败
 
@@ -24,21 +18,11 @@ public interface Error_code {
 
     String ERROR_CODE_0010 = "error_10";  //【验证码】验证码已过期，请重新发送验证码
 
-    String ERROR_CODE_0011 = "error_11";  //【更改密码】原密码错误
-
     String ERROR_CODE_0012 = "error_12";  //【发送订单】手机号未注册用户
-
-    String ERROR_CODE_0013 = "error_13";  //【关注】已经关注过
 
     String ERROR_CODE_0014 = "error_14";  //【通用】没有数据
 
-    String ERROR_CODE_0015 = "error_15";  //【绑定第三方】当前用户已经绑定此第三方
-
     String ERROR_CODE_0016 = "error_16";  //【收藏】没有收藏记录
-
-    String ERROR_CODE_0017 = "error_17";  //【通用】手机号不存在
-
-    String ERROR_CODE_0018 = "error_18";  //【绑定第三方】不能绑定已经登录过的第三方账号
 
     String ERROR_CODE_0019 = "error_19";  //【通用】操作失败
 

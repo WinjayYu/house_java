@@ -15,9 +15,11 @@ public class ThirdUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false)
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id", insertable = false)
+
+    @Column(name = "user_id")
+    private Integer user;
 
     private String openid;
 
@@ -37,11 +39,11 @@ public class ThirdUser implements Serializable {
         this.id = id;
     }
 
-    public User getUser() {
+    public Integer getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Integer user) {
         this.user = user;
     }
 
