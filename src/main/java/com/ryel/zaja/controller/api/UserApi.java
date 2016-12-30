@@ -13,6 +13,7 @@ import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.ryel.zaja.utils.bean.FileBo;;
+import com.sun.org.apache.xml.internal.utils.SerializableLocatorImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -139,7 +140,7 @@ public class UserApi {
             Result result = Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
             return JsonUtil.obj2ApiJson(result);
         }
-        if(null == origUser.getPassword()){
+        if("".equals(origUser.getPassword())){
             Result result = Result.error().msg(Error_code.ERROR_CODE_0030);//未设置密码
             return JsonUtil.obj2ApiJson(result);
         }
@@ -334,28 +335,31 @@ public class UserApi {
     }
 
     @RequestMapping(value = "thiredlogin", method = RequestMethod.POST)
-    public Result thirdLogin(String openid, String type, String nickname,
+    public String thirdLogin(String openid, String type, String nickname,
                              String headUrl) {
         try {
             ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
             if (null != thirdUser) {
                 if (null != thirdUser.getUser()) {
-                    String mobile = thirdUser.getUser().getMobile();
-                    User user = userService.findByMobile(mobile);
-                    return Result.success().msg("").data(user);
+                    User user = thirdUser.getUser();
+                    Result result = Result.success().msg("").data(user);
+                    return JsonUtil.obj2ApiJson(result);
                 } else {
                     Map<String, String> map = new HashMap<>();
                     map.put("status", "0");//"0"代表没有绑定手机号
-                    return Result.success().msg("").data(map);
+                    Result result = Result.success().msg("").data(map);
+                    return JsonUtil.obj2ApiJson(result);
                 }
 
             } else {
                 ThirdUser thirdUser1 = thirdUserService.create(type, openid, headUrl, nickname);
-                return Result.success().msg("").data(thirdUser1);
+                Result result = Result.success().msg("").data(thirdUser1);
+                return JsonUtil.obj2ApiJson(result);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
+            return JsonUtil.obj2ApiJson(result);
         }
     }
 
@@ -381,13 +385,26 @@ public class UserApi {
                 return JsonUtil.obj2ApiJson(result);
             }
 
+
+
             ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
             if (null == thirdUser) {
                 Result result = Result.error().msg(Error_code.ERROR_CODE_0029);
                 return JsonUtil.obj2ApiJson(result);
             }
+
+
+            if(null != userService.findByMobile(mobile)){
+                thirdUser.setUser(userService.findByMobile(mobile));
+                ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
+
+                Result result = Result.success().msg("").data(thirdUser1);
+                return JsonUtil.obj2ApiJson(result);
+            }
+
             User user = new User();
             user.setHead(thirdUser.getHead());
+            user.setPassword("");
             user.setNickname(thirdUser.getNickname());
             user.setType(UserType.USER.getCode());
             user.setSex("30");//"30"表示未设置性别
@@ -398,9 +415,9 @@ public class UserApi {
             //将userId存到第三方表中
             User origUser = userService.findByMobile(mobile);
             thirdUser.setUser(origUser);
-            thirdUserService.update(thirdUser);
+            ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
-            Result result = Result.success().msg("");
+            Result result = Result.success().msg("").data(thirdUser2);
             return JsonUtil.obj2ApiJson(result);
         } catch (BizException be){
             logger.error(be.getMessage(), be);
