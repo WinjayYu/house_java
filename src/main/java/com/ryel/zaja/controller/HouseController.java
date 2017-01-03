@@ -48,9 +48,6 @@ public class HouseController extends BaseController {
     private final String remoteUrlHead = "http://oi0y2qwer.bkt.clouddn.com/";
 
     @RequestMapping("/index")
-    public String index(HttpServletRequest request,
-                        HttpServletResponse response) {
-        return "房源列表";
     public ModelAndView index(){
         ModelAndView modelAndView = new ModelAndView("房源列表");
         modelAndView.addObject("statusList",HouseStatus.getAllStatusOptionHtml(true));
