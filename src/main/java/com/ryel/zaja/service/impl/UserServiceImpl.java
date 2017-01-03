@@ -216,4 +216,47 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         return userDao;
     }
 
+    @Override
+    @Transactional
+    public void applyAgent(Integer userId, AgentMaterial agentMaterial, MultipartFile positive, MultipartFile negative, MultipartFile companyPic) {
+        if(userId == null
+                || agentMaterial == null
+                || StringUtils.isBlank(agentMaterial.getIdcard())
+                || StringUtils.isBlank(agentMaterial.getCompanyName())
+                || StringUtils.isBlank(agentMaterial.getCompanyCode())
+                ){
+            throw new BizException(Error_code.ERROR_CODE_0023);
+        }
+        if(positive == null || negative == null || companyPic == null){
+            throw new BizException(Error_code.ERROR_CODE_0023, "有图片为空");
+        }
+        User user = userDao.findOne(userId);
+
+        AgentMaterial idagent = agentMaterialDao.findByIdcard(agentMaterial.getIdcard());
+        if(idagent != null){
+            throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
+        }
+        // 保存用户
+        user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态
+        user.setType(UserType.AGENT.getCode());
+        update(user);
+        // 上传图片
+        String positivePath = bizUploadFile.uploadAgentImageToLocal(positive,user.getId());
+        if(StringUtils.isBlank(positivePath)){
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+        }
+        String negativePath = bizUploadFile.uploadAgentImageToLocal(negative,user.getId());
+        if(StringUtils.isBlank(negativePath)){
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+        }
+        String companyPicPath = bizUploadFile.uploadAgentImageToLocal(companyPic,user.getId());
+        if(StringUtils.isBlank(companyPicPath)){
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+        }
+        // 保存扩展信息
+        agentMaterial.setAgent(user);
+        agentMaterial.setPositive(positivePath);
+        agentMaterial.setNegative(negativePath);
+        agentMaterial.setCompanyPic(companyPicPath);
+        agentMaterialDao.save(agentMaterial);    }
 }

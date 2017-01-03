@@ -19,4 +19,5 @@ public interface BuyHouseService extends ICommonService<BuyHouse> {
 
     List<Integer> findByUserIdAsId(Integer userId);
 
+    Long count(Integer demandId);
 }

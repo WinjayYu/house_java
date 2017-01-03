@@ -91,6 +91,12 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
 
     @Override
     public List<Integer> findByUserIdAsId(Integer userId) {
+
         return buyHouseDao.findByUserIdAsId(userId);
+    }
+
+    @Override
+    public Long count(Integer demandId) {
+        return buyHouseDao.count(demandId);
     }
 }

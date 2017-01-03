@@ -19,4 +19,6 @@ public interface SellHouseService extends ICommonService<SellHouse> {
     Page<SellHouse> agentPage(Integer pageNum, Integer pageSize, List<String> uids, List<Integer> list);
 
     List<Integer> findByUserIdAsId(Integer userId);
+
+    Long count(Integer demandId);
 }

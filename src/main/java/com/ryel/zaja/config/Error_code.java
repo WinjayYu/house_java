@@ -60,4 +60,5 @@ public interface Error_code {
 
     String ERROR_CODE_0036 = "error_36";   //  【登录】此账号没审核通过
 
+    String ERROR_CODE_0037 = "error_37";   //  【接单】此需求已经有60人接单
 }

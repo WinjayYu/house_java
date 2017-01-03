@@ -125,20 +125,26 @@ public class CommentApi {
     @RequestMapping(value = "findonecomment", method = RequestMethod.POST)
     public Result findOneComment(Integer userId){
         try{
+
+            Map<String, Object> dataMap = new HashMap<>();
+            Map<String, Object> comment = new HashMap<>();
+
+
             Page<Comment> page = commentService.findOneComment(userId,
                     new PageRequest(0, 1, Sort.Direction.DESC, "addTime"));
-            if(null != page){
-//                Map<String, Object> dataMap = APIFactory.fitting(page);
-                Map<String, Object> dataMap = new HashMap<>();
-                Map<String, Object> comment = new HashMap<>();
+
+
+            if(0 != page.getContent().size()) {
 
                 comment.put("id", page.getContent().get(0).getId());
                 comment.put("user", page.getContent().get(0).getUser());
                 comment.put("content", page.getContent().get(0).getContent());
                 comment.put("star", page.getContent().get(0).getStar());
                 comment.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(page.getContent().get(0).getAddTime()));
-                dataMap.put("comment",comment);
-
+                dataMap.put("comment", comment);
+            }else{
+                dataMap.put("comment", new HashMap<>());
+            }
 
                 //接单总数
                 Long sellHouseCount = agentSellHouseService.count(userId);
@@ -157,12 +163,11 @@ public class CommentApi {
 
                 //房源总数
                 Long houseCount  = houseService.count(userId);
+                houseCount = houseCount == null ? 0 : houseCount;
                 dataMap.put("houseCount", houseCount);
 
                 return Result.success().msg("").data(dataMap);
-            }else{
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
-            }
+
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());

@@ -2,6 +2,7 @@ package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.House;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,5 +32,8 @@ public interface BuyHouseDao extends JpaRepository<BuyHouse, Integer> ,JpaSpecif
 
     @Query("select b.id from BuyHouse b where b.user.id = ?1")
     List<Integer> findByUserIdAsId(Integer userId);
+
+    @Query("select count(b) from BuyHouse b where b.id = ?1")
+    Long count(Integer demandId);
 
 }

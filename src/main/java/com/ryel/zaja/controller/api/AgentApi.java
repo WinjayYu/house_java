@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,7 +57,7 @@ public class AgentApi {
     @Autowired
     private HouseOrderService houseOrderService;
     @Resource
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private BizUploadFile bizUploadFile;
     @Resource
@@ -111,7 +112,7 @@ public class AgentApi {
                            @RequestParam(required = false) MultipartFile companyPicFile) {
         try {
             // 校验验证码
-            Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
+            Object origVerCode = stringRedisTemplate.opsForValue().get(user.getMobile());
             if (null == origVerCode) {
                 return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
             }
@@ -468,6 +469,11 @@ public class AgentApi {
             User user = new User();
             user.setId(agentId);
             if ("10".equals(type)) {       // 接买房单
+                //一个需求接单数不能超过60
+                if(buyHouseService.count(demandId) > 60){
+                    return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
+                }
+
                 AgentBuyHouse agentBuyHouse = new AgentBuyHouse();
                 agentBuyHouse.setAgent(user);
                 BuyHouse buyHouse = buyHouseService.findById(demandId);
@@ -477,6 +483,12 @@ public class AgentApi {
                 agentBuyHouse.setBuyHouse(buyHouse);
                 agentBuyHouseService.create(agentBuyHouse);
             } else {                      // 接卖房单
+
+                //一个需求接单数不能超过60
+                if(sellHouseService.count(demandId) > 60){
+                    return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
+                }
+
                 AgentSellHouse agentSellHouse = new AgentSellHouse();
                 agentSellHouse.setAgent(user);
                 SellHouse sellHouse = sellHouseService.findById(demandId);

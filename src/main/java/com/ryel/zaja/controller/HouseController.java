@@ -5,14 +5,8 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.AgentRegisterStatus;
 import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.controller.api.BuyHouseApi;
-import com.ryel.zaja.entity.AgentMaterial;
-import com.ryel.zaja.entity.Feature;
-import com.ryel.zaja.entity.House;
-import com.ryel.zaja.entity.User;
-import com.ryel.zaja.service.AgentMaterialService;
-import com.ryel.zaja.service.BizUploadFile;
-import com.ryel.zaja.service.HouseService;
-import com.ryel.zaja.service.UserService;
+import com.ryel.zaja.entity.*;
+import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.DataTableFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +30,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/mgt/house")
-public class HouseController extends BaseController{
+public class HouseController extends BaseController {
     protected final static Logger logger = LoggerFactory.getLogger(HouseController.class);
     @Value("${pro.upload.path}")
     private String path;
@@ -46,6 +40,12 @@ public class HouseController extends BaseController{
     private BizUploadFile bizUploadFile;
     @Autowired
     private HouseService houseService;
+    @Autowired
+    private SellHouseService sellHouseService;
+    @Autowired
+    private QiNiuService qiNiuService;
+
+    private final String remoteUrlHead = "http://oi0y2qwer.bkt.clouddn.com/";
 
     @RequestMapping("/index")
     public ModelAndView index(){
@@ -67,10 +67,11 @@ public class HouseController extends BaseController{
     public ModelAndView detail(Integer id) {
         ModelAndView modelAndView = new ModelAndView("房源详情");
         House house = houseService.findById(id);
-        if(StringUtils.isNotBlank(house.getFeature())){
-            Feature feature = JsonUtil.json2Obj(house.getFeature(),Feature.class);
-            modelAndView.addObject("feature",feature);
+        if (StringUtils.isNotBlank(house.getFeature())) {
+            Feature feature = JsonUtil.json2Obj(house.getFeature(), Feature.class);
+            modelAndView.addObject("feature", feature);
         }
+        modelAndView.addObject("house", house);
         if(StringUtils.isNotBlank(house.getImgs())){
             List<String> imageList = JsonUtil.json2Obj(house.getImgs(),List.class);
             if(!CollectionUtils.isEmpty(imageList)){
@@ -83,19 +84,43 @@ public class HouseController extends BaseController{
 
     @RequestMapping("/approve")
     @ResponseBody
-    public Result approve(Integer id,String type) {
+    public Result approve(Integer id, String type) {
         House house = houseService.findById(id);
-        if("0".equals(type)){
+        if ("0".equals(type)) {
             // 设置为上架状态
             house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
+            if (null != house.getSellHouse()) {
+                SellHouse sellHouse = house.getSellHouse();
+                sellHouse.setHouseNum(sellHouse.getHouseNum() + 1);
+                sellHouseService.save(sellHouse);
+            }
             // 本地图片上传到七牛并更新imgs字段
             String imgs = house.getImgs();
             if (StringUtils.isNotBlank(imgs)) {
                 List<String> imageList = JsonUtil.json2Obj(imgs, List.class);
+
+                //删除七牛图片
+                try {
+                    qiNiuService.deleteMultipleFile(remoteUrlHead + house.getId());
+                }catch (Exception e){
+                    logger.error("上传文件异常");
+                    e.printStackTrace();
+                }
+
+                try {
+                    //删除本地图片
+                    for (String str : imageList) {
+                        File file = new File(str);
+                        file.delete();
+                    }
+                }catch (Exception e){
+                    logger.error("删除本地图片失败！");
+                }
+
                 List<String> newList = new ArrayList<String>();
                 if (!CollectionUtils.isEmpty(imageList)) {
                     for (String imageUrl : imageList) {
-                        String newUrl = localUrlToQiniuUrl(imageUrl,house.getId().toString());
+                        String newUrl = localUrlToQiniuUrl(imageUrl, house.getId().toString());
                         newList.add(newUrl);
                     }
                 }
@@ -110,7 +135,7 @@ public class HouseController extends BaseController{
         return Result.success();
     }
 
-    private String localUrlToQiniuUrl(String localUrl,String houseId){
+    private String localUrlToQiniuUrl(String localUrl, String houseId) {
         String newUrl = localUrl;
         if (StringUtils.isNotBlank(localUrl)) {
             try {
@@ -118,7 +143,7 @@ public class HouseController extends BaseController{
                 File file = new File(imagePath);
                 if (file.exists()) {
                     newUrl = bizUploadFile.uploadHouseImageToQiniu(file, houseId);
-                }else {
+                } else {
                     logger.error("文件不存在：" + file.getPath());
                 }
             } catch (Exception e) {
