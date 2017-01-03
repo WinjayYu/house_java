@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -374,13 +375,20 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     }
 
     @Override
-    public Page<House> mgtPageHouse(int pageNum, int pageSize) {
+    public Page<House> mgtPageHouse(int pageNum, int pageSize,final String title,final String status) {
         Page<House> page = houseDao.findAll(new Specification<House>() {
             @Override
             public Predicate toPredicate(Root<House> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicateList = new ArrayList<Predicate>();
                 Predicate result = null;
-
+                if (StringUtils.isNotBlank(title)) {
+                    Predicate predicate = cb.like(root.get("title").as(String.class), "%" + title + "%");
+                    predicateList.add(predicate);
+                }
+                if (StringUtils.isNotBlank(status)) {
+                    Predicate predicate = cb.equal(root.get("status").as(String.class), status);
+                    predicateList.add(predicate);
+                }
                 if (predicateList.size() > 0) {
                     result = cb.and(predicateList.toArray(new Predicate[]{}));
                 }
@@ -390,7 +398,11 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                 return query.getRestriction();
             }
         }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-
+        if(!CollectionUtils.isEmpty(page.getContent())){
+            for(House house : page.getContent()){
+                house.setStatusDesc(HouseStatus.getDescByCode(house.getStatus()));
+            }
+        }
         return page;
     }
 

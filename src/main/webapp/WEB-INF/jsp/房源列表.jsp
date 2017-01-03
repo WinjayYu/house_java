@@ -27,6 +27,24 @@
             <div class="col-lg-12">
                 <div class="panel panel-default">
 
+                    <div class="panel-heading">
+
+                        <form class="navbar-form navbar-right" role="search">
+                            <div class="form-group">
+                                <label>标题：</label>
+                                <input type="text" class="form-control" value="" id="title"  maxlength="20">
+                            </div>
+                            <div class="form-group">
+                                <label>状态：</label>
+                                <select class="form-control input-sm" id="status">
+                                    ${statusList}
+                                </select>
+                            </div>
+                            <button type="button" id="c_search" class="btn btn-info btn-sm">查询</button>
+                        </form>
+
+                        <div class="clearfix"></div>
+                    </div>
 
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -66,202 +84,6 @@
     <!-- /#page-wrapper -->
 
 
-    <!-- Modal -->
-    <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="userModalLabel">操作</h4>
-                </div>
-                <div class="modal-body ">
-                    <form id="userForm" method="post" action="user/save" class="form-horizontal" role="form">
-                        <input type="hidden" id="id" name="id" value="">
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">姓名:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="name" name="name" maxlength="20"
-                                       data-rule="required" placeholder="请输入姓名">
-                            </div>
-                        </div>
-                        <div class="form-group img_tooltip" >
-                            <label for="imageUrl" class="col-sm-2 control-label">头像:</label>
-                            <div class="col-sm-5">
-                                <input type="hidden" id="imageUrl" name="imgUrl" value="">
-
-                                <div class="image_show" style="display: none">
-
-                                </div>
-                                <div class="image_handle"   data-toggle="tooltip" data-placement="top" title="" data-original-title="建议上传宽480px高320px的图片">
-                                    <div class="dropped"></div>
-                                </div>
-                            </div>
-                            <div class="col-sm-5">
-                                <a href="javascript:void(0)" id="removeImg" class="btn btn-info" role="button" >删除图片</a>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">英文名:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="ename" name="ename" maxlength="20"
-                                       data-rule="required" placeholder="请输入英文名">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">国籍:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="nationality" name="nationality" maxlength="20"
-                                       data-rule="required" placeholder="请输入国籍">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">医院:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="hospital" name="hospital" maxlength="20"
-                                       data-rule="required" placeholder="请输入医院">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">职务:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="post" name="post" maxlength="20"
-                                       data-rule="required" placeholder="请输入职务">
-                            </div>
-                        </div>  
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">职称:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="titles" name="titles" maxlength="20"
-                                       data-rule="required" placeholder="请输入职称">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">科室:</label>
-                            <div class="col-sm-5">
-                                <input type="text" class="form-control" id="department" name="department" maxlength="20"
-                                       data-rule="required" placeholder="请输入科室">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="description" class="col-sm-2 control-label">描述:</label>
-                            <div class="col-sm-5">
-                                 <textarea type="text" class="form-control" id="description"  name="description" maxlength="500"
-                                           rows="3"
-                                           data-rule="required"
-                                           placeholder="请输入描述"></textarea>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" id="userSave" class="btn btn-primary">保存</button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-    <!-- Modal end -->
-
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content" >
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="userDetailModalLabel">用户详情</h4>
-                </div>
-                <div class="modal-body" id="print-row">
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">姓名:</label>
-                            <span _name="name"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">手机:</label>
-                            <span _name="tel"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">邮箱:</label>
-                            <span _name="email"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">英文名:</label>
-                            <span _name="ename"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">国籍:</label>
-                            <span _name="nationality"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">性别:</label>
-                            <span _name="sex"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">医院:</label>
-                            <span _name="hospital"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">职务:</label>
-                            <span _name="post"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">科室:</label>
-                            <span _name="titles"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">职称:</label>
-                            <span _name="department"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">备注:</label>
-                            <span _name="remark"></span>
-                        </p>
-                    </div>
-                    <div class="row">
-                        <p class="col-sm-9">
-                            <label class="col-sm-3 control-label">注册时间:</label>
-                            <span _name="createDate"></span>
-                        </p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-    <!-- Modal end -->
-
-
 </div>
 <!-- /#wrapper -->
 
@@ -285,7 +107,7 @@
 
                 $("#c_search").click(function () {
                     _this.v.dTable.ajax.reload();
-                })
+                });
 
                 $("#batchDelete").click(function(){
                     var checkBox = $("#dataTables tbody tr").find('input[type=checkbox]:checked');
@@ -315,7 +137,7 @@
                         {"data": "id"},
                         {"data": "title"},
                         {"data": "layout"},
-                        {"data": "status"},
+                        {"data": "statusDesc"},
                         {"data": ""}
                     ],
                     "columnDefs": [
@@ -328,23 +150,8 @@
                     "createdRow": function (row, data, index) {
                         var mobileHtml = '<a target="_blank" href="mgt/house/detail?id='+data.id+'">'+data.id+'</a>';
                         $('td', row).eq(0).html(mobileHtml);
-                        var status = "";
-                        if(data.status=="10"){
-                            status="待审核";
-                        }else if(data.status=="20"){
-                            status="审核驳回";
-                        }else if(data.status=="30"){
-                            status="已上架";
-                        }else if(data.status=="30"){
-                            status="已下架";
-                        }else if(data.status=="30"){
-                            status="交接中";
-                        }else if(data.status=="30"){
-                            status="已关闭";
-                        }
-                        $('td', row).eq(3).html(status);
                         var btnHtml = "<button   title='通过'  class='btn btn-primary btn-circle pass'>" +
-                                "<i class='fa fa-edit'></i>" +
+                                "<i class='fa fa-check'></i>" +
                                 "</button>" +
                                 "&nbsp;&nbsp;" +
                                 "<button  title='驳回'  class='btn btn-default btn-circle reject'>" +
@@ -367,7 +174,8 @@
                         });
                     },
                     "fnServerParams": function (aoData) {
-                        aoData.name = $("#s_name").val();
+                        aoData.title = $("#title").val();
+                        aoData.status = $("#status").val();
                     }
                 });
             },
