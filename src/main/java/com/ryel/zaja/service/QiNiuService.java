@@ -6,12 +6,16 @@ import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Configuration;
+import com.qiniu.storage.model.FileInfo;
+import com.qiniu.storage.model.FileListing;
 import com.qiniu.util.Auth;
 import com.ryel.zaja.core.exception.BizException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -58,7 +62,7 @@ public class QiNiuService {
             //调用put方法上传
             Response res = uploadManager.put(FilePath, key, getUpToken());
             //打印返回的信息
-            System.out.println(res.bodyString());
+//            System.out.println(res.bodyString());
             String bodyString = res.bodyString().toString();
 
             return bodyString;
@@ -94,6 +98,36 @@ public class QiNiuService {
             throw new BizException(r.toString());
         }
     }
+
+    //删除多个文件
+    public void deleteMultipleFile(String prefix){
+        try {
+            List<String> imgs = multipleFile(prefix);
+            for(String img : imgs){
+                bucketManager.delete(bucketname, img);
+            }
+        }catch (QiniuException e){
+            Response r = e.response;
+            throw new BizException(r.toString());
+        }
+    }
+
+    //操作多个文件
+    public List<String> multipleFile(String prefix){
+        try{
+            FileListing fileListing = bucketManager.listFiles(bucketname,prefix,null,100,null);
+            FileInfo[] items = fileListing.items;
+            List<String> imgs = new ArrayList<>();
+            for(FileInfo fileInfo:items){
+                imgs.add(fileInfo.key);
+            }
+            return imgs;
+        }catch (QiniuException e){
+            Response r = e.response;
+            throw new BizException(r.toString());
+        }
+    }
+
 
     public  String getDomain() {
         return domain;

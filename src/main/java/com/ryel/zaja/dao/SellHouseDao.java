@@ -29,4 +29,7 @@ public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpec
 
     @Query("select s.id from SellHouse s where s.user.id = ?1")
     List<Integer> findByUserIdAsId(Integer userId);
+
+    @Query("select count(s) from SellHouse s where s.id = ?1")
+    Long count(Integer demandId);
 }

@@ -40,4 +40,7 @@ public interface UserService extends ICommonService<User>{
 
     void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
                        MultipartFile positive, MultipartFile negative, MultipartFile companyPic);
+
+    void applyAgent(Integer userId, AgentMaterial agentMaterial,
+                    MultipartFile positive, MultipartFile negative, MultipartFile companyPic);
 }

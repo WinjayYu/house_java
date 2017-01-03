@@ -60,11 +60,11 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     public House create(House house) {
 
         //经纪人从已有的sellHouse编辑房源，则sellHouse的house_num加1
-        if(null != house.getSellHouse()){
+       /* if(null != house.getSellHouse()){
             SellHouse sellHouse = house.getSellHouse();
             sellHouse.setHouseNum(sellHouse.getHouseNum() + 1);
             sellHouseService.save(sellHouse);
-        }
+        }*/
         return houseDao.save(house);
     }
 

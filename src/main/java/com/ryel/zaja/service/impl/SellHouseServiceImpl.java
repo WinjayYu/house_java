@@ -60,6 +60,12 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
 
     @Override
     public List<Integer> findByUserIdAsId(Integer userId) {
+
         return sellHouseDao.findByUserIdAsId(userId);
+    }
+
+    @Override
+    public Long count(Integer demandId) {
+        return sellHouseDao.count(demandId);
     }
 }

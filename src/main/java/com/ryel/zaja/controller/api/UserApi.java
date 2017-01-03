@@ -14,6 +14,7 @@ import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.ryel.zaja.utils.bean.FileBo;;
 import com.sun.org.apache.xml.internal.utils.SerializableLocatorImpl;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -200,7 +201,7 @@ public class UserApi {
         try {
 
             User user = userService.findById(userId);
-            if(null != user.getHead()){
+            if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){
                 String head = user.getHead();
                 String filename = head.substring(head.indexOf("user"));
                 qiNiuService.deleteOneFile(filename);
@@ -343,7 +344,7 @@ public class UserApi {
                 if (null != thirdUser.getUser()) {
                     int id = thirdUser.getUser();
                     User user = userService.findById(id);
-                    Result result = Result.success().msg("").data(user);
+                    Result result = Result.success().msg("").data(user2map(user));
                     return JsonUtil.obj2ApiJson(result);
                 } else {
                     Map<String, String> map = new HashMap<>();
@@ -372,35 +373,42 @@ public class UserApi {
      * @return
      */
     @RequestMapping(value = "bindmobile", method = RequestMethod.POST)
-    public String bindMobile(String mobile, String openid, String verCode) {
+    public Result bindMobile(String mobile, String openid, String verCode) {
         try {
             ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
             String origVerCode = valueops.get(mobile);
 
             if (null == origVerCode) {
-                Result result = Result.error().msg(Error_code.ERROR_CODE_0010);
-                return JsonUtil.obj2ApiJson(result);
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
             }
             if (!origVerCode.equals(verCode)) {
-                Result result = Result.error().msg(Error_code.ERROR_CODE_0009);
-                return JsonUtil.obj2ApiJson(result);
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
             }
 
 
 
             ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
             if (null == thirdUser) {
-                Result result = Result.error().msg(Error_code.ERROR_CODE_0029);
-                return JsonUtil.obj2ApiJson(result);
+                return Result.error().msg(Error_code.ERROR_CODE_0029).data(new HashMap<>());
+
             }
 
 
             if(null != userService.findByMobile(mobile)){
-                thirdUser.setUser(userService.findByMobile(mobile).getId());
+
+                User user = userService.findByMobile(mobile);
+
+                thirdUser.setUser(user.getId());
                 ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
 
-                Result result = Result.success().msg("").data(thirdUser1);
-                return JsonUtil.obj2ApiJson(result);
+                String str = JsonUtil.obj2Json(thirdUser1);
+                JSONObject obj = new JSONObject(str);
+                obj.remove("user");
+                obj.append("user", user.toString());
+
+                Map<String, Object> dataMap = new HashMap<>();
+                dataMap.put("thirdUser",obj.toString());
+                return Result.success().msg("").data(dataMap);
             }
 
             User user = new User();
@@ -418,16 +426,14 @@ public class UserApi {
             thirdUser.setUser(origUser.getId());
             ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
-            Result result = Result.success().msg("").data(thirdUser2);
-            return JsonUtil.obj2ApiJson(result);
+          return Result.success().msg("").data(thirdUser2);
         } catch (BizException be){
             logger.error(be.getMessage(), be);
-            Result result =  Result.error().msg(Error_code.ERROR_CODE_0006);
-            return JsonUtil.obj2ApiJson(result);
+            return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
-            return JsonUtil.obj2ApiJson(result);
+            return  Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
     }
 
@@ -460,13 +466,13 @@ public class UserApi {
      * 申请成为经纪人
      */
     @RequestMapping(value = "apply", method = RequestMethod.POST)
-    public Result register(User user, AgentMaterial agentMaterial, String verifycode,
+    public Result register(Integer userId, AgentMaterial agentMaterial,
                            @RequestParam(required = false) MultipartFile positiveFile,
                            @RequestParam(required = false) MultipartFile negativeFile,
                            @RequestParam(required = false) MultipartFile companyPicFile) {
         try {
 
-            userService.agentRegister(user,agentMaterial,verifycode,positiveFile,negativeFile,companyPicFile);
+            userService.applyAgent(userId,agentMaterial,positiveFile,negativeFile,companyPicFile);
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
@@ -474,6 +480,37 @@ public class UserApi {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 检查用户类型和经纪人状态
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "checktype", method = RequestMethod.POST)
+    public String checkType(Integer userId){
+        try{
+            if(null == userId){
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0002);
+                return JsonUtil.obj2ApiJson(result);
+            }
+            User user = userService.findById(userId);
+            if(null == user){
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
+                return JsonUtil.obj2ApiJson(result);
+            }
+
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("type", user.getType());
+            dataMap.put("agentStatus", user.getAgentStatus());
+
+            Result result = Result.success().msg("").data(dataMap);
+            return JsonUtil.obj2ApiJson(result);
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0001);
+            return JsonUtil.obj2ApiJson(result);
         }
     }
 }
