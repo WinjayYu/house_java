@@ -101,6 +101,7 @@ public class HouseController extends BaseController{
                 }
                 String newImgs = JsonUtil.obj2Json(newList);
                 house.setImgs(newImgs);
+                house.setCover(newList.get(0));
             }
         }else {
             house.setStatus(HouseStatus.REJECT.getCode());
