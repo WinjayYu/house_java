@@ -16,4 +16,7 @@ public interface ThirdUserService extends ICommonService<ThirdUser>{
     ThirdUser bindMobile(String mobile, String openid);
 
     ThirdUser update(ThirdUser thirdUser);
+
+    //一个账户只能绑定一个微信或者QQ
+    ThirdUser check(Integer user, String type);
 }

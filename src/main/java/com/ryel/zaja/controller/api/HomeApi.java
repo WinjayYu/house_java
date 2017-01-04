@@ -4,8 +4,10 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
+import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.GetDistanceUtil;
 import com.ryel.zaja.utils.MapSortUtils;
+import com.sun.scenario.animation.AnimationPulse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,6 @@ public class HomeApi {
     private UserService userService;
 
 
-
     @RequestMapping(value = "home", method = RequestMethod.POST)
     public Result home(@RequestParam(value = "userId", required = false) Integer userId,
                        @RequestParam(value = "longitude", required = false) Double lon1,
@@ -56,8 +57,8 @@ public class HomeApi {
                        @RequestParam(value = "city", required = false) String city) {
 
         Map<String, Object> home = new HashMap<String, Object>();
-        List<House> recomHouses = new ArrayList<House>();
-        List<House> hotHouses = new ArrayList<House>();
+        List recomHouses;
+        List hotHouses;
 
         HomeCoverUrl homeCoverUrl = homeCoverUrlService.find(1);
         home.put("homeCoverUrl", homeCoverUrl);
@@ -68,7 +69,8 @@ public class HomeApi {
         if (null != userId) {
             User user = userService.findById(userId);
             type = user.getType();
-            recomHouses = recommend(userId, type);
+            recomHouses = APIFactory.listFilterHouse(recommend(userId, type));
+
             if (!CollectionUtils.isEmpty(recomHouses)) {
                 home.put("recomHouses", recomHouses);
             } else {
@@ -82,15 +84,17 @@ public class HomeApi {
 
         //如果有经纬度和城市名字，则调用hotHouse方法，热门推荐
         if (null != lon1 && null != lat1 && null != city) {
-            hotHouses = hotHouse(lon1, lat1, city, type);
+            hotHouses = APIFactory.listFilterHouse(hotHouse(lon1, lat1, city, type));
         } else {
-            lon1 = 114.323705; lat1 = 30.468666; city = "武汉";
-            hotHouses = hotHouse(lon1, lat1, city, type);
+            lon1 = 114.323705;
+            lat1 = 30.468666;
+            city = "武汉";
+            hotHouses = APIFactory.listFilterHouse(hotHouse(lon1, lat1, city, type));
         }
         if (!hotHouses.isEmpty() && null != hotHouses) {
             home.put("hotHouses", hotHouses);
         } else {
-            List<House> recoHouses = recommendService.findByStatus("10");
+            List recoHouses = APIFactory.listFilterHouse((recommendService.findByStatus("10")));
             home.put("hotHouses", recoHouses);
         }
 
@@ -138,7 +142,7 @@ public class HomeApi {
         List<House> sortHouses = new ArrayList<>();
         for (int b = list.size() - 1; b >= 0; b--) {
             sortHouses.add(houses.get(list.get(b)));
-            if(20 == sortHouses.size()) break;
+            if (20 == sortHouses.size()) break;
         }
         return sortHouses;
 

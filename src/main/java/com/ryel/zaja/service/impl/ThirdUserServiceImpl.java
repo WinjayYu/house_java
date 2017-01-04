@@ -55,4 +55,10 @@ public class ThirdUserServiceImpl extends AbsCommonService<ThirdUser> implements
         ClassUtil.copyProperties(origThirdUser, thirdUser);*/
         return save(thirdUser);
     }
+
+    //一个账户只能绑定一个微信或者QQ
+    @Override
+    public ThirdUser check(Integer user, String type) {
+        return thirdUserDao.findByUserAndType(user, type);
+    }
 }

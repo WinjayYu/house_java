@@ -7,14 +7,12 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
-import com.ryel.zaja.entity.Community;
-import com.ryel.zaja.entity.House;
-import com.ryel.zaja.entity.SellHouse;
-import com.ryel.zaja.entity.User;
+import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.ClassUtil;
 import com.ryel.zaja.utils.GetDistanceUtil;
+import com.ryel.zaja.utils.MapSortUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,10 +30,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by billyu on 2016/11/28.
@@ -55,6 +50,15 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Autowired
     SellHouseService sellHouseService;
+
+    @Autowired
+    BuyHouseService  buyHouseService;
+
+    @Autowired
+    RecommendService recommendService;
+
+    @Autowired
+    CollectService collectService;
 
     @Override
     @Transactional
@@ -141,22 +145,13 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     public List<House> findByCommunityUid(String uid, String type) {
-        List<String> list = new ArrayList<>();
         if (UserType.AGENT.getCode().equals(type)) {
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            return houseDao.findByCommunityUid(uid, list);
+            return houseDao.findByCommunityUid(uid, HouseStatus.getAgentCanSeeStatus());
         }else if(UserType.USER.getCode().equals(type)){
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            return houseDao.findByCommunityUid(uid, list);
+            return houseDao.findByCommunityUid(uid, HouseStatus.getUserCanSeeStatus());
         }else{
-            list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.REJECT.getCode());
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.SOLD_OUT_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            list.add(HouseStatus.CLOSED.getCode());
-            return houseDao.findByCommunityUid(uid, list);
+
+            return houseDao.findByCommunityUid(uid, HouseStatus.getManagerCanSeeStatus());
         }
     }
 
@@ -167,69 +162,35 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     public Page<House> findByUid(String uid,String type, Pageable pageable) {
-        List<String> list = new ArrayList<>();
         if (UserType.AGENT.getCode().equals(type)) {
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            return houseDao.findByUid(uid, list, pageable);
+            return houseDao.findByUid(uid, HouseStatus.getAgentCanSeeStatus(), pageable);
         }else if(UserType.USER.getCode().equals(type)){
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            return houseDao.findByUid(uid, list, pageable);
+            return houseDao.findByUid(uid, HouseStatus.getUserCanSeeStatus(), pageable);
         }else{
-            list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.REJECT.getCode());
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.SOLD_OUT_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            list.add(HouseStatus.CLOSED.getCode());
-            return houseDao.findByUid(uid, list, pageable);
+            return houseDao.findByUid(uid, HouseStatus.getManagerCanSeeStatus(), pageable);
         }
     }
 
     @Override
     public Page<House> findByUids(List<String> uids,String type, Pageable pageable) {
-        List<String> list = new ArrayList<>();
         if (UserType.AGENT.getCode().equals(type)) {
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            return houseDao.findByUids(uids, list, pageable);
+            return houseDao.findByUids(uids, HouseStatus.getAgentCanSeeStatus(), pageable);
         }else if(UserType.USER.getCode().equals(type)){
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            return houseDao.findByUids(uids, list, pageable);
+            return houseDao.findByUids(uids, HouseStatus.getUserCanSeeStatus(), pageable);
         }else{
-            list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.REJECT.getCode());
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.SOLD_OUT_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            list.add(HouseStatus.CLOSED.getCode());
-            return houseDao.findByUids(uids, list, pageable);
+
+            return houseDao.findByUids(uids, HouseStatus.getManagerCanSeeStatus(), pageable);
         }
     }
 
 
-    @Override
-    public List<House> findByCity(String city) {
-        return houseDao.findByCity(city);
-    }
-
     public List<House> findByLayout(String houseType, String type) {
-        List<String> list = new ArrayList<>();
         if (UserType.AGENT.getCode().equals(type)) {
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            return houseDao.findByHouseLayout(houseType, list);
+            return houseDao.findByHouseLayout(houseType, HouseStatus.getAgentCanSeeStatus());
         }else if(UserType.USER.getCode().equals(type)){
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            return houseDao.findByHouseLayout(houseType, list);
+            return houseDao.findByHouseLayout(houseType, HouseStatus.getUserCanSeeStatus());
         }else{
-            list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.REJECT.getCode());
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.SOLD_OUT_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            list.add(HouseStatus.CLOSED.getCode());
-            return houseDao.findByHouseLayout(houseType, list);
+            return houseDao.findByHouseLayout(houseType, HouseStatus.getManagerCanSeeStatus());
         }
     }
 
@@ -246,22 +207,12 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     @Override
     public Page<House> findByAddTime(String type, Pageable pageable) {
-        List<String> list = new ArrayList<>();
         if (UserType.AGENT.getCode().equals(type)) {
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            return houseDao.findByAddTime(list, pageable);
+            return houseDao.findByAddTime(HouseStatus.getAgentCanSeeStatus(), pageable);
         }else if(UserType.USER.getCode().equals(type)){
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            return houseDao.findByAddTime(list, pageable);
+            return houseDao.findByAddTime(HouseStatus.getUserCanSeeStatus(), pageable);
         }else{
-            list.add(HouseStatus.SAVED.getCode());
-            list.add(HouseStatus.REJECT.getCode());
-            list.add(HouseStatus.PUTAWAY_YET.getCode());
-            list.add(HouseStatus.SOLD_OUT_YET.getCode());
-            list.add(HouseStatus.IN_CONNECT.getCode());
-            list.add(HouseStatus.CLOSED.getCode());
-            return houseDao.findByAddTime(list, pageable);
+            return houseDao.findByAddTime(HouseStatus.getManagerCanSeeStatus(), pageable);
         }
 
     }
@@ -426,4 +377,96 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
     public Long count(Integer agentId) {
         return houseDao.countByAgentId(agentId);
     }
+
+    //home界面的zaja推荐房源
+    @Override
+    public List<House> recommend(int userId, String type) {
+        List<House> result = new ArrayList<>();
+        List<BuyHouse> buyHouses = new ArrayList<>();
+        if (UserType.USER.getCode().equals(type)) {
+            buyHouses = buyHouseService.findByUserId(userId);
+        }
+        if (buyHouses.isEmpty()) {
+            return recommendService.findByStatus("10");
+        } else {
+            //随机获取一条数据
+            BuyHouse bh = buyHouses.get(new Random().nextInt(buyHouses.size()));
+
+            List<House> houses = new ArrayList<House>();
+
+            //加上小区一样的房源
+            /*if (-1 != bh.getCommunity().indexOf("|")) {
+                String[] str = bh.getCommunity().split("\\|");
+                int j = new Random().nextInt(str.length);
+                for (int i = 0; i < str.length; i++) {
+                    houses.addAll(houseService.findByCommunityUid(str[i], type));
+                }
+            } else {*/
+
+            houses = findByCommunityUid(bh.getCommunity().getUid(), type);
+
+            //加上户型一样的房源
+            houses.addAll(findByLayout(bh.getLayout(), type));
+
+            //如果小于5条数据则返回结果
+            if (houses.size() <= 5) {
+                List<House> recoHouses = recommendService.findByStatus("10");
+                for (int i = 0; houses.size() < 5; ) {
+                    houses.add(recoHouses.get(i));
+                    i++;
+                }
+                return houses;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<House> hotHouse(double lon1, double lat1, String city, String type) {
+
+        List<Community> communities = new ArrayList<Community>();
+        List<Community> communityBycity = communityService.findByCity(city);
+        List<String> uids = new ArrayList<>();
+        List<House> houses = new ArrayList<>();
+
+        for (Community community : communityBycity) {
+            double lon2 = community.getLongitude().doubleValue();
+            double lat2 = community.getLatitude().doubleValue();
+            //计算两个点之间的距离
+            double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
+            if (distance <= 100000) {//100公里之内的
+                communities.add(community);
+            }
+        }
+        for (Community community : communities) {
+            uids.add(community.getUid());
+        }
+        //return uids;
+        for (int i = 0; i < uids.size(); i++) {
+            houses.addAll(findByCommunityUid(uids.get(i), type));
+            if (6 == houses.size()) break;
+        }
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < houses.size(); i++) {
+
+            int clickNum = houses.get(i).getViewNum();
+            int collect = collectService.countByHouseId(houses.get(i).getId());
+            //热度值，clickNum*1  + collect*2
+            int hotNum = clickNum + collect * 2;
+            map.put(i, hotNum);
+        }
+
+        Map sortMap = MapSortUtils.sortByValue(map);
+        List<Integer> list = new ArrayList<Integer>(sortMap.keySet());
+
+        List<House> sortHouses = new ArrayList<>();
+        for (int b = list.size() - 1; b >= 0; b--) {
+            sortHouses.add(houses.get(list.get(b)));
+            if (20 == sortHouses.size()) break;
+        }
+        return sortHouses;
+
+    }
+
 }

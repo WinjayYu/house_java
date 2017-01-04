@@ -398,6 +398,10 @@ public class UserApi {
 
                 User user = userService.findByMobile(mobile);
 
+                //一个账户只能绑定一个微信或者QQ
+                if(null != thirdUserService.check(user.getId(),thirdUser.getType())){
+                    return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
+                }
                 thirdUser.setUser(user.getId());
                 ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
 

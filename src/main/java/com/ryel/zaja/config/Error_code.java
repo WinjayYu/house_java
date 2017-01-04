@@ -61,4 +61,7 @@ public interface Error_code {
     String ERROR_CODE_0036 = "error_36";   //  【登录】此账号没审核通过
 
     String ERROR_CODE_0037 = "error_37";   //  【接单】此需求已经有60人接单
+
+    String ERROR_CODE_0038 = "error_38";   //  【第三方登陆】此账户已经绑定过其他第三方
+
 }
