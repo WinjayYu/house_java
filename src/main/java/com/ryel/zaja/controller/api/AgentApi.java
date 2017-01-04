@@ -5,6 +5,7 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.*;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
+import com.ryel.zaja.push.Push;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.BizUtil;
@@ -66,6 +67,8 @@ public class AgentApi {
     private RecommendService recommendService;
     @Autowired
     private HouseTagService tagService;
+    @Autowired
+    private PushDeviceService pushService;
 
     /**
      * 登录
@@ -916,6 +919,17 @@ public class AgentApi {
             houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
 
             houseOrderService.save(houseOrder);
+
+            //发送推送信息
+            PushDevice pushDevice = pushService.findByUser(user);
+            if(null!=pushDevice)
+            {
+                if(pushDevice.getDevice().equals("Android"))
+                {
+                    Push push = new Push();
+                    push.sendAndroidOrder(user.getId());
+                }
+            }
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
