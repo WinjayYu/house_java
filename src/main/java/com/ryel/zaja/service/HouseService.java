@@ -22,8 +22,6 @@ public interface HouseService extends ICommonService<House> {
 
     List<House> findByAgentIdAndSellHouseId(Integer agentId,Integer sellHouseId);
 
-    List<House> findByCity(String city);
-
     Page<House> findByUid(String uid,String type, Pageable pageable);
 
     Page<House> findByUids(List<String> uids,String type, Pageable pageable);
@@ -50,11 +48,7 @@ public interface HouseService extends ICommonService<House> {
 
     Page<House> findByAddTime(String type, Pageable pageable);
 
-    /**
-     * 获取所有房源列表
-     *
-     * @return
-     */
+
     List<House> list();
 
     void agentDeleteHouse(Integer houseId, Integer agentId);
@@ -77,4 +71,8 @@ public interface HouseService extends ICommonService<House> {
     Page<House> pageByAgentId2(int agentId, Pageable pageable);
 
     Long count(Integer agentId);
+
+    //home页面的zaja推荐与热门房源
+    List<House> recommend(int userId, String type);
+    List<House> hotHouse(double lon1, double lat1, String city, String type);
 }

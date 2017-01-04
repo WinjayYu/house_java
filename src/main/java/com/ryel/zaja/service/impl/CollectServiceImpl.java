@@ -30,6 +30,7 @@ import java.util.Map;
  * Created by billyu on 2016/12/14.
  */
 @Service
+@Transactional(readOnly = true)
 public class CollectServiceImpl extends AbsCommonService<Collect> implements CollectService{
     protected final static Logger logger = LoggerFactory.getLogger(CollectServiceImpl.class);
 
@@ -53,7 +54,7 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
 
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional
     public Collect create(Integer userId, Integer houseId) {
 
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
@@ -79,7 +80,7 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
     }
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional
     public Collect cancelCollect(Integer userId, Integer houseId) {
         Collect collect = collectDao.findByUserIdAndHouseId(userId, houseId);
         if(null == collect){

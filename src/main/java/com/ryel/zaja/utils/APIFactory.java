@@ -150,6 +150,13 @@ public class APIFactory {
     }
 
 
+    public static List<Map<String,Object>> listFilterHouse(List<House> houses){
+        List<Map<String,Object>> list = new ArrayList<>();
+        for(House house : houses){
+            list.add(filterHouse(house));
+        }
+        return list;
+    }
 
 
 }

@@ -2,6 +2,7 @@ package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.Collect;
 import com.ryel.zaja.entity.House;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

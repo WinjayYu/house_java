@@ -10,6 +10,7 @@ import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.RedisService;
 import com.ryel.zaja.utils.APIFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,6 +38,10 @@ public class CollectApi {
 
     @Autowired
     HouseService houseService;
+
+
+    @Autowired
+    private CacheManager cacheManager;
 
     /**
      * 收藏
