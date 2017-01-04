@@ -19,19 +19,19 @@ public class MyInterceptor implements HandlerInterceptor {
 //        System.out.println(">>>MyInterceptor1>>>>>>>在请求处理之前进行调用（Controller方法调用之前）");
 
 //        Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
-        String time = httpServletRequest.getHeader("key");
-        String token = httpServletRequest.getHeader("token");
-        if(null == time || null == token){
+        String KEY = httpServletRequest.getHeader("KEY");
+        String TOKEN = httpServletRequest.getHeader("TOKEN");
+        if(null == KEY || null == TOKEN){
             return false;
         }
-        Long subTime = Long.parseLong(time) - 5;
+        Long subTime = Long.parseLong(KEY) - 5;
         String timestamp = new StringBuffer(subTime.toString()).reverse().toString();
         Long currentTime = new Timestamp(System.currentTimeMillis()).getTime();
         long distance = (new Timestamp(System.currentTimeMillis())).getTime() - Long.parseLong(timestamp);
         if(distance > 600000){
             return false;
         }
-        String result = timestamp + "zaja";
+        String result = timestamp + "ZAJA";
 
         byte[] bytesOfMessage = result.getBytes("UTF-8");
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -39,7 +39,7 @@ public class MyInterceptor implements HandlerInterceptor {
         byte byteData[] = md.digest(bytesOfMessage);
         String serverToken = Hex.encodeHexString(byteData);
 
-        if(!token.equals(serverToken)){
+        if(!TOKEN.equals(serverToken)){
             return false;
         }
 
