@@ -33,11 +33,20 @@ public class MyInterceptor implements HandlerInterceptor {
         }
         String result = timestamp + "ZAJA";
 
-        byte[] bytesOfMessage = result.getBytes("UTF-8");
+//        byte[] bytesOfMessage = result.getBytes("UTF-8");
         MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(bytesOfMessage);
-        byte byteData[] = md.digest(bytesOfMessage);
-        String serverToken = Hex.encodeHexString(byteData);
+        md.update(result.getBytes());
+        byte byteData[] = md.digest();
+
+        StringBuffer hexString = new StringBuffer();
+        for (int i=0;i<byteData.length;i++) {
+            String hex=Integer.toHexString(0xff & byteData[i]);
+            if(hex.length()==1) hexString.append('0');
+            hexString.append(hex);
+        }
+        String serverToken = hexString.toString().toUpperCase();
+
+//        String serverToken = Hex.encodeHexString(byteData);
 
         if(!TOKEN.equals(serverToken)){
             return false;
