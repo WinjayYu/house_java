@@ -469,4 +469,36 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
     }
 
+    @Override
+    public Page<House> backPageHouse(int pageNum, int pageSize, final String status) {
+        Page<House> page = houseDao.findAll(new Specification<House>() {
+            @Override
+            public Predicate toPredicate(Root<House> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicateList = new ArrayList<Predicate>();
+                Predicate result = null;
+                if (StringUtils.isNotBlank(status)) {
+                    Predicate predicate = cb.equal(root.get("status").as(String.class), status);
+                    predicateList.add(predicate);
+                }else
+                {
+                    Predicate predicate = cb.notEqual(root.get("status").as(String.class), HouseStatus.SAVED.getCode());
+                    predicateList.add(predicate);
+                }
+                if (predicateList.size() > 0) {
+                    result = cb.and(predicateList.toArray(new Predicate[]{}));
+                }
+                if (result != null) {
+                    query.where(result);
+                }
+                return query.getRestriction();
+            }
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+        if(!CollectionUtils.isEmpty(page.getContent())){
+            for(House house : page.getContent()){
+                house.setStatusDesc(HouseStatus.getDescByCode(house.getStatus()));
+            }
+        }
+        return page;
+    }
+
 }

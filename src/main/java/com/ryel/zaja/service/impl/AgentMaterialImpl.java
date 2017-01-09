@@ -4,6 +4,7 @@ import com.ryel.zaja.dao.AgentMaterialDao;
 import com.ryel.zaja.entity.AgentMaterial;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.AgentMaterialService;
+import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,11 @@ public class AgentMaterialImpl extends AbsCommonService<AgentMaterial> implement
     }
 
     @Override
+    @Transactional
     public AgentMaterial update(AgentMaterial agentMaterial) {
-        return null;
+        AgentMaterial origAgent = agentMaterialDao.findByIdcard(agentMaterial.getIdcard());
+        ClassUtil.copyProperties(origAgent, agentMaterial);
+        return save(origAgent);
     }
 
     @Override

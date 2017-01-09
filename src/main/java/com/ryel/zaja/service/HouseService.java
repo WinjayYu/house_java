@@ -75,4 +75,6 @@ public interface HouseService extends ICommonService<House> {
     //home页面的zaja推荐与热门房源
     List<House> recommend(int userId, String type);
     List<House> hotHouse(double lon1, double lat1, String city, String type);
+    //获取所有的房屋信息
+    Page<House> backPageHouse(int pageNum, int pageSize,String status);
 }

@@ -173,10 +173,10 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         }
         User agent = userDao.findByMobile(user.getMobile());
         if(agent != null){
-            if (UserType.AGENT.getCode().equals(agent.getType()))
+            if (UserType.AGENT.getCode().equals(agent.getType()) && !(AgentRegisterStatus.APPROVE_REJECT.getCode().equals(agent.getAgentStatus())))
             {
                 throw new BizException(Error_code.ERROR_CODE_0024,"用户已经存在");
-            }else
+            }else if(UserType.USER.getCode().equals(agent.getType()))
             {
                 throw new BizException(Error_code.ERROR_CODE_0031,"用户为普通用户，请走用户端申请流程");
             }
@@ -185,22 +185,34 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         if(idagent != null){
             throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
         }
-        // 保存用户
-        user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态
-        user.setType(UserType.AGENT.getCode());
-        create(user);
+
+        //审核被拒绝用户
+        if(agent != null && AgentRegisterStatus.APPROVE_REJECT.getCode().equals(agent.getAgentStatus()))
+        {
+            //更新用户
+            agent.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
+            agent.setType(UserType.AGENT.getCode());
+            update(agent);
+
+            user = agent;
+        }else{
+            //新建用户
+            user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
+            user.setType(UserType.AGENT.getCode());
+            create(user);
+        }
         // 上传图片
         String positivePath = bizUploadFile.uploadAgentImageToLocal(positive,user.getId());
         if(StringUtils.isBlank(positivePath)){
-            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传本地失败");
         }
         String negativePath = bizUploadFile.uploadAgentImageToLocal(negative,user.getId());
         if(StringUtils.isBlank(negativePath)){
-            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传本地失败");
         }
         String companyPicPath = bizUploadFile.uploadAgentImageToLocal(companyPic,user.getId());
         if(StringUtils.isBlank(companyPicPath)){
-            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
+            throw new BizException(Error_code.ERROR_CODE_0025,"图片上传本地失败");
         }
         // 保存扩展信息
         agentMaterial.setAgent(user);
@@ -259,4 +271,60 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         agentMaterial.setNegative(negativePath);
         agentMaterial.setCompanyPic(companyPicPath);
         agentMaterialDao.save(agentMaterial);    }
+
+    @Override
+    public Page<User> unCheckAgent(int pageNum, int pageSize) {
+        Page<User> page = userDao.findAll(new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicateList = new ArrayList<Predicate>();
+                Predicate result = null;
+                {
+                    Predicate predicate = cb.equal(root.get("type").as(String.class), UserType.AGENT.getCode());
+                    predicateList.add(predicate);
+                }
+                {
+                    Predicate predicate = cb.equal(root.get("agentStatus").as(String.class), AgentRegisterStatus.APPROVE_APPLY.getCode());
+                    predicateList.add(predicate);
+                }
+                if (predicateList.size() > 0) {
+                    result = cb.and(predicateList.toArray(new Predicate[]{}));
+                }
+                if (result != null) {
+                    query.where(result);
+                }
+                return query.getRestriction();
+            }
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+
+        return page;
+    }
+
+    @Override
+    public Page<User> userList(int pageNum, int pageSize, final String usertype) {
+        Page<User> page = userDao.findAll(new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicateList = new ArrayList<Predicate>();
+                Predicate result = null;
+                {
+                    Predicate predicate = cb.equal(root.get("type").as(String.class), usertype);
+                    predicateList.add(predicate);
+                }
+                {
+                    Predicate predicate = cb.notEqual(root.get("agentStatus").as(String.class), AgentRegisterStatus.APPROVE_APPLY.getCode());
+                    predicateList.add(predicate);
+                }
+                if (predicateList.size() > 0) {
+                    result = cb.and(predicateList.toArray(new Predicate[]{}));
+                }
+                if (result != null) {
+                    query.where(result);
+                }
+                return query.getRestriction();
+            }
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
+
+        return page;
+    }
 }

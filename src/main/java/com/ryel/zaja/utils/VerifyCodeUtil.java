@@ -45,6 +45,35 @@ public class VerifyCodeUtil {
         return textEntity;
     }
 
+    public static String sendTip(String mobile, String msg,String type) {
+        //经纪人审核成功
+        if("0".equals(type)){
+            msg = "您的经纪人申请信息已经通过，尽快登录，开启经纪人之旅。";
+        }else if("1".equals(type)){
+            //经纪人审核失败
+            msg = "感谢您申请【ZAJA】经纪人，" + msg + "，期待您的再次提交。";
+        }else{
+            //房源审核失败
+            msg = "感谢您提交宝贵的房源信息，" + msg + ",期待您的再次提交。";
+        }
+        // just replace key here
+        Client client = Client.create();
+        client.addFilter(new HTTPBasicAuthFilter(
+                "api", "key-312d01f92a34086bbcc57f31047578b4"));
+        WebResource webResource = client.resource(
+                "http://sms-api.luosimao.com/v1/send.json");
+        MultivaluedMapImpl formData = new MultivaluedMapImpl();
+        formData.add("mobile", mobile);
+        formData.add("message",  msg + "【ZAJA】");
+        ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).
+                post(ClientResponse.class, formData);
+        String textEntity = response.getEntity(String.class);
+        int status = response.getStatus();
+        //System.out.print(textEntity);
+        //System.out.print(status);
+        return textEntity;
+    }
+
     public static String testStatus() {
         Client client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(

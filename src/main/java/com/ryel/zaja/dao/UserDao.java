@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserDao extends JpaRepository<User, Integer>,JpaSpecificationExecutor<User> {
 
-    @Cacheable
     User findByMobile(String mobile);
 
     User findByMobileAndPassword(String mobile, String password);

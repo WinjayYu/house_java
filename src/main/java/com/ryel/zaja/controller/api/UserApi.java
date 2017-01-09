@@ -308,6 +308,7 @@ public class UserApi {
      */
     @RequestMapping(value = "sendverifycode", method = RequestMethod.POST)
     public Result verifyCode(String mobile, String type) {
+        try {
         String verCode = VerifyCodeUtil.getVerCode();
         ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
         valueops.set(mobile, verCode);
@@ -316,7 +317,7 @@ public class UserApi {
 
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
 
-        try {
+
             JSONObject jsonObj = new JSONObject(textEntity);
             int error_code = jsonObj.getInt("error");
             String error_msg = jsonObj.getString("msg");
