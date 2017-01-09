@@ -1,6 +1,7 @@
 package com.ryel.zaja.service;
 
 import com.ryel.zaja.entity.AgentBuyHouse;
+import com.ryel.zaja.entity.AgentLocation;
 import com.ryel.zaja.entity.BuyHouse;
 import com.ryel.zaja.entity.SellHouse;
 import org.springframework.data.domain.Page;
@@ -17,4 +18,5 @@ public interface AgentBuyHouseService extends ICommonService<AgentBuyHouse> {
     List<Integer> findBuyHouseByAgentId(Integer agnetId);
 
     AgentBuyHouse create(AgentBuyHouse agentBuyHouse);
+
 }

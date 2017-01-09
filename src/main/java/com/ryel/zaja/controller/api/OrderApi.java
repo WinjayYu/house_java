@@ -9,6 +9,7 @@ import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.entity.*;
+import com.ryel.zaja.service.ComplainService;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.utils.APIFactory;
@@ -37,6 +38,9 @@ public class OrderApi {
 
     @Autowired
     private HouseService houseService;
+
+    @Autowired
+    private ComplainService complainService;
 
     //创建订单
     @RequestMapping(value = "createorder")
@@ -169,15 +173,20 @@ public class OrderApi {
 
 
     /**
-     * 用户投诉,状态值从"10"变成"12"
+     * 用户投诉,订单状态值从"10"变成"12"，投诉内容写进数据库
      * @param userId
      * @param houseOrderId
      * @return
      */
     @RequestMapping(value = "complain", method = RequestMethod.POST)
-    public Result complain(Integer userId, Integer houseOrderId){
-
-        return changeStatus(userId, houseOrderId,HouseOrderStatus.COMPLAIN.getCode());
+    public Result complain(Integer userId, Integer houseOrderId, String content){
+        try{
+            complainService.create(userId, houseOrderId, content);
+            return changeStatus(userId, houseOrderId,HouseOrderStatus.COMPLAIN.getCode());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
 
     }
 
@@ -206,6 +215,7 @@ public class OrderApi {
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
 
 
 }

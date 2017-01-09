@@ -186,6 +186,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
         }
         // 保存用户
+        user.setHead("http://oi0y2qwer.bkt.clouddn.com/agent_head.png");//默认头像
         user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态
         user.setType(UserType.AGENT.getCode());
         create(user);
@@ -254,9 +255,13 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             throw new BizException(Error_code.ERROR_CODE_0025,"图片上传七牛失败");
         }
         // 保存扩展信息
+        if(null != agentMaterialDao.findByAgentId(user.getId())){
+            throw new BizException(Error_code.ERROR_CODE_0039);
+        }
         agentMaterial.setAgent(user);
         agentMaterial.setPositive(positivePath);
         agentMaterial.setNegative(negativePath);
         agentMaterial.setCompanyPic(companyPicPath);
-        agentMaterialDao.save(agentMaterial);    }
+        agentMaterialDao.save(agentMaterial);
+    }
 }

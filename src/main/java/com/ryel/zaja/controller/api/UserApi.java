@@ -4,10 +4,7 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
-import com.ryel.zaja.entity.AgentMaterial;
-import com.ryel.zaja.entity.House;
-import com.ryel.zaja.entity.ThirdUser;
-import com.ryel.zaja.entity.User;
+import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
@@ -32,7 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -72,6 +71,8 @@ public class UserApi {
     @Resource
     private BizUploadFile bizUploadFile;
 
+    @Autowired
+    private FeedbackService feedbackService;
 
 
 
@@ -101,7 +102,7 @@ public class UserApi {
             return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
         }
         try {
-            user.setHead("");
+            user.setHead("http://oi0y2qwer.bkt.clouddn.com/user_head.png");
             user.setNickname("");
             user.setUsername("");
             if (null == user.getSex()) {
@@ -320,16 +321,12 @@ public class UserApi {
             JSONObject jsonObj = new JSONObject(textEntity);
             int error_code = jsonObj.getInt("error");
             String error_msg = jsonObj.getString("msg");
-            if (error_code == 0) {
-                System.out.println("Send message success.");
-            } else {
-                System.out.println("Send message failed,code is " + error_code + ",msg is " + error_msg);
+            if(0 != error_code){
                 return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
             }
         } catch (JSONException e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
-
         }
 
         return Result.success().msg("").data(new HashMap<>());
@@ -408,7 +405,7 @@ public class UserApi {
                 String str = JsonUtil.obj2Json(thirdUser1);
                 JSONObject obj = new JSONObject(str);
                 obj.remove("user");
-                obj.append("user", user.toString());
+                obj.append("user", JsonUtil.obj2ApiJson(user));
 
                 Map<String, Object> dataMap = new HashMap<>();
                 dataMap.put("thirdUser",obj.toString());
@@ -430,7 +427,7 @@ public class UserApi {
             thirdUser.setUser(origUser.getId());
             ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
-          return Result.success().msg("").data(thirdUser2);
+          return Result.success().msg("").data(origUser);
         } catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());
@@ -515,6 +512,64 @@ public class UserApi {
             logger.error(e.getMessage(), e);
             Result result = Result.error().msg(Error_code.ERROR_CODE_0001);
             return JsonUtil.obj2ApiJson(result);
+        }
+    }
+
+    /**
+     * 反馈
+     * @param userId
+     * @param content
+     * @param image1
+     * @param image2
+     * @param image3
+     * @param image4
+     * @return
+     */
+    @RequestMapping(value = "feedback", method = RequestMethod.POST)
+    public Result feedback(Integer userId,
+                           String content,
+                           @RequestParam(required = false) MultipartFile image1,
+                           @RequestParam(required = false) MultipartFile image2,
+                           @RequestParam(required = false) MultipartFile image3,
+                           @RequestParam(required = false) MultipartFile image4){
+
+        try{
+            List<String> imagePathList = new ArrayList<String>();
+            if (image1 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image1, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image2 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image2, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image3 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image3, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image4 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image4, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+
+            Feedback feedback = new Feedback();
+
+            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
+            feedback.setUser(userService.findById(userId));
+            feedback.setContent(content);
+
+            return Result.success().msg("").data(feedbackService.create(feedback));
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.ryel.zaja.utils;
 
+import com.ryel.zaja.entity.AgentLocation;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.User;
 import org.springframework.data.domain.Page;
@@ -150,6 +151,11 @@ public class APIFactory {
     }
 
 
+    /**
+     * House列表过滤
+     * @param houses
+     * @return
+     */
     public static List<Map<String,Object>> listFilterHouse(List<House> houses){
         List<Map<String,Object>> list = new ArrayList<>();
         for(House house : houses){
@@ -158,5 +164,14 @@ public class APIFactory {
         return list;
     }
 
+
+    public static Map<String,Object> filterAgentLocation(AgentLocation agentLocation){
+        Map<String, Object> houseMap = new HashMap<String, Object>();
+        houseMap.put("agent", filterUser(agentLocation.getAgent()));
+        houseMap.put("longitude", agentLocation.getLongitude());
+        houseMap.put("latitude", agentLocation.getLatitude());
+
+        return houseMap;
+    }
 
 }

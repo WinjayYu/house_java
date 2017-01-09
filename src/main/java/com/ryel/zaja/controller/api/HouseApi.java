@@ -1,3 +1,4 @@
+/*
 package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
@@ -22,9 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+*/
 /**
  * Created by billyu on 2017/1/4.
- */
+ *//*
+
 @RestController
 @RequestMapping(value = "/api", produces = "application/json; charset=UTF-8")
 public class HouseApi {
@@ -51,7 +54,8 @@ public class HouseApi {
     @Autowired
     private UserService userService;
 
-    /**
+    */
+/**
      * home页面
      *
      * @param userId
@@ -59,7 +63,8 @@ public class HouseApi {
      * @param lat1
      * @param city
      * @return
-     */
+     *//*
+
     @RequestMapping(value = "/home", method = RequestMethod.POST)
     public Result home(@RequestParam(value = "userId", required = false) Integer userId,
                        @RequestParam(value = "longitude", required = false) Double lon1,
@@ -116,13 +121,15 @@ public class HouseApi {
         }
     }
 
-    /**
+    */
+/**
      * 用户买房需求列表
      * @param userId
      * @param pageNum
      * @param pageSize
      * @return
-     */
+     *//*
+
     @RequestMapping(value = "/house/listbuyhouses", method = RequestMethod.POST)
     public Result listBuyHouses(Integer userId, Integer pageNum, Integer pageSize) {
         try {
@@ -146,7 +153,8 @@ public class HouseApi {
     }
 
 
-    /**
+    */
+/**
      * 发布买房需求
      *
      * @param community
@@ -156,7 +164,8 @@ public class HouseApi {
      * @param renovation
      * @param area
      * @return
-     */
+     *//*
+
     @RequestMapping(value = "/house/buyhouse", method = RequestMethod.POST)
     public Result buyHouse(Community community, Integer userId, String price,
                            String layout, String renovation, String area) {
@@ -217,3 +226,4 @@ public class HouseApi {
 
 
 }
+*/

@@ -26,6 +26,6 @@ public class HomeCoverUrlServiceImpl extends AbsCommonService<HomeCoverUrl> impl
 
     @Override
     public JpaRepository<HomeCoverUrl, Integer> getDao() {
-        return null;
+        return getDao();
     }
 }

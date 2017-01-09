@@ -64,4 +64,6 @@ public interface Error_code {
 
     String ERROR_CODE_0038 = "error_38";   //  【第三方登陆】此账户已经绑定过其他第三方
 
+    String ERROR_CODE_0039 = "error_39";   //  【申请经纪人】您已申请过
+
 }

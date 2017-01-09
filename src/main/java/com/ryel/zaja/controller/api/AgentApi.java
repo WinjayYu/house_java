@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,6 +70,8 @@ public class AgentApi {
     private HouseTagService tagService;
     @Autowired
     private PushDeviceService pushService;
+    @Autowired
+    private AgentLocationService agentLocationService;
 
     /**
      * 登录
@@ -557,7 +560,9 @@ public class AgentApi {
     public Result mycommission(Integer agentId) {
         try {
             List<HouseOrder> list = houseOrderService.findPayedOrderByAgentId(agentId);
-            return Result.success().data(list);
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("list", list);
+            return Result.success().data(dataMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -852,7 +857,7 @@ public class AgentApi {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -936,7 +941,7 @@ public class AgentApi {
             return Result.error().msg(e.getCode());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -961,7 +966,7 @@ public class AgentApi {
             return Result.success();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -986,7 +991,7 @@ public class AgentApi {
             return Result.success();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -1003,7 +1008,7 @@ public class AgentApi {
             return Result.success().data(tags);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 
@@ -1033,9 +1038,69 @@ public class AgentApi {
 
         }catch (Exception e){
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
+    /**
+     * 附近的经纪人
+     * @param longitude
+     * @param latitude
+     * @param district
+     * @return
+     */
+    @RequestMapping(value = "nearbyagent", method = RequestMethod.POST)
+    public Result nearbyAgent(Double longitude, Double latitude, String district, String city){
+        try{
+            if(null == longitude || null == latitude){
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+            List<AgentLocation> listByDisOrCity = new ArrayList<>();
+
+            if(null != district) {
+                listByDisOrCity = agentLocationService.findByDis(district);
+            }
+            if(listByDisOrCity.isEmpty()){
+                listByDisOrCity = agentLocationService.findByCity(city);
+            }
+
+            List<AgentLocation> listByLoc = agentLocationService.findByLoc(longitude, latitude, listByDisOrCity);
+            if(listByLoc.isEmpty()){
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            }
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            for(AgentLocation agentLocation : listByLoc){
+                resultList.add(APIFactory.filterAgentLocation(agentLocation));
+            }
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("nearbyagent", resultList);
+            return Result.success().msg("").data(dataMap);
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 创建或者更新经济人的位置信息
+     * @param agentLocation
+     * @return
+     */
+    @RequestMapping(value = "createlocation", method = RequestMethod.POST)
+    public Result createLocaion(AgentLocation agentLocation){
+        try{
+            AgentLocation origAgentLocation = agentLocationService.findByAgent(agentLocation.getAgent());
+            if(null == origAgentLocation){
+                agentLocationService.create(agentLocation);
+            }else{
+                agentLocationService.update(origAgentLocation, agentLocation);
+            }
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());        }
+    }
+
 
 }
 
