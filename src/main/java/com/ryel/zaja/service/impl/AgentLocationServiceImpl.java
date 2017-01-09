@@ -52,8 +52,8 @@ public class AgentLocationServiceImpl extends AbsCommonService<AgentLocation> im
     }
 
     @Override
-    public AgentLocation findByAgent(User agent) {
-        return agentLocationDao.findByAgentId(agent.getId());
+    public AgentLocation findByAgent(Integer agentId) {
+        return agentLocationDao.findByAgentId(agentId);
     }
 
     @Override

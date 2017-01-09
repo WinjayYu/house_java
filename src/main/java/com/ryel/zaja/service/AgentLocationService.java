@@ -15,7 +15,7 @@ public interface AgentLocationService extends ICommonService<AgentLocation>{
 
     List<AgentLocation> findByLoc(Double longitude, Double latitude, List<AgentLocation> listByDis);
 
-    AgentLocation findByAgent(User agent);
+    AgentLocation findByAgent(Integer agentId);
 
     AgentLocation create(AgentLocation agentLocation);
 

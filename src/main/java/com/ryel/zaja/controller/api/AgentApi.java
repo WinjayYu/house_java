@@ -1087,9 +1087,9 @@ public class AgentApi {
      * @return
      */
     @RequestMapping(value = "createlocation", method = RequestMethod.POST)
-    public Result createLocaion(AgentLocation agentLocation){
+    public Result createLocaion(Integer agentId, AgentLocation agentLocation){
         try{
-            AgentLocation origAgentLocation = agentLocationService.findByAgent(agentLocation.getAgent());
+            AgentLocation origAgentLocation = agentLocationService.findByAgent(agentId);
             if(null == origAgentLocation){
                 agentLocationService.create(agentLocation);
             }else{

@@ -87,7 +87,7 @@ public class BizUploadFile {
     {
         try {
             FileBo fileBo = defaultUploadFile.saveFile(bizPath + file.getOriginalFilename(), file.getInputStream());
-            return fileBo.getFile().toString();
+            return fileBo.getName();
         } catch (IOException e) {
             e.printStackTrace();
             throw new BizException("保存失败",e);

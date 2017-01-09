@@ -279,8 +279,8 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         agentMaterial.setNegative(negativePath);
         agentMaterial.setCompanyPic(companyPicPath);
         agentMaterialDao.save(agentMaterial);
-    }
-        agentMaterialDao.save(agentMaterial);    }
+
+}
 
     @Override
     public Page<User> unCheckAgent(int pageNum, int pageSize) {
