@@ -43,4 +43,9 @@ public interface UserService extends ICommonService<User>{
 
     void applyAgent(Integer userId, AgentMaterial agentMaterial,
                     MultipartFile positive, MultipartFile negative, MultipartFile companyPic);
+
+    //获取未审核的经纪人信息
+    Page<User> unCheckAgent(int pageNum, int pageSize);
+    //获取所有经纪人/或者用户
+    Page<User> userList(int pageNum, int pageSize, String usertype);
 }

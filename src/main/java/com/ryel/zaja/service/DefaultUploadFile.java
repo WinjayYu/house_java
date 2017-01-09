@@ -42,6 +42,16 @@ public class DefaultUploadFile {
     }
 
     /**
+     * 删除文件
+     * @param originalFileName
+     */
+    public boolean deleteFile(String originalFileName)
+    {
+       return FileUtil.deleteFile(path+originalFileName);
+    }
+
+
+    /**
      * 保存文件到本地
      * @param originalFileName
      * @param inputStream
