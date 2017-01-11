@@ -28,7 +28,7 @@ public class AgentLocationServiceImpl extends AbsCommonService<AgentLocation> im
 
     @Override
     public JpaRepository<AgentLocation, Integer> getDao() {
-        return getDao();
+        return agentLocationDao;
     }
 
     @Override

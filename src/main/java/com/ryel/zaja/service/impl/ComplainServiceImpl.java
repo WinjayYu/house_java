@@ -1,10 +1,13 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.dao.ComplainDao;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.dao.UserDao;
 import com.ryel.zaja.entity.Complain;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.ComplainService;
+import com.ryel.zaja.service.HouseOrderService;
+import com.ryel.zaja.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -18,14 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class ComplainServiceImpl extends AbsCommonService<Complain> implements ComplainService {
 
     @Autowired
-    UserDao userDao;
+    UserService userService;
 
     @Autowired
-    HouseOrderDao houseOrderDao;
+    HouseOrderService houseOrderService;
+
+    @Autowired
+    ComplainDao complainDao;
 
     @Override
     public JpaRepository<Complain, Integer> getDao() {
-        return getDao();
+        return complainDao;
     }
 
 
@@ -33,10 +39,10 @@ public class ComplainServiceImpl extends AbsCommonService<Complain> implements C
     @Transactional
     public Complain create(Integer userId, Integer houseOrderId, String content) {
         Complain complain = new Complain();
-        complain.setUser(userDao.findOne(userId));
-        complain.setHouseOrder(houseOrderDao.findOne(houseOrderId));
+        complain.setUser(userService.findById(userId));
+        complain.setHouseOrder(houseOrderService.findById(houseOrderId));
         complain.setContent(content);
 
-        return save(complain);
+        return complainDao.save(complain);
     }
 }

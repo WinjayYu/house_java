@@ -39,7 +39,7 @@ import java.util.*;
 @RestController()
 @RequestMapping(value = "/api/agent/", produces = "application/json; charset=UTF-8")
 public class AgentApi {
-    protected final static Logger logger = LoggerFactory.getLogger(BuyHouseApi.class);
+    protected final static Logger logger = LoggerFactory.getLogger(AgentApi.class);
     @Autowired
     private HouseService houseService;
     @Autowired
@@ -1091,6 +1091,8 @@ public class AgentApi {
         try{
             AgentLocation origAgentLocation = agentLocationService.findByAgent(agentId);
             if(null == origAgentLocation){
+                User agent = userService.findById(agentId);
+                agentLocation.setAgent(agent);
                 agentLocationService.create(agentLocation);
             }else{
                 agentLocationService.update(origAgentLocation, agentLocation);

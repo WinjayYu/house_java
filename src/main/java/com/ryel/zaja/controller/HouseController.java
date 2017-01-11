@@ -4,7 +4,6 @@ package com.ryel.zaja.controller;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.AgentRegisterStatus;
 import com.ryel.zaja.config.enums.HouseStatus;
-import com.ryel.zaja.controller.api.BuyHouseApi;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.DataTableFactory;
@@ -110,8 +109,13 @@ public class HouseController extends BaseController {
                 try {
                     //删除本地图片
                     for (String str : imageList) {
-                        File file = new File(str);
-                        file.delete();
+                        String newStr = str.replace(url, path);
+                        File file = new File(newStr);
+                        if(file.exists()){
+                            file.delete();
+                        }else {
+                            logger.error("文件不存在：" + file.getPath());
+                        }
                     }
                 }catch (Exception e){
                     logger.error("删除本地图片失败！");
