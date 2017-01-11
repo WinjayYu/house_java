@@ -3,11 +3,11 @@ package com.ryel.zaja.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
+/**投诉表
  * Created by billyu on 2017/1/9.
  */
 @Entity
-@Table(name = "Complain")
+@Table(name = "complain")
 public class Complain implements Serializable {
 
     private static final long serialVersionUID = 1L;

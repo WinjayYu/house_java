@@ -21,7 +21,7 @@ import java.util.Map;
 @RestController()
 @RequestMapping(value = "/api/pingan/",produces = "application/json; charset=UTF-8")
 public class PinganApi {
-    protected final static Logger logger = LoggerFactory.getLogger(BuyHouseApi.class);
+    protected final static Logger logger = LoggerFactory.getLogger(PinganApi.class);
 
     @RequestMapping(value = "quickpaymentparamencrypt")
     public Result quickpaymentparamencrypt(String userId) {

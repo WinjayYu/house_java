@@ -47,7 +47,7 @@ public class DefaultUploadFile {
      */
     public boolean deleteFile(String originalFileName)
     {
-       return FileUtil.deleteFile(path+originalFileName);
+       return FileUtil.deleteDirectory(path+originalFileName);
     }
 
 

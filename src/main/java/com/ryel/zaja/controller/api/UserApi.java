@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * app 客户端用户登入,注册等功能.
  */
 @RestController()
-@RequestMapping(value = "/api/user/", produces = "application/json; charset=UTF-8")
+@RequestMapping(value = "/api", produces = "application/json; charset=UTF-8")
 public class UserApi {
     protected final static Logger logger = LoggerFactory.getLogger(UserApi.class);
 
@@ -65,15 +66,28 @@ public class UserApi {
     @Autowired
     private ThirdUserService thirdUserService;
 
-    @Autowired
-    private HouseService houseService;
-
     @Resource
     private BizUploadFile bizUploadFile;
 
     @Autowired
     private FeedbackService feedbackService;
 
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private AgentSellHouseService agentSellHouseService;
+
+    @Autowired
+    private AgentBuyHouseService agentBuyHouseService;
+
+    @Autowired
+    private HouseService houseService;
+
+    @Autowired
+    CollectService collectService;
+
+    private static final String USERHEADURL = "http://oi0y2qwer.bkt.clouddn.com/user_head.png";
 
 
 //    private static int EXPIRES = 10 * 60; //超时时间10min
@@ -90,7 +104,7 @@ public class UserApi {
      * @apiParam {String} mobile 手机
      * @apiSuccess {Result} Result 返回结果
      */
-    @RequestMapping(value = "register", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public Result register(User user, @RequestParam("verCode") String verCode) {
         ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
         String origVerCode = valueops.get(user.getMobile());
@@ -102,7 +116,7 @@ public class UserApi {
             return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
         }
         try {
-            user.setHead("http://oi0y2qwer.bkt.clouddn.com/user_head.png");
+            user.setHead(USERHEADURL);
             user.setNickname("");
             user.setUsername("");
             if (null == user.getSex()) {
@@ -135,7 +149,7 @@ public class UserApi {
      * @apiSuccess {Result} Result 返回结果
      * @apiUse UserInfo
      */
-    @RequestMapping(value = "login", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/login", method = RequestMethod.POST)
     public String login(String mobile, String password) {
         User origUser = userService.login(mobile, password);
         if(null == origUser) {
@@ -163,7 +177,7 @@ public class UserApi {
      * @apiSuccess {Result} Result 返回结果
      * @apiUse UserInfo
      */
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
     public Result update(Integer userId, String nickname, String sex) {
         User user = new User();
         user.setId(userId);
@@ -195,7 +209,7 @@ public class UserApi {
      * }
      */
     //@RequestParam(value = "head", required = true) MultipartFile file
-    @RequestMapping(value = "head")
+    @RequestMapping(value = "/user/head")
     public Result headUpload(Integer userId,
                              @RequestParam(required = true) MultipartFile image) throws Exception {
 
@@ -271,7 +285,7 @@ public class UserApi {
      * "msg":""
      * }
      */
-    @RequestMapping(value = "findpassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/findpassword", method = RequestMethod.POST)
     public Result findPassword(String mobile, String password, String verCode) {
         try {
             User user = userService.findByMobile(mobile);
@@ -307,7 +321,7 @@ public class UserApi {
      * @param type   1=注册，2=修改密码
      * @return
      */
-    @RequestMapping(value = "sendverifycode", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/sendverifycode", method = RequestMethod.POST)
     public Result verifyCode(String mobile, String type) {
         try {
         String verCode = VerifyCodeUtil.getVerCode();
@@ -333,7 +347,7 @@ public class UserApi {
         return Result.success().msg("").data(new HashMap<>());
     }
 
-    @RequestMapping(value = "thiredlogin", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/thiredlogin", method = RequestMethod.POST)
     public String thirdLogin(String openid, String type, String nickname,
                              String headUrl) {
         try {
@@ -370,7 +384,7 @@ public class UserApi {
      * @param verCode
      * @return
      */
-    @RequestMapping(value = "bindmobile", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/bindmobile", method = RequestMethod.POST)
     public Result bindMobile(String mobile, String openid, String verCode) {
         try {
             ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
@@ -403,14 +417,14 @@ public class UserApi {
                 thirdUser.setUser(user.getId());
                 ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
 
-                String str = JsonUtil.obj2Json(thirdUser1);
+               /* String str = JsonUtil.obj2Json(thirdUser1);
                 JSONObject obj = new JSONObject(str);
                 obj.remove("user");
                 obj.append("user", JsonUtil.obj2ApiJson(user));
 
                 Map<String, Object> dataMap = new HashMap<>();
-                dataMap.put("thirdUser",obj.toString());
-                return Result.success().msg("").data(dataMap);
+                dataMap.put("user",obj.toString());*/
+                return Result.success().msg("").data(user2map(user));
             }
 
             User user = new User();
@@ -428,7 +442,7 @@ public class UserApi {
             thirdUser.setUser(origUser.getId());
             ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
-          return Result.success().msg("").data(origUser);
+          return Result.success().msg("").data(user2map(origUser));
         } catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());
@@ -443,7 +457,7 @@ public class UserApi {
      * 获取经纪人发布的房源列表
      * @param userId
      */
-    @RequestMapping(value = "queryagentpublishlist", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/queryagentpublishlist", method = RequestMethod.POST)
     public Result querymypublishlist(Integer userId, Integer pageNum, Integer pageSize) {
         try {
             if (null == pageNum) {
@@ -467,7 +481,7 @@ public class UserApi {
     /**
      * 申请成为经纪人
      */
-    @RequestMapping(value = "apply", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/apply", method = RequestMethod.POST)
     public Result register(Integer userId, AgentMaterial agentMaterial,
                            @RequestParam(required = false) MultipartFile positiveFile,
                            @RequestParam(required = false) MultipartFile negativeFile,
@@ -490,7 +504,7 @@ public class UserApi {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "checktype", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/checktype", method = RequestMethod.POST)
     public String checkType(Integer userId){
         try{
             if(null == userId){
@@ -526,7 +540,7 @@ public class UserApi {
      * @param image4
      * @return
      */
-    @RequestMapping(value = "feedback", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
     public Result feedback(Integer userId,
                            String content,
                            @RequestParam(required = false) MultipartFile image1,
@@ -537,25 +551,25 @@ public class UserApi {
         try{
             List<String> imagePathList = new ArrayList<String>();
             if (image1 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image1, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image2 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image2, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image3 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image3, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image4 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image4, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
@@ -567,10 +581,235 @@ public class UserApi {
             feedback.setUser(userService.findById(userId));
             feedback.setContent(content);
 
-            return Result.success().msg("").data(feedbackService.create(feedback));
+            feedback = feedbackService.create(feedback);
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("feedback", feedback);
+
+            return Result.success().msg("").data(dataMap);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
+    /**
+     * 创建评论
+     * @param userId
+     * @param agentId
+     * @param houseOrderId
+     * @param star
+     * @param content
+     * @return
+     */
+    @RequestMapping(value = "/comment/create", method = RequestMethod.POST)
+    public Result create(Integer userId, Integer agentId, Integer houseOrderId, Integer star, String content){
+        if(null == userId
+                || null == agentId
+                || null == content
+                || null == star){
+            return Result.error().msg(Error_code.ERROR_CODE_0002).data(new HashMap<>());
+        }
+        try{
+
+            Comment comment = commentService.create(userId, agentId, houseOrderId, star, content);
+//            Comment comment = commentService.findByHouseOrderId(houseOrderId);
+
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+
+    }
+
+    /**
+     * 检查订单是否评价过
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "/comment/check", method = RequestMethod.POST)
+    public Result check(Integer houseOrderId){
+        try{
+            Map<String, String> map = new HashMap<>();
+            String flag = "";
+            Comment comment = commentService.findByHouseOrderId(houseOrderId);
+            if(null != comment){
+                flag = "0";//已评价过
+            }else{
+                flag = "1";//未评价
+            }
+            map.put("flag", flag);
+            return Result.success().data(map);
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+
+    }
+
+    /**
+     * 经纪人的评论列表
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/comment/listcomment")
+    public String listComment(Integer userId, Integer pageNum, Integer pageSize){
+        try{
+            Page<Comment> page = commentService.findByAgentId(userId, pageNum, pageSize);
+            if(0 != page.getContent().size()){
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                Result result = Result.success().msg("").data(dataMap);
+                return JsonUtil.obj2ApiJson(result);
+            }
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            return JsonUtil.obj2ApiJson(result);
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+            return JsonUtil.obj2ApiJson(result,"houseOrder");
+        }
+    }
+
+    /**
+     * 经济人第一条评论
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/comment/findonecomment", method = RequestMethod.POST)
+    public Result findOneComment(Integer userId){
+        try{
+
+            Map<String, Object> dataMap = new HashMap<>();
+            Map<String, Object> comment = new HashMap<>();
+
+
+            Page<Comment> page = commentService.findOneComment(userId,
+                    new PageRequest(0, 1, Sort.Direction.DESC, "addTime"));
+
+
+            if(0 != page.getContent().size()) {
+
+                comment.put("id", page.getContent().get(0).getId());
+                comment.put("user", page.getContent().get(0).getUser());
+                comment.put("content", page.getContent().get(0).getContent());
+                comment.put("star", page.getContent().get(0).getStar());
+                comment.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(page.getContent().get(0).getAddTime()));
+                dataMap.put("comment", comment);
+            }else{
+                dataMap.put("comment", new HashMap<>());
+            }
+
+            //接单总数
+            Long sellHouseCount = agentSellHouseService.count(userId);
+            Long buyHouseCount  = agentBuyHouseService.count(userId);
+            Long count = sellHouseCount + buyHouseCount;
+            if(null == count) {
+                count = 0L;
+            }
+
+            dataMap.put("count", count);
+
+            //评分的平均分
+            Double average = commentService.average(userId);
+            average = average == null ?  0.0 : average;
+            dataMap.put("avg", average);
+
+            //房源总数
+            Long houseCount  = houseService.count(userId);
+            houseCount = houseCount == null ? 0 : houseCount;
+            dataMap.put("houseCount", houseCount);
+
+            return Result.success().msg("").data(dataMap);
+
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 收藏
+     * @param userId
+     * @param houseId
+     * @return
+     */
+    @RequestMapping(value = "/collect/collect",method = RequestMethod.POST)
+    public Result collect(Integer userId, Integer houseId){
+
+        try{
+            collectService.create(userId, houseId);
+        }catch (BizException be){
+            return Result.error().msg(be.getMessage()).data(new HashMap<>());
+        }catch(Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+        return Result.success().msg("").data(new HashMap<>());
+    }
+
+    /**
+     * 取消收藏
+     * @param userId
+     * @param houseId
+     * @return
+     */
+    @RequestMapping(value = "/collect/cancelcollect")
+    public Result cancelCollect(Integer userId, Integer houseId){
+        try{
+            collectService.cancelCollect(userId, houseId);
+            return Result.success().data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0016).data(new HashMap<>());
+        }
+    }
+
+    //点击房源详情的时候调用此接口，检查是否收藏
+    @RequestMapping(value = "/collect/check", method = RequestMethod.POST)
+    public Result check(Integer userId, Integer houseId){
+
+        Map<String, String> map = new HashMap<String,String>();
+        String status = "1";
+        if(collectService.check(userId, houseId)){
+            status = "0";//已收藏
+        }else{
+            status = "1";//未收藏
+        }
+        map.put("status", status);
+        return Result.success().msg("").data(map);
+    }
+
+    /**
+     * 我的收藏列表
+     * @param userId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/collect/listcollect", method = RequestMethod.POST)
+    public Result listCollect(Integer userId, Integer pageNum, Integer pageSize){
+
+        try{
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
+            Page<House> page = collectService.pageByUserId(userId, pageNum, pageSize);
+            if(null != page) {
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                return Result.success().data(dataMap);
+            }else{
+                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }
+    }
+
 }
