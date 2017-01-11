@@ -16,9 +16,14 @@ public class WalletConstant {
 	public static final int SERVER_PORT = 7072;
 
 	/**
-	 * 资金汇总账号
+	 * 见证宝资金汇总账号（监管账户）
 	 */
 	public static final String SUP_ACCT_ID = "11016544213188";
+
+	/**
+	 * 证书环境一般户
+	 */
+	public static final String COMMON_ACCT_ID = "11016611115009";
 
 	/**
 	 * 企业码
@@ -26,10 +31,9 @@ public class WalletConstant {
 	public static final String QYDM = "3076";
 
 	/**
-	 * 快捷支付商户号 2000766918
+	 * 快捷支付正式商户号
 	 */
-	//正式商户号 2000311146
-	public static final String QUICK_PAYMENT_ID = "2000766918";
+	public static final String QUICK_PAYMENT_ID = "2000311146";
 	
 	
 

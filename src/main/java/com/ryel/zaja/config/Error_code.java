@@ -66,4 +66,10 @@ public interface Error_code {
 
     String ERROR_CODE_0039 = "error_39";   //  【申请经纪人】您已申请过
 
+    String ERROR_CODE_0040 = "error_40";   //  【平安】创建账户失败
+
+    String ERROR_CODE_0041 = "error_41";   //  【平安】创建账户时用户id为空
+
+    String ERROR_CODE_0042 = "error_42";   //  【平安】创建账户时用户信息异常
+
 }
