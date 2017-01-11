@@ -1098,8 +1098,6 @@ public class AgentApi {
             agentLocation.setAgent(agent);
             AgentLocation origAgentLocation = agentLocationService.findByAgent(agentId);
             if(null == origAgentLocation){
-                User agent = userService.findById(agentId);
-                agentLocation.setAgent(agent);
                 agentLocationService.create(agentLocation);
             }else{
                 agentLocationService.update(origAgentLocation, agentLocation);
