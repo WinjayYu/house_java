@@ -119,54 +119,77 @@ public class WalletApi {
         }
     }
 
-    @RequestMapping(value = "paynotify")
-    public void paynotify(String orig, String sign) {
+    /**
+     * 查询见证宝余额信息
+     * @param userId 用户id
+     */
+    @RequestMapping(value = "getWalletBalanceInfo")
+    public Result getWalletInfo(Integer userId) {
+        HashMap parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
+        HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
         try {
-            try {
-                VerifyCodeUtil.send("13554372007","[orig]"+orig,"1");
-                VerifyCodeUtil.send("13554372007","[sign]"+sign,"1");
-            }catch (Exception e){
-                e.printStackTrace();
+            // 校验用户信息
+            if(userId == null){
+                logger.info("userId:" + userId);
+                return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
+            }
+            UserWalletAccount userWalletAccount = userWalletAccountService.findByUserId(userId);
+            if(userWalletAccount == null){
+                logger.info("userWalletAccount is null");
+                return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
             }
 
+            parmaKeyDict.put("TranFunc", "6037");
+            parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
+            parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
+            parmaKeyDict.put("SupAcctId",WalletConstant.SUP_ACCT_ID);
+            parmaKeyDict.put("ThirdCustId", userWalletAccount.getThirdCustId());
+            parmaKeyDict.put("Reserve", "1");
 
-            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
-            KeyedCollection output = new KeyedCollection("output");
+            System.out.println("请求报文==============" + parmaKeyDict);
 
-            String encoding = "GBK";
-            logger.info("---银行返回后台通知原始数据---" + orig);
-            logger.info("---银行返回后台通知签名数据---" + sign);
+            ZJJZ_API_GW msg = new ZJJZ_API_GW();
+            String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
 
-            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
-            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
-            logger.info("---Base64Decode后的后台通知原始数据---" + orig);
-            logger.info("---Base64Decode后的后台通知签名数据---" + sign);
+            System.out.println("第一部分：生成发送银行的请求的报文的实例");
+            System.out.println(tranMessage);
+            System.out.println("-------------------------------");
 
-            boolean result = util.verifyData(sign, orig);
-            logger.info("---通知验签结果---" + result);
-            if (!result) {
-                logger.info("---验签失败---" + result);
-            }
+            msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+            String recvMessage = (String) retKeyDict.get("RecvMessage");// 银行返回的报文
 
-            output = util.parseOrigData(orig);
-            logger.info("---平安订单详细信息---" + output);
-            logger.info("---平安订单详细信息---" + JsonUtil.obj2Json(output));
-            String payStatus = (String) output.getDataValue("status");
-            if (StringUtils.equals("01", payStatus)) {
-                String orderId = (String) output.getDataValue("orderId");
+            System.out.println("第二部分：获取银行返回的报文");
+            System.out.println(recvMessage);
+            System.out.println("-------------------------------");
+
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            System.out.println("返回报文:=" + retKeyDict);
+            /**
+             * 第三部分：解析银行返回的报文的实例
+             */
+            /**
+             * 返回retKeyDict包含如下字段：
+             * 子账户账号	   CustAcctId	C(32)	必输
+             * 子账户可提现余额	TotalAmount	9(15)	必输
+             * 子账户可用余额	TotalBalance	9(15)	必输
+             * 子账户冻结金额	TotalFreezeAmount	9(15)	必输	指在担保子账户里待支付或冻结的金额
+             * 保留域	Reserve	C(120)	可选
+             */
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            String rspCode = (String) retKeyDict.get("RspCode");
+            if ("000000".equals(rspCode)) {
+                return Result.success().data(retKeyDict);
             } else {
-                String errorMsg = (String) output.getDataValue("errorMsg");
-                logger.info("失败原因====================" + errorMsg);
-            }
-
-            try {
-                VerifyCodeUtil.send("13554372007","[output]"+JsonUtil.obj2Json(output),"1");
-            }catch (Exception e){
-                e.printStackTrace();
+                return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
+        } finally {
+            pinganApiLogService.create(PinganApiEnum.CREATE_ACCOUNT,
+                    JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
         }
     }
+
 }
 

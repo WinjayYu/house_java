@@ -1,7 +1,7 @@
 package com.ryel.zaja.service.impl;
 
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.UserWalletAccountDao;
-import com.ryel.zaja.entity.User;
 import com.ryel.zaja.entity.UserWalletAccount;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.UserWalletAccountService;
@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -20,6 +23,20 @@ public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAcc
 
     @Autowired
     private UserWalletAccountDao userWalletAccountDao;
+
+    @Override
+    public UserWalletAccount findByUserId(Integer userId) {
+        List<UserWalletAccount> list = userWalletAccountDao.findByUserId(userId);
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }else {
+            if(list.size() > 1){
+                throw new BizException("查询到多条UserWalletAccount,userId=" + userId);
+            }else {
+                return list.get(0);
+            }
+        }
+    }
 
     @Override
     public UserWalletAccount create(UserWalletAccount userWalletAccount) {
