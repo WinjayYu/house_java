@@ -251,10 +251,6 @@ public class BackManageAPI {
                     e.printStackTrace();
                 }
 
-                //删除本地图片
-                defaultUploadFile.deleteFile("house/"+house.getId());
-
-
                 List<String> newList = new ArrayList<String>();
                 if (!CollectionUtils.isEmpty(imageList)) {
                     for (String imageUrl : imageList) {
@@ -265,6 +261,10 @@ public class BackManageAPI {
                 String newImgs = JsonUtil.obj2Json(newList);
                 house.setImgs(newImgs);
                 house.setCover(newList.get(0));
+
+                //删除本地图片
+                defaultUploadFile.deleteFile("house/"+house.getId());
+
             }
         }else {
             house.setStatus(HouseStatus.REJECT.getCode());
