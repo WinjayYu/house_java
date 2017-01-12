@@ -400,12 +400,16 @@ public class UserApi {
 
                 User user = userService.findByMobile(mobile);
 
+
                 //一个账户只能绑定一个微信或者QQ
-                if(null != thirdUserService.check(user.getId(),thirdUser.getType())){
-                    return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
+                ThirdUser thirdUser1 = thirdUserService.check(user.getId(),thirdUser.getType());
+                if(null != thirdUser1){
+                    if(null != thirdUser1.getUser()) {
+                        return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
+                    }
                 }
                 thirdUser.setUser(user.getId());
-                ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
+                thirdUserService.update(thirdUser);
 
                /* String str = JsonUtil.obj2Json(thirdUser1);
                 JSONObject obj = new JSONObject(str);
@@ -532,7 +536,6 @@ public class UserApi {
      */
     @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
     public Result feedback(Integer userId,
-                           Integer agentId,
                            String content,
                            @RequestParam(required = false) MultipartFile image1,
                            @RequestParam(required = false) MultipartFile image2,
@@ -540,29 +543,28 @@ public class UserApi {
                            @RequestParam(required = false) MultipartFile image4){
 
         try{
-            Integer id = userId == null ? agentId : userId;
 
             List<String> imagePathList = new ArrayList<String>();
             if (image1 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, id);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image2 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, id);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image3 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, id);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image4 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, id);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
@@ -574,11 +576,9 @@ public class UserApi {
             feedback.setUser(userService.findById(userId));
             feedback.setContent(content);
 
-            feedback = feedbackService.create(feedback);
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("feedback", feedback);
+            feedbackService.create(feedback);
 
-            return Result.success().msg("").data(dataMap);
+            return Result.success().msg("").data(new HashMap<>());
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
