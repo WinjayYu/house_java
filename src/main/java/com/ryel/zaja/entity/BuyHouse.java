@@ -59,6 +59,8 @@ public class BuyHouse implements Serializable {
     @Column(name = "last_modified_time")
     private Date lastModifiedTime;
 
+    private Integer num;
+
     public BuyHouse() {
     }
 
@@ -150,5 +152,11 @@ public class BuyHouse implements Serializable {
         this.lastModifiedTime = lastModifiedTime;
     }
 
+    public Integer getNum() {
+        return num;
+    }
 
+    public void setNum(Integer num) {
+        this.num = num;
+    }
 }

@@ -136,7 +136,7 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     public HouseOrder payment(Integer userId, Integer houseOrderId) {
         HouseOrder houseOrder = check(houseOrderId);
         if(!HouseOrderStatus.WAIT_PAYMENT.getCode().equals(houseOrder.getStatus())){
-            throw new BizException(Error_code.ERROR_CODE_0034);
+            throw new BizException(Error_code.ERROR_CODE_0019);
         }
         houseOrder.setStatus(HouseOrderStatus.IN_CONNECT.getCode());//房屋交接中
         if(null != houseOrder.getHouse()) {

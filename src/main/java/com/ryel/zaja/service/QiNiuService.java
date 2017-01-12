@@ -35,7 +35,7 @@ public class QiNiuService {
     //上传文件的路径
     //String FilePath = "/.../...";
 
-    public final String domain = "http://oi0y2qwer.bkt.clouddn.com/";
+    public final String domain = "https://img.zaja.xin/";
 
 
     //密钥配置

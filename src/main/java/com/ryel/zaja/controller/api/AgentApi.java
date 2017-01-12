@@ -81,7 +81,7 @@ public class AgentApi {
     public Result login(String mobile, String password) {
         try {
             if (StringUtils.isBlank(mobile) || StringUtils.isBlank(password)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0022).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             User user = userService.agentLogin(mobile, password);
             if (user == null) {
@@ -169,8 +169,8 @@ public class AgentApi {
             }
             Page<House> houses = houseService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == houses.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(houses);
             return Result.success().data(dataMap);
@@ -267,8 +267,8 @@ public class AgentApi {
             }
             Page<HouseOrder> page = houseOrderService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
 
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -318,8 +318,8 @@ public class AgentApi {
             }
             Page<BuyHouse> page = agentBuyHouseService.pageBuyHouseByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -414,8 +414,8 @@ public class AgentApi {
             } else {
                 page = sellHouseService.agentPage(pageNum, pageSize, null, list);
             }
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -475,10 +475,6 @@ public class AgentApi {
             User user = new User();
             user.setId(agentId);
             if ("10".equals(type)) {       // 接买房单
-                //一个需求接单数不能超过60
-                if(buyHouseService.count(demandId) > 60){
-                    return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
-                }
 
                 AgentBuyHouse agentBuyHouse = new AgentBuyHouse();
                 agentBuyHouse.setAgent(user);
@@ -489,11 +485,6 @@ public class AgentApi {
                 agentBuyHouse.setBuyHouse(buyHouse);
                 agentBuyHouseService.create(agentBuyHouse);
             } else {                      // 接卖房单
-
-                //一个需求接单数不能超过60
-                if(sellHouseService.count(demandId) > 60){
-                    return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
-                }
 
                 AgentSellHouse agentSellHouse = new AgentSellHouse();
                 agentSellHouse.setAgent(user);
@@ -528,8 +519,8 @@ public class AgentApi {
             }
             Page<Comment> page = commentService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
 
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -1066,7 +1057,7 @@ public class AgentApi {
 
             List<AgentLocation> listByLoc = agentLocationService.findByLoc(longitude, latitude, listByDisOrCity);
             if(listByLoc.isEmpty()){
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+                return Result.success().msg("").data(new HashMap<>());
             }
             List<Map<String, Object>> resultList = new ArrayList<>();
             for(AgentLocation agentLocation : listByLoc){
@@ -1093,7 +1084,7 @@ public class AgentApi {
             User agent = userService.findById(agentId);
             if (null == agent)
             {
-                return Result.error().msg(Error_code.ERROR_CODE_0002);
+                return Result.error().msg(Error_code.ERROR_CODE_0023);
             }
             agentLocation.setAgent(agent);
             AgentLocation origAgentLocation = agentLocationService.findByAgent(agentId);

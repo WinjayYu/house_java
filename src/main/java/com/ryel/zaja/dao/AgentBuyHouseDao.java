@@ -27,4 +27,5 @@ public interface AgentBuyHouseDao extends JpaRepository<AgentBuyHouse, Integer>,
 
     @Query("select a from AgentBuyHouse a where a.buyHouse = ?1 and a.agent = ?2")
     AgentBuyHouse findBuyHouseAndAgent(BuyHouse buyHouse, User agent);
+
 }
