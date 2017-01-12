@@ -85,7 +85,10 @@ public class UserApi {
     private HouseService houseService;
 
     @Autowired
-    CollectService collectService;
+    private CollectService collectService;
+
+    @Autowired
+    private ApkService apkService;
 
     private static final String USERHEADURL = "http://oi0y2qwer.bkt.clouddn.com/user_head.png";
 
@@ -529,6 +532,7 @@ public class UserApi {
      */
     @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
     public Result feedback(Integer userId,
+                           Integer agentId,
                            String content,
                            @RequestParam(required = false) MultipartFile image1,
                            @RequestParam(required = false) MultipartFile image2,
@@ -536,27 +540,29 @@ public class UserApi {
                            @RequestParam(required = false) MultipartFile image4){
 
         try{
+            Integer id = userId == null ? agentId : userId;
+
             List<String> imagePathList = new ArrayList<String>();
             if (image1 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, id);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image2 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, id);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image3 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, id);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
             }
             if (image4 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, id);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
@@ -797,6 +803,39 @@ public class UserApi {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
+    }
+
+    /**
+     * 检查apk是否是最新版
+     * @param version
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "/checkapkversion", method = RequestMethod.POST)
+    public Result apkVersion(String version, String type){
+        try{
+            if(null == version || null == type){
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+
+            Apk latestApk = apkService.findLatestVersion(type);
+
+            Apk apk = apkService.check(version, type);
+            if(null == apk || null == latestApk){
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+
+            Map<String, Object> dataMap = new HashMap<>();
+
+            if(!apk.getVersion().equals(latestApk.getVersion())){
+                dataMap.put("version",latestApk.getVersion());
+                dataMap.put("path", latestApk.getPath());
+                return Result.success().msg("").data(dataMap);
+            }
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());        }
     }
 
 }
