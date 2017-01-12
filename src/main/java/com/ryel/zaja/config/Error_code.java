@@ -52,7 +52,7 @@ public interface Error_code {
 
     String ERROR_CODE_0039 = "error_39";   //  【申请经纪人】您已申请过
 
-    String ERROR_CODE_0040 = "error_40";   //  【忘记密码和修改密码】新密码不能与原密码相同
+    String ERROR_CODE_0037 = "error_37";   //  【忘记密码和修改密码】新密码不能与原密码相同
 
     String ERROR_CODE_0040 = "error_40";   //  【平安】创建账户失败
 

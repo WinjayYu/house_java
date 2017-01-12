@@ -289,7 +289,7 @@ public class UserApi {
             }
 
             if(password.equals(user.getPassword())){
-                return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
             }
             user.setPassword(password);
             userService.update(user);
