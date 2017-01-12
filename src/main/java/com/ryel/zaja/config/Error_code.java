@@ -54,4 +54,14 @@ public interface Error_code {
 
     String ERROR_CODE_0040 = "error_40";   //  【忘记密码和修改密码】新密码不能与原密码相同
 
+    String ERROR_CODE_0040 = "error_40";   //  【平安】创建账户失败
+
+    String ERROR_CODE_0041 = "error_41";   //  【平安】用户id为空
+
+    String ERROR_CODE_0042 = "error_42";   //  【平安】创建账户时用户信息异常
+
+    String ERROR_CODE_0043 = "error_43";   //  【平安】该用户没有见证宝账户
+
+    String ERROR_CODE_0044 = "error_44";   //  【平安】查询见证宝账户信息异常
+
 }
