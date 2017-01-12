@@ -44,15 +44,18 @@ public interface Error_code {
 
     String ERROR_CODE_0033 = "error_33";   // 【接单】不能接收自己发布的订单
 
+    String ERROR_CODE_0034 = "error_34";   //  【更改账户】新手机号码已是ZAJA账户
+
     String ERROR_CODE_0035 = "error_35";   //  【删除房源】经纪人与房屋信息不匹配
 
     String ERROR_CODE_0036 = "error_36";   //  【登录】此账号没审核通过
+
+    String ERROR_CODE_0037 = "error_37";   //  【忘记密码和修改密码】新密码不能与原密码相同
 
     String ERROR_CODE_0038 = "error_38";   //  【第三方登陆】此账户已经绑定过其他第三方
 
     String ERROR_CODE_0039 = "error_39";   //  【申请经纪人】您已申请过
 
-    String ERROR_CODE_0037 = "error_37";   //  【忘记密码和修改密码】新密码不能与原密码相同
 
     String ERROR_CODE_0040 = "error_40";   //  【平安】创建账户失败
 
