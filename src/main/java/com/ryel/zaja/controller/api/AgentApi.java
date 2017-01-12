@@ -73,6 +73,8 @@ public class AgentApi {
     private PushDeviceService pushService;
     @Autowired
     private AgentLocationService agentLocationService;
+    @Autowired
+    private FeedbackService feedbackService;
 
     /**
      * 登录
@@ -141,7 +143,7 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "/changeAccount", method = RequestMethod.POST)
+    @RequestMapping(value = "/changeaccount", method = RequestMethod.POST)
     public Result changeAccount(Integer agentId, String mobile, String password, String verCode) {
         try {
             User user = userService.findById(agentId);
@@ -163,7 +165,7 @@ public class AgentApi {
             User mobileuser = userService.findByMobile(mobile);
             if(mobileuser != null)
             {
-                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0034).data(new HashMap<>());
             }
 
             user.setMobile(mobile);
@@ -1140,5 +1142,65 @@ public class AgentApi {
     }
 
 
+    /**
+     * 反馈
+     * @param agentId
+     * @param content
+     * @param image1
+     * @param image2
+     * @param image3
+     * @param image4
+     * @return
+     */
+    @RequestMapping(value = "feedback", method = RequestMethod.POST)
+    public Result feedback(Integer agentId,
+                           String content,
+                           @RequestParam(required = false) MultipartFile image1,
+                           @RequestParam(required = false) MultipartFile image2,
+                           @RequestParam(required = false) MultipartFile image3,
+                           @RequestParam(required = false) MultipartFile image4){
+
+        try{
+            List<String> imagePathList = new ArrayList<String>();
+            if (image1 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image2 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image3 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image4 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+
+            Feedback feedback = new Feedback();
+
+            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
+            feedback.setUser(userService.findById(agentId));
+            feedback.setContent(content);
+
+            feedbackService.create(feedback);
+
+
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
 }
 
