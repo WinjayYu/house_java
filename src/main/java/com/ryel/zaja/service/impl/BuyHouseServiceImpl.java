@@ -9,6 +9,7 @@ import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.BuyHouseService;
 import com.ryel.zaja.service.CommunityService;
 import com.ryel.zaja.utils.APIFactory;
+import com.ryel.zaja.utils.ClassUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -95,8 +96,15 @@ public class BuyHouseServiceImpl extends AbsCommonService<BuyHouse> implements B
         return buyHouseDao.findByUserIdAsId(userId);
     }
 
-    @Override
+   /* @Override
     public Long count(Integer demandId) {
         return buyHouseDao.count(demandId);
+    }*/
+
+    @Override
+    public BuyHouse update(BuyHouse buyHouse) {
+        BuyHouse origUser = findById(buyHouse.getId());
+        ClassUtil.copyProperties(origUser, buyHouse);
+        return buyHouseDao.save(origUser);
     }
 }

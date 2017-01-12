@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,6 +73,8 @@ public class AgentApi {
     private PushDeviceService pushService;
     @Autowired
     private AgentLocationService agentLocationService;
+    @Autowired
+    private FeedbackService feedbackService;
 
     /**
      * 登录
@@ -81,7 +84,7 @@ public class AgentApi {
     public Result login(String mobile, String password) {
         try {
             if (StringUtils.isBlank(mobile) || StringUtils.isBlank(password)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0022).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             User user = userService.agentLogin(mobile, password);
             if (user == null) {
@@ -99,8 +102,11 @@ public class AgentApi {
             }
             AgentMaterial agentMaterial = agentMaterialService.findByAgentId(user.getId());
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put("user", user);
-            data.put("agentMaterial", agentMaterial);
+
+            Map userMap = APIFactory.filterUser(user);
+            userMap.put("idcard",agentMaterial.getIdcard());
+            data.put("user", userMap);
+//            data.put("agentMaterial", agentMaterial);
             return Result.success().msg("").data(data);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -131,6 +137,42 @@ public class AgentApi {
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(e.getCode()).data(new HashMap<>());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    @RequestMapping(value = "/changeaccount", method = RequestMethod.POST)
+    public Result changeAccount(Integer agentId, String mobile, String password, String verCode) {
+        try {
+            User user = userService.findById(agentId);
+
+            if (null == user) {
+                return Result.error().msg(Error_code.ERROR_CODE_0012).data(new HashMap<>());//手机号未注册用户
+            }
+
+            ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
+            String origVerCode = valueops.get(mobile);
+
+            if (null == origVerCode) {
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
+            }
+            if (!origVerCode.equals(verCode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+            }
+
+            User mobileuser = userService.findByMobile(mobile);
+            if(mobileuser != null)
+            {
+                return Result.error().msg(Error_code.ERROR_CODE_0034).data(new HashMap<>());
+            }
+
+            user.setMobile(mobile);
+            user.setPassword(password);
+            userService.update(user);
+
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -169,8 +211,8 @@ public class AgentApi {
             }
             Page<House> houses = houseService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == houses) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == houses.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(houses);
             return Result.success().data(dataMap);
@@ -267,8 +309,8 @@ public class AgentApi {
             }
             Page<HouseOrder> page = houseOrderService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
 
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -318,8 +360,8 @@ public class AgentApi {
             }
             Page<BuyHouse> page = agentBuyHouseService.pageBuyHouseByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -414,8 +456,8 @@ public class AgentApi {
             } else {
                 page = sellHouseService.agentPage(pageNum, pageSize, null, list);
             }
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -475,10 +517,6 @@ public class AgentApi {
             User user = new User();
             user.setId(agentId);
             if ("10".equals(type)) {       // 接买房单
-                //一个需求接单数不能超过60
-                if(buyHouseService.count(demandId) > 60){
-                    return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
-                }
 
                 AgentBuyHouse agentBuyHouse = new AgentBuyHouse();
                 agentBuyHouse.setAgent(user);
@@ -489,11 +527,6 @@ public class AgentApi {
                 agentBuyHouse.setBuyHouse(buyHouse);
                 agentBuyHouseService.create(agentBuyHouse);
             } else {                      // 接卖房单
-
-                //一个需求接单数不能超过60
-                if(sellHouseService.count(demandId) > 60){
-                    return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
-                }
 
                 AgentSellHouse agentSellHouse = new AgentSellHouse();
                 agentSellHouse.setAgent(user);
@@ -528,8 +561,8 @@ public class AgentApi {
             }
             Page<Comment> page = commentService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
 
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -1066,7 +1099,7 @@ public class AgentApi {
 
             List<AgentLocation> listByLoc = agentLocationService.findByLoc(longitude, latitude, listByDisOrCity);
             if(listByLoc.isEmpty()){
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+                return Result.success().msg("").data(new HashMap<>());
             }
             List<Map<String, Object>> resultList = new ArrayList<>();
             for(AgentLocation agentLocation : listByLoc){
@@ -1093,7 +1126,7 @@ public class AgentApi {
             User agent = userService.findById(agentId);
             if (null == agent)
             {
-                return Result.error().msg(Error_code.ERROR_CODE_0002);
+                return Result.error().msg(Error_code.ERROR_CODE_0023);
             }
             agentLocation.setAgent(agent);
             AgentLocation origAgentLocation = agentLocationService.findByAgent(agentId);
@@ -1109,5 +1142,65 @@ public class AgentApi {
     }
 
 
+    /**
+     * 反馈
+     * @param agentId
+     * @param content
+     * @param image1
+     * @param image2
+     * @param image3
+     * @param image4
+     * @return
+     */
+    @RequestMapping(value = "feedback", method = RequestMethod.POST)
+    public Result feedback(Integer agentId,
+                           String content,
+                           @RequestParam(required = false) MultipartFile image1,
+                           @RequestParam(required = false) MultipartFile image2,
+                           @RequestParam(required = false) MultipartFile image3,
+                           @RequestParam(required = false) MultipartFile image4){
+
+        try{
+            List<String> imagePathList = new ArrayList<String>();
+            if (image1 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image2 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image3 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image4 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, agentId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+
+            Feedback feedback = new Feedback();
+
+            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
+            feedback.setUser(userService.findById(agentId));
+            feedback.setContent(content);
+
+            feedbackService.create(feedback);
+
+
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
 }
 

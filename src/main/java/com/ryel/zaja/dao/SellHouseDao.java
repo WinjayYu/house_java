@@ -24,12 +24,10 @@ public interface SellHouseDao extends JpaRepository<SellHouse, Integer> ,JpaSpec
     @Query("select b from SellHouse b")
     Page<SellHouse> pageAll(Pageable pageable);
 
-    @Query("select s from SellHouse s where s.community.uid in ?1 and s.id not in ?2")
+    @Query("select s from SellHouse s where s.community.uid in ?1 and s.id not in ?2 and s.num <= 60")
     Page<SellHouse> agentPage(List<String> uids, List<Integer> list, Pageable pageable);
 
     @Query("select s.id from SellHouse s where s.user.id = ?1")
     List<Integer> findByUserIdAsId(Integer userId);
 
-    @Query("select count(s) from SellHouse s where s.id = ?1")
-    Long count(Integer demandId);
 }

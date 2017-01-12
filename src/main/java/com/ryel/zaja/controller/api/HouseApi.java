@@ -206,6 +206,7 @@ public class HouseApi {
 
             buyHouse.setLayout(layout);
             buyHouse.setRenovation(renovation);
+            buyHouse.setNum(0);
 
             if(null == area){
                 buyHouse.setMinArea(null);
@@ -246,8 +247,8 @@ public class HouseApi {
             Map<String, Object> map = new HashMap<>();
             Page<SellHouse> page = sellHouseService.pageByUserId(userId, pageNum, pageSize);
 
-            if (null == page) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+            if (0 == page.getContent().size()) {
+                return Result.error().msg("").data(new HashMap<>());
             }
 
             Map<String, Object> dataMap = APIFactory.fitting(page);
@@ -293,6 +294,7 @@ public class HouseApi {
             sellHouse.setArea(area);
             sellHouse.setStatus(SellHouseStatus.PUBLISHED.getCode());
             sellHouse.setHouseNum(0);
+            sellHouse.setNum(0);
             sellHouseService.create(sellHouse);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -319,7 +321,7 @@ public class HouseApi {
             }
             Page<House> page = houseService.findBySellHouse(userId,  new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
             if(null == page){
-                return Result.error().msg(Error_code.ERROR_CODE_0014);
+                return Result.success().msg("").data(new HashMap<>());
             }
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -405,8 +407,8 @@ public class HouseApi {
         Page<House> houses = houseService.findByUid(uid, UserType.USER.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
 
 //        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
-        if (null == houses) {
-            return Result.error().msg(Error_code.ERROR_CODE_0020);
+        if (0 == houses.getContent().size()) {
+            return Result.success().msg("").data(new HashMap<>());
         }
         Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);

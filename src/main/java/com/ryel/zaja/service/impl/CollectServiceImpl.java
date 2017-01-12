@@ -63,12 +63,8 @@ public class CollectServiceImpl extends AbsCommonService<Collect> implements Col
         }
 
         House house = houseDao.findOne(houseId);
-        if(null == house){
-            throw new BizException(Error_code.ERROR_CODE_0016);
-        }
+
             collect = new Collect();
-
-
             collect.setHouse(house);
 
             User user = userDao.findOne(userId);

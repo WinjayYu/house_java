@@ -16,5 +16,5 @@ public interface ThirdUserDao extends JpaRepository<ThirdUser, Integer>,JpaSpeci
 
     ThirdUser findByOpenid(String openid);
 
-    ThirdUser findByUserAndType(Integer user, String type);
+    ThirdUser findByUserAndType(Integer userId, String type);
 }

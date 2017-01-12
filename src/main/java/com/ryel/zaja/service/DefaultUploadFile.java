@@ -50,6 +50,15 @@ public class DefaultUploadFile {
        return FileUtil.deleteDirectory(path+originalFileName);
     }
 
+    /**
+     * 删除文件
+     * @param originalFileName
+     */
+    public boolean deleteOneFile(String originalFileName)
+    {
+        return FileUtil.deleteFile(path+originalFileName);
+    }
+
 
     /**
      * 保存文件到本地

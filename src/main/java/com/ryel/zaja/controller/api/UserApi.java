@@ -85,7 +85,10 @@ public class UserApi {
     private HouseService houseService;
 
     @Autowired
-    CollectService collectService;
+    private CollectService collectService;
+
+    @Autowired
+    private ApkService apkService;
 
     private static final String USERHEADURL = "http://oi0y2qwer.bkt.clouddn.com/user_head.png";
 
@@ -263,27 +266,11 @@ public class UserApi {
 
 
     /**
-     * @api {post} /api/user/findPassword 13.找回密码
-     * @apiVersion 0.0.1
-     * @apiName user.findPassword
-     * @apiNote /api/user/findPassword
-     * @apiParam {String} mobile 用户邮箱
-     * @apiGroup user
-     * @apiDescription findPassword
-     * @apiSuccess {Result} Result 返回结果
-     * @apiSuccessExample {json} Success-Response:
-     * 账号不存在或者其他错误信息:
-     * {
-     * "status":1,
-     * "data":{},
-     * "msg":"error_14"
-     * }
-     * 找回密码短信发送成功:
-     * {
-     * "status":0,
-     * "data":{},
-     * "msg":""
-     * }
+     * 修改密码和忘记密码
+     * @param mobile
+     * @param password
+     * @param verCode
+     * @return
      */
     @RequestMapping(value = "/user/findpassword", method = RequestMethod.POST)
     public Result findPassword(String mobile, String password, String verCode) {
@@ -304,6 +291,9 @@ public class UserApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
             }
 
+            if(password.equals(user.getPassword())){
+                return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
+            }
             user.setPassword(password);
             userService.update(user);
 
@@ -410,12 +400,16 @@ public class UserApi {
 
                 User user = userService.findByMobile(mobile);
 
+
                 //一个账户只能绑定一个微信或者QQ
-                if(null != thirdUserService.check(user.getId(),thirdUser.getType())){
-                    return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
+                ThirdUser thirdUser1 = thirdUserService.check(user.getId(),thirdUser.getType());
+                if(null != thirdUser1){
+                    if(null != thirdUser1.getUser()) {
+                        return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
+                    }
                 }
                 thirdUser.setUser(user.getId());
-                ThirdUser thirdUser1 = thirdUserService.update(thirdUser);
+                thirdUserService.update(thirdUser);
 
                /* String str = JsonUtil.obj2Json(thirdUser1);
                 JSONObject obj = new JSONObject(str);
@@ -508,7 +502,7 @@ public class UserApi {
     public String checkType(Integer userId){
         try{
             if(null == userId){
-                Result result = Result.error().msg(Error_code.ERROR_CODE_0002);
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0023);
                 return JsonUtil.obj2ApiJson(result);
             }
             User user = userService.findById(userId);
@@ -549,6 +543,7 @@ public class UserApi {
                            @RequestParam(required = false) MultipartFile image4){
 
         try{
+
             List<String> imagePathList = new ArrayList<String>();
             if (image1 != null) {
                 String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
@@ -581,11 +576,9 @@ public class UserApi {
             feedback.setUser(userService.findById(userId));
             feedback.setContent(content);
 
-            feedback = feedbackService.create(feedback);
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("feedback", feedback);
+            feedbackService.create(feedback);
 
-            return Result.success().msg("").data(dataMap);
+            return Result.success().msg("").data(new HashMap<>());
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -607,7 +600,7 @@ public class UserApi {
                 || null == agentId
                 || null == content
                 || null == star){
-            return Result.error().msg(Error_code.ERROR_CODE_0002).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
         }
         try{
 
@@ -664,7 +657,7 @@ public class UserApi {
                 Result result = Result.success().msg("").data(dataMap);
                 return JsonUtil.obj2ApiJson(result);
             }
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            Result result = Result.success().msg("");
             return JsonUtil.obj2ApiJson(result);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
@@ -763,7 +756,7 @@ public class UserApi {
             return Result.success().data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);
-            return Result.error().msg(Error_code.ERROR_CODE_0016).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
     }
 
@@ -804,12 +797,45 @@ public class UserApi {
                 Map<String, Object> dataMap = APIFactory.fitting(page);
                 return Result.success().data(dataMap);
             }else{
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+                return Result.success().msg("").data(new HashMap<>());
             }
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
+    }
+
+    /**
+     * 检查apk是否是最新版
+     * @param version
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "/checkapkversion", method = RequestMethod.POST)
+    public Result apkVersion(String version, String type){
+        try{
+            if(null == version || null == type){
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+
+            Apk latestApk = apkService.findLatestVersion(type);
+
+            Apk apk = apkService.check(version, type);
+            if(null == apk || null == latestApk){
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+
+            Map<String, Object> dataMap = new HashMap<>();
+
+            if(!apk.getVersion().equals(latestApk.getVersion())){
+                dataMap.put("version",latestApk.getVersion());
+                dataMap.put("path", latestApk.getPath());
+                return Result.success().msg("").data(dataMap);
+            }
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());        }
     }
 
 }
