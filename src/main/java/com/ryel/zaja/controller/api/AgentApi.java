@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -99,8 +100,11 @@ public class AgentApi {
             }
             AgentMaterial agentMaterial = agentMaterialService.findByAgentId(user.getId());
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put("user", user);
-            data.put("agentMaterial", agentMaterial);
+
+            Map userMap = APIFactory.filterUser(user);
+            userMap.put("idcard",agentMaterial.getIdcard());
+            data.put("user", userMap);
+//            data.put("agentMaterial", agentMaterial);
             return Result.success().msg("").data(data);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -131,6 +135,42 @@ public class AgentApi {
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(e.getCode()).data(new HashMap<>());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    @RequestMapping(value = "/changeAccount", method = RequestMethod.POST)
+    public Result changeAccount(Integer agentId, String mobile, String password, String verCode) {
+        try {
+            User user = userService.findById(agentId);
+
+            if (null == user) {
+                return Result.error().msg(Error_code.ERROR_CODE_0012).data(new HashMap<>());//手机号未注册用户
+            }
+
+            ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
+            String origVerCode = valueops.get(mobile);
+
+            if (null == origVerCode) {
+                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
+            }
+            if (!origVerCode.equals(verCode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+            }
+
+            User mobileuser = userService.findByMobile(mobile);
+            if(mobileuser != null)
+            {
+                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+            }
+
+            user.setMobile(mobile);
+            user.setPassword(password);
+            userService.update(user);
+
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
