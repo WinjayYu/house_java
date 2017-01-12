@@ -58,7 +58,7 @@ public class ThirdUserServiceImpl extends AbsCommonService<ThirdUser> implements
 
     //一个账户只能绑定一个微信或者QQ
     @Override
-    public ThirdUser check(Integer user, String type) {
-        return thirdUserDao.findByUserAndType(user, type);
+    public ThirdUser check(Integer userId, String type) {
+        return thirdUserDao.findByUserAndType(userId, type);
     }
 }
