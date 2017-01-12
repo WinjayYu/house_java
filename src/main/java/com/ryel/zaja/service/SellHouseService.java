@@ -20,5 +20,5 @@ public interface SellHouseService extends ICommonService<SellHouse> {
 
     List<Integer> findByUserIdAsId(Integer userId);
 
-    Long count(Integer demandId);
+    SellHouse update(SellHouse sellHouse);
 }

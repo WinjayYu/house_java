@@ -7,6 +7,7 @@ import java.util.Map;
 
 public enum PinganApiEnum {
     CREATE_ACCOUNT("create_account", "创建见证宝账户", "6000"),
+    GET_WALLET_BALANCE_INFO("get_wallet_balance_info", "查询见证宝余额信息", "6037"),
     ;
 
     PinganApiEnum(String code, String name, String pinganCode) {

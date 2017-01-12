@@ -53,6 +53,8 @@ public class SellHouse implements Serializable {
     @Column(name = "house_num")
     private Integer houseNum;
 
+    private Integer num;
+
     public SellHouse() {
     }
 
@@ -142,5 +144,13 @@ public class SellHouse implements Serializable {
 
     public void setHouseNum(Integer houseNum) {
         this.houseNum = houseNum;
+    }
+
+    public Integer getNum() {
+        return num;
+    }
+
+    public void setNum(Integer num) {
+        this.num = num;
     }
 }

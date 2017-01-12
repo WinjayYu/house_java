@@ -67,6 +67,13 @@ public class OrderApi {
 
     }
 
+    /**
+     * 订单列表
+     * @param userId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "listorder", method = RequestMethod.POST)
     public Result listOrder(Integer userId, Integer pageNum, Integer pageSize) {
         try {
@@ -80,8 +87,8 @@ public class OrderApi {
             Map<String, Object> map = new HashMap<>();
             Page<HouseOrder> page = houseOrderService.pageByUserId(userId, new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "id"));
 
-            if (page == null) {
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            if (0 == page.getContent().size()) {
+                return Result.success().msg("").data(new HashMap<>());
             }
 
             Map<String, Object> dataMap = APIFactory.fitting(page);

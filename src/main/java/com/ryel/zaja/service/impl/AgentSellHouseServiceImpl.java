@@ -7,6 +7,7 @@ import com.ryel.zaja.entity.AgentSellHouse;
 import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.AgentSellHouseService;
+import com.ryel.zaja.service.SellHouseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,9 @@ public class AgentSellHouseServiceImpl extends AbsCommonService<AgentSellHouse> 
 
     @Autowired
     private AgentSellHouseDao agentSellHouseDao;
+
+    @Autowired
+    private SellHouseService sellHouseService;
 
 
     @Override
@@ -52,6 +56,12 @@ public class AgentSellHouseServiceImpl extends AbsCommonService<AgentSellHouse> 
         if(null != agentSellHouseDao.findbySellHouseAndAgent(agentSellHouse.getSellHouse(), agentSellHouse.getAgent())){
             throw new BizException(Error_code.ERROR_CODE_0032);
         }
+
+        //sellHouse的num加1
+        SellHouse sellHouse = agentSellHouse.getSellHouse();
+        sellHouse.setNum(sellHouse.getNum() + 1);
+        sellHouseService.update(sellHouse);
+
         return this.save(agentSellHouse);
     }
 }

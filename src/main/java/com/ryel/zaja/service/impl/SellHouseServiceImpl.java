@@ -4,6 +4,7 @@ import com.ryel.zaja.dao.SellHouseDao;
 import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.SellHouseService;
+import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,8 +65,11 @@ public class SellHouseServiceImpl extends AbsCommonService<SellHouse> implements
         return sellHouseDao.findByUserIdAsId(userId);
     }
 
+
     @Override
-    public Long count(Integer demandId) {
-        return sellHouseDao.count(demandId);
+    public SellHouse update(SellHouse sellHouse) {
+        SellHouse origUser = findById(sellHouse.getId());
+        ClassUtil.copyProperties(origUser, sellHouse);
+        return sellHouseDao.save(origUser);
     }
 }

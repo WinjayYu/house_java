@@ -263,27 +263,11 @@ public class UserApi {
 
 
     /**
-     * @api {post} /api/user/findPassword 13.找回密码
-     * @apiVersion 0.0.1
-     * @apiName user.findPassword
-     * @apiNote /api/user/findPassword
-     * @apiParam {String} mobile 用户邮箱
-     * @apiGroup user
-     * @apiDescription findPassword
-     * @apiSuccess {Result} Result 返回结果
-     * @apiSuccessExample {json} Success-Response:
-     * 账号不存在或者其他错误信息:
-     * {
-     * "status":1,
-     * "data":{},
-     * "msg":"error_14"
-     * }
-     * 找回密码短信发送成功:
-     * {
-     * "status":0,
-     * "data":{},
-     * "msg":""
-     * }
+     * 修改密码和忘记密码
+     * @param mobile
+     * @param password
+     * @param verCode
+     * @return
      */
     @RequestMapping(value = "/user/findpassword", method = RequestMethod.POST)
     public Result findPassword(String mobile, String password, String verCode) {
@@ -304,6 +288,9 @@ public class UserApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
             }
 
+            if(password.equals(user.getPassword())){
+                return Result.error().msg(Error_code.ERROR_CODE_0037).data(new HashMap<>());
+            }
             user.setPassword(password);
             userService.update(user);
 
@@ -508,7 +495,7 @@ public class UserApi {
     public String checkType(Integer userId){
         try{
             if(null == userId){
-                Result result = Result.error().msg(Error_code.ERROR_CODE_0002);
+                Result result = Result.error().msg(Error_code.ERROR_CODE_0023);
                 return JsonUtil.obj2ApiJson(result);
             }
             User user = userService.findById(userId);
@@ -607,7 +594,7 @@ public class UserApi {
                 || null == agentId
                 || null == content
                 || null == star){
-            return Result.error().msg(Error_code.ERROR_CODE_0002).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
         }
         try{
 
@@ -664,7 +651,7 @@ public class UserApi {
                 Result result = Result.success().msg("").data(dataMap);
                 return JsonUtil.obj2ApiJson(result);
             }
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+            Result result = Result.success().msg("");
             return JsonUtil.obj2ApiJson(result);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
@@ -763,7 +750,7 @@ public class UserApi {
             return Result.success().data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);
-            return Result.error().msg(Error_code.ERROR_CODE_0016).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }
     }
 
@@ -804,7 +791,7 @@ public class UserApi {
                 Map<String, Object> dataMap = APIFactory.fitting(page);
                 return Result.success().data(dataMap);
             }else{
-                return Result.error().msg(Error_code.ERROR_CODE_0014).data(new HashMap<>());
+                return Result.success().msg("").data(new HashMap<>());
             }
         }catch (Exception e){
             logger.error(e.getMessage(), e);
