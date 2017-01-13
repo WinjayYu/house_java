@@ -202,6 +202,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             user = agent;
         }else{
             //新建用户
+            user.setHead("https://img.zaja.xin/agent_head.png");//默认头像
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
             create(user);

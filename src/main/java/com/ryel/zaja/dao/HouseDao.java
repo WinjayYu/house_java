@@ -68,4 +68,8 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
 
     @Query("select count(h) from House h where h.agent.id = ?1")
     Long countByAgentId(Integer agentId);
+
+    //用sellHouseId查出所有的通过此sellHouse编辑而成的House
+    @Query("select h from House h where h.sellHouse.id = ?1 and h.status = 30")
+    Page<House> PageBySellHouse(Integer sellHouseId, Pageable pageable);
 }
