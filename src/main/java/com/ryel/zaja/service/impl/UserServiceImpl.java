@@ -189,7 +189,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         user.setHead("http://oi0y2qwer.bkt.clouddn.com/agent_head.png");//默认头像
         user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态
         user.setType(UserType.AGENT.getCode());
-        create(user);
+//        create(user);
 
         //审核被拒绝用户
         if(agent != null && AgentRegisterStatus.APPROVE_REJECT.getCode().equals(agent.getAgentStatus()))
@@ -204,7 +204,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             //新建用户
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
-            create(user);
+            user = create(user);
         }
         // 上传图片
         String positivePath = bizUploadFile.uploadAgentImageToLocal(positive,user.getId());

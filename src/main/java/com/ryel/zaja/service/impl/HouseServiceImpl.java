@@ -224,8 +224,8 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
 
     @Override
-    public Page<House> findBySellHouse(Integer userId, Pageable pageable) {
-        return houseDao.findBySellHouse(userId,pageable);
+    public Page<House> pageBySellHouse(Integer sellHouseId, Pageable pageable) {
+        return houseDao.PageBySellHouse(sellHouseId, pageable);
     }
 
     @Override
