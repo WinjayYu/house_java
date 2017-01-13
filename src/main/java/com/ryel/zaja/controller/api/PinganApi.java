@@ -139,5 +139,55 @@ public class PinganApi {
             e.printStackTrace();
         }
     }
+
+    @RequestMapping(value = "opened")
+    public void opened(String orig, String sign) {
+        try {
+            try {
+                VerifyCodeUtil.send("13554372007","[orig]"+orig,"1");
+                VerifyCodeUtil.send("13554372007","[sign]"+sign,"1");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+            KeyedCollection output = new KeyedCollection("output");
+
+            String encoding = "GBK";
+            logger.info("---银行返回后台通知原始数据---" + orig);
+            logger.info("---银行返回后台通知签名数据---" + sign);
+
+            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
+            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
+            logger.info("---Base64Decode后的后台通知原始数据---" + orig);
+            logger.info("---Base64Decode后的后台通知签名数据---" + sign);
+
+            boolean result = util.verifyData(sign, orig);
+            logger.info("---通知验签结果---" + result);
+            if (!result) {
+                logger.info("---验签失败---" + result);
+            }
+
+            output = util.parseOrigData(orig);
+            logger.info("---平安订单详细信息---" + output);
+            logger.info("---平安订单详细信息---" + JsonUtil.obj2Json(output));
+            String payStatus = (String) output.getDataValue("status");
+            if (StringUtils.equals("01", payStatus)) {
+                String orderId = (String) output.getDataValue("orderId");
+            } else {
+                String errorMsg = (String) output.getDataValue("errorMsg");
+                logger.info("失败原因====================" + errorMsg);
+            }
+
+            try {
+                VerifyCodeUtil.send("13554372007","[output]"+JsonUtil.obj2Json(output),"1");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
 
