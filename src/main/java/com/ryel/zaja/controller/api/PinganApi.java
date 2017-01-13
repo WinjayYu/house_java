@@ -358,7 +358,8 @@ public class PinganApi {
         input.put("remark", "unionpay01 ");
         input.put("customerId", userId);
         input.put("OpenId", openId);
-        input.put("NOTIFYURL", "https://testebank.sdb.com.cn/corporbank/unionpayNotify.jsp");
+//        input.put("NOTIFYURL", "https://testebank.sdb.com.cn/corporbank/unionpayNotify.jsp");
+        input.put("NOTIFYURL", "https://zaja.xin/zaja//api/pingan/submitnotify");
         input.put("verifyCode", "111111");// 短信验证码
 
         try {
@@ -373,6 +374,64 @@ public class PinganApi {
             }
         } catch (Exception e1) {
             e1.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "submitnotify")
+    public void submitNotify(String orig, String sign) {
+        try {
+
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+            KeyedCollection output = new KeyedCollection("output");
+
+            String encoding = "GBK";
+            logger.info("---银行返回后台通知原始数据---" + orig);
+            logger.info("---银行返回后台通知签名数据---" + sign);
+
+            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
+            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
+            logger.info("---Base64Decode后的后台通知原始数据---" + orig);
+            logger.info("---Base64Decode后的后台通知签名数据---" + sign);
+
+            boolean result = util.verifyData(sign, orig);
+            logger.info("---通知验签结果---" + result);
+            if (!result) {
+                logger.info("---验签失败---" + result);
+            }
+
+            output = util.parseOrigData(orig);
+            logger.info("---平安订单详细信息---" + output);
+            logger.info("---平安订单详细信息---" + JsonUtil.obj2Json(output));
+//  orig信息：
+//            status	char	2	01成功，02失败，00未成功
+//            date	varchar	14	支付完成时间，
+//            YYYYMMDDHHMMSS
+//            charge	number	12,2	订单手续费金额，12整数，2小数
+//            masterId	char	10	商户号
+//            orderId	varchar	26	订单号
+//            currency	char	3	币种，目前只支持RMB
+//            amount	number	12,2	订单金额，12整数，2小数
+//            objectName	varchar	200	款项描述
+//            paydate	varchar	14	下单时间，
+//            YYYYMMDDHHMMSS
+//            validtime	number	10	订单有效期(毫秒)，0不生效
+//            remark	varchar	500	备注字段
+//            customerId	varchar	30	商户会员号
+//            accNo	varchar	4	银行卡号后四位
+//            telephone	varchar	20	银行预留手机号
+//            errorCode	varchar	8	错误返回相应的错误码, 正常返回为空
+//            errorMsg	varchar	100	错误码对应的错误说明，正常返回为空
+
+            String payStatus = (String) output.getDataValue("status");
+            if (StringUtils.equals("01", payStatus)) {
+                // 成功
+            } else {
+                String errorMsg = (String) output.getDataValue("errorMsg");
+                logger.info("失败原因====================" + errorMsg);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
