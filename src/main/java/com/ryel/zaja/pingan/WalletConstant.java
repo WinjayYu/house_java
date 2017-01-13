@@ -32,9 +32,11 @@ public class WalletConstant {
 
 	/**
 	 * 快捷支付正式商户号
+	 * 测试：2000311146
+	 * 正式：2000766918
 	 */
-	public static final String QUICK_PAYMENT_ID = "2000311146";
-	
+	public static final String QUICK_PAYMENT_ID = "2000766918";
+
 	
 
 }

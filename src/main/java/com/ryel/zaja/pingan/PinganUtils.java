@@ -17,4 +17,12 @@ public class PinganUtils {
 		String thirdLogNo = rdNum + srd;
 		return thirdLogNo;
 	}
+
+	public static String generateThirdHtId() {
+		return "TH" + generateThirdLogNo();
+	}
+
+	public static void main(String[] args){
+		System.err.print(generateThirdHtId());
+	}
 }
