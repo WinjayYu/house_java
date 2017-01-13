@@ -244,7 +244,13 @@ public class HouseApi {
     @RequestMapping(value = "/sellhouse/listsellhouses", method = RequestMethod.POST)
     public Result allSellHouses(Integer userId, Integer pageNum, Integer pageSize) {
         try {
-            Map<String, Object> map = new HashMap<>();
+            if (null == pageNum) {
+                pageNum = 1;
+            }
+            if (null == pageSize) {
+                pageSize = 1;
+            }
+
             Page<SellHouse> page = sellHouseService.pageByUserId(userId, pageNum, pageSize);
 
             if (0 == page.getContent().size()) {
@@ -305,13 +311,13 @@ public class HouseApi {
 
     /**
      * 通过用户发布的卖房需求查房源
-     * @param userId
+     * @param sellHouseId
      * @param pageNum
      * @param pageSize
      * @return
      */
     @RequestMapping(value = "/sellhouse/mysellhouse", method = RequestMethod.POST)
-    public Result mySellHouse(Integer userId, Integer pageNum, Integer pageSize){
+    public Result mySellHouse(Integer sellHouseId, Integer pageNum, Integer pageSize){
         try {
             if (null == pageNum) {
                 pageNum = 1;
@@ -319,7 +325,7 @@ public class HouseApi {
             if (null == pageSize) {
                 pageSize = 1;
             }
-            Page<House> page = houseService.findBySellHouse(userId,  new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+            Page<House> page = houseService.pageBySellHouse(sellHouseId,new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id") );
             if(null == page){
                 return Result.success().msg("").data(new HashMap<>());
             }

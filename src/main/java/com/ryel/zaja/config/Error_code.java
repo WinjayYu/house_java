@@ -60,10 +60,18 @@ public interface Error_code {
 
     String ERROR_CODE_0041 = "error_41";   //  【平安】用户id为空
 
-    String ERROR_CODE_0042 = "error_42";   //  【平安】创建账户时用户信息异常
+    String ERROR_CODE_0042 = "error_42";   //  【平安】找不到用户信息
 
     String ERROR_CODE_0043 = "error_43";   //  【平安】该用户没有见证宝账户
 
     String ERROR_CODE_0044 = "error_44";   //  【平安】查询见证宝账户信息异常
+
+    String ERROR_CODE_0045 = "error_45";   //  【平安】接口必填参数为空
+
+    String ERROR_CODE_0046 = "error_46";   //  【平安】bankType错误
+
+    String ERROR_CODE_0047 = "error_47";   //  【平安】绑定提现账户异常
+
+    String ERROR_CODE_0048 = "error_48";   //  【平安】绑定提现账户发送验证码失败
 
 }
