@@ -20,8 +20,17 @@ public class Push {
 	private String timestamp = null;
 	private PushClient client = new PushClient();
 
-	private String AndroidAPPKey = "585b4864b27b0a28c3001157";
-	private String AndroidAPPMasterSecret = "ktmfzr0rd2jd12f1z919iylpeqvdswd4";
+	private String User_AndroidAPPKey = "5877023f2ae85b2acd00041f";
+	private String User_AndroidAPPMasterSecret = "gofdakts7johl26mf6lrm5k4bx90iqyp";
+
+	private String User_IOSAPPKey = "587866dbf5ade435f3000e0e";
+	private String User_IOSAPPMasterSecret = "ir1zrzr7czhaiy5bqtpqvdotucammuyr";
+
+	private String Agent_AndroidAPPKey = "585b4864b27b0a28c3001157";
+	private String Agent_AndroidAPPMasterSecret = "ktmfzr0rd2jd12f1z919iylpeqvdswd4";
+
+	private String Agent_IOSAPPKey = "587866f399f0c708750006e2";
+	private String Agent_IOSAPPMasterSecret = "pptinp1fhygxerknloijocnnsawpbwkx";
 
 	public Push()
 	{
@@ -245,7 +254,7 @@ public class Push {
 
 
 	public void sendAndroidOrder(Integer userId) throws Exception {
-		AndroidCustomizedcast customizedcast = new AndroidCustomizedcast(AndroidAPPKey,AndroidAPPMasterSecret);
+		AndroidCustomizedcast customizedcast = new AndroidCustomizedcast(User_AndroidAPPKey,User_AndroidAPPMasterSecret);
 		// TODO Set your alias here, and use comma to split them if there are multiple alias.
 		// And if you have many alias, you can also upload a file containing these alias, then
 		// use file_id to send customized notification.
@@ -258,6 +267,20 @@ public class Push {
 		// TODO Set 'production_mode' to 'false' if it's a test device.
 		// For how to register a test device, please see the developer doc.
 		customizedcast.setProductionMode();
+		client.send(customizedcast);
+	}
+
+	public void sendIOSOrder(Integer userId) throws Exception {
+		IOSCustomizedcast customizedcast = new IOSCustomizedcast(User_IOSAPPKey,User_IOSAPPMasterSecret);
+		// TODO Set your alias and alias_type here, and use comma to split them if there are multiple alias.
+		// And if you have many alias, you can also upload a file containing these alias, then
+		// use file_id to send customized notification.
+		customizedcast.setAlias(userId+"", "ZAJA");
+		customizedcast.setAlert("经纪人跟您发了一条订单信息");
+		customizedcast.setBadge( 0);
+		customizedcast.setSound( "default");
+		// TODO set 'production_mode' to 'true' if your app is under production mode
+		customizedcast.setTestMode();
 		client.send(customizedcast);
 	}
 

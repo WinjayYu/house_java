@@ -956,6 +956,10 @@ public class AgentApi {
                 {
                     Push push = new Push();
                     push.sendAndroidOrder(user.getId());
+                }else
+                {
+                    Push push = new Push();
+                    push.sendIOSOrder(user.getId());
                 }
             }
             return Result.success().msg("").data(new HashMap<>());

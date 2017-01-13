@@ -74,4 +74,10 @@ public interface Error_code {
 
     String ERROR_CODE_0048 = "error_48";   //  【平安】绑定提现账户发送验证码失败
 
+    String ERROR_CODE_0049 = "error_49";   //  【平安】转账时交易记录不存在
+
+    String ERROR_CODE_0050 = "error_50";   //  【平安】交易发生异常
+
+    String ERROR_CODE_0051 = "error_51";   //  【平安】提现异常
+
 }
