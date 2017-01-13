@@ -78,6 +78,13 @@ public class BizUploadFile {
             String bodyString = qiNiuService.upload(path, key);
             if (StringUtils.isNotBlank(bodyString)) {
                 QiniuResponse qiniuResponse = JsonUtil.json2Obj(bodyString, QiniuResponse.class);
+
+                //删除本地图片
+                File origfile = new File(path);
+                if(origfile.isFile() && origfile.exists()){
+                    origfile.delete();
+                }
+
                 return qiNiuService.getDomain() + qiniuResponse.getKey();
             }else {
                 throw new BizException("上传七牛异常");

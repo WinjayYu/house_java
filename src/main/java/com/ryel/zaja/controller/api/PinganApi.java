@@ -5,16 +5,13 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.pingan.WalletConstant;
 import com.ryel.zaja.utils.JsonUtil;
-import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,13 +140,6 @@ public class PinganApi {
     @RequestMapping(value = "opened")
     public void opened(String orig, String sign) {
         try {
-            try {
-                VerifyCodeUtil.send("13554372007","[orig]"+orig,"1");
-                VerifyCodeUtil.send("13554372007","[sign]"+sign,"1");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
 
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
             KeyedCollection output = new KeyedCollection("output");
@@ -180,11 +170,6 @@ public class PinganApi {
                 logger.info("失败原因====================" + errorMsg);
             }
 
-            try {
-                VerifyCodeUtil.send("13554372007","[output]"+JsonUtil.obj2Json(output),"1");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
