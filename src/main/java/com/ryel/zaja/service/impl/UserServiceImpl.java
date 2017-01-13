@@ -185,11 +185,6 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         if(idagent != null){
             throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
         }
-        // 保存用户
-        user.setHead("http://oi0y2qwer.bkt.clouddn.com/agent_head.png");//默认头像
-        user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());  // 申请审核状态
-        user.setType(UserType.AGENT.getCode());
-        create(user);
 
         //审核被拒绝用户
         if(agent != null && AgentRegisterStatus.APPROVE_REJECT.getCode().equals(agent.getAgentStatus()))
@@ -202,6 +197,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             user = agent;
         }else{
             //新建用户
+            user.setHead("https://img.zaja.xin/agent_head.png");//默认头像
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
             create(user);
