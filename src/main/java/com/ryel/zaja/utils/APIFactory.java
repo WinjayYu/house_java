@@ -1,19 +1,19 @@
 package com.ryel.zaja.utils;
 
+import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.AgentLocation;
 import com.ryel.zaja.entity.House;
+import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.entity.User;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Created by 涂奕恒 on 2014-12-15.
  */
-public class APIFactory {
+public class APIFactory{
 
     /**
      * json转换公共类
@@ -37,6 +37,9 @@ public class APIFactory {
             {
                 newList.add(filterHouse((House)ob));
             }
+            if(ob instanceof SellHouse){
+                newList.add(filterSellHouse((SellHouse)ob));
+            }
         }
 
         // data中的list
@@ -45,6 +48,8 @@ public class APIFactory {
         dataMap.put("page", pageMap);
         return dataMap;
     }
+
+
 
     /**
      * json转换公共类
@@ -150,6 +155,28 @@ public class APIFactory {
         return  houseMap;
     }
 
+    /**
+     * SellHouse过滤字段
+     * <p/>
+     *
+     * @return
+     */
+    private static Map<String,Object> filterSellHouse(SellHouse sellHouse) {
+        Map<String, Object> sellHouseMap = new HashMap<String, Object>();
+        sellHouseMap.put("id",sellHouse.getId());
+        sellHouseMap.put("status",sellHouse.getStatus());
+        sellHouseMap.put("addTime",sellHouse.getAddTime());
+        sellHouseMap.put("lastModifiedTime",sellHouse.getLastModifiedTime());
+        sellHouseMap.put("community",sellHouse.getCommunity());
+        sellHouseMap.put("layout",sellHouse.getLayout());
+        sellHouseMap.put("price",sellHouse.getPrice());
+        sellHouseMap.put("renovation",sellHouse.getRenovation());
+        sellHouseMap.put("area",sellHouse.getArea());
+        sellHouseMap.put("houseNum",sellHouse.getHouseNum());
+        sellHouseMap.put("num",sellHouse.getNum()*3 + new Random().nextInt(3));
+
+        return  sellHouseMap;
+    }
 
     /**
      * House列表过滤
@@ -174,4 +201,14 @@ public class APIFactory {
         return houseMap;
     }
 
+
+    /**
+     * 当page的size为0的时候，使用此方法，返回前台需要的格式
+     * @return
+     */
+    public static Map<String, Object> emptyMap(){
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("list",new ArrayList<>());
+        return map;
+    }
 }

@@ -211,9 +211,7 @@ public class AgentApi {
             }
             Page<House> houses = houseService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (0 == houses.getContent().size()) {
-                return Result.success().msg("").data(new HashMap<>());
-            }
+
             Map<String, Object> dataMap = APIFactory.fitting(houses);
             return Result.success().data(dataMap);
         } catch (Exception e) {
@@ -309,9 +307,7 @@ public class AgentApi {
             }
             Page<HouseOrder> page = houseOrderService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (0 == page.getContent().size()) {
-                return Result.success().msg("").data(new HashMap<>());
-            }
+
 
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -360,9 +356,7 @@ public class AgentApi {
             }
             Page<BuyHouse> page = agentBuyHouseService.pageBuyHouseByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (0 == page.getContent().size()) {
-                return Result.success().msg("").data(new HashMap<>());
-            }
+
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
@@ -456,9 +450,7 @@ public class AgentApi {
             } else {
                 page = sellHouseService.agentPage(pageNum, pageSize, null, list);
             }
-            if (0 == page.getContent().size()) {
-                return Result.success().msg("").data(new HashMap<>());
-            }
+
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
         } catch (Exception e) {
@@ -561,9 +553,7 @@ public class AgentApi {
             }
             Page<Comment> page = commentService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
-            if (0 == page.getContent().size()) {
-                return Result.success().msg("").data(new HashMap<>());
-            }
+
 
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
