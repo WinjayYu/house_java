@@ -37,8 +37,6 @@ public class WalletConstant {
 	 */
 	public static final String QUICK_PAYMENT_ID = "2000766918";
 
-	public static final String QUICK_PAYMENT_ID = "2000766918";
-
 
 
 }
