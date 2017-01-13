@@ -54,7 +54,7 @@ public class PinganApi {
             java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyyMMddHHmmss");
             timestamp = formatter.format(date);
             datetamp = timestamp.substring(0, 8);
-            String masterId = WalletConstant.SUP_ACCT_ID;
+            String masterId = WalletConstant.QUICK_PAYMENT_ID;
 
             com.sdb.payclient.core.PayclientInterfaceUtil util = new com.sdb.payclient.core.PayclientInterfaceUtil();
             com.ecc.emp.data.KeyedCollection input = new com.ecc.emp.data.KeyedCollection("input");
@@ -105,13 +105,6 @@ public class PinganApi {
     @RequestMapping(value = "paynotify")
     public void paynotify(String orig, String sign) {
         try {
-            try {
-                VerifyCodeUtil.send("13554372007","[orig]"+orig,"1");
-                VerifyCodeUtil.send("13554372007","[sign]"+sign,"1");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
 
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
             KeyedCollection output = new KeyedCollection("output");
@@ -131,22 +124,17 @@ public class PinganApi {
                 logger.info("---验签失败---" + result);
             }
 
-            output = util.parseOrigData(orig);
-            logger.info("---平安订单详细信息---" + output);
-            logger.info("---平安订单详细信息---" + JsonUtil.obj2Json(output));
-            String payStatus = (String) output.getDataValue("status");
-            if (StringUtils.equals("01", payStatus)) {
-                String orderId = (String) output.getDataValue("orderId");
-            } else {
-                String errorMsg = (String) output.getDataValue("errorMsg");
-                logger.info("失败原因====================" + errorMsg);
-            }
+//            output = util.parseOrigData(orig);
+//            logger.info("---平安订单详细信息---" + output);
+//            logger.info("---平安订单详细信息---" + JsonUtil.obj2Json(output));
+//            String payStatus = (String) output.getDataValue("status");
+//            if (StringUtils.equals("01", payStatus)) {
+//                String orderId = (String) output.getDataValue("orderId");
+//            } else {
+//                String errorMsg = (String) output.getDataValue("errorMsg");
+//                logger.info("失败原因====================" + errorMsg);
+//            }
 
-            try {
-                VerifyCodeUtil.send("13554372007","[output]"+JsonUtil.obj2Json(output),"1");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

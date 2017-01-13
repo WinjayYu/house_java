@@ -23,6 +23,9 @@ public class Push {
 	private String AndroidAPPKey = "585b4864b27b0a28c3001157";
 	private String AndroidAPPMasterSecret = "ktmfzr0rd2jd12f1z919iylpeqvdswd4";
 
+	private String IOSAPPKey = "585b4875aed17970d60008a5";
+	private String IOSAPPMasterSecret = "lf0dj3gzamzsxhyb0wcuetg8yrwre4fx";
+
 	public Push()
 	{
 
@@ -258,6 +261,20 @@ public class Push {
 		// TODO Set 'production_mode' to 'false' if it's a test device.
 		// For how to register a test device, please see the developer doc.
 		customizedcast.setProductionMode();
+		client.send(customizedcast);
+	}
+
+	public void sendIOSOrder(Integer userId) throws Exception {
+		IOSCustomizedcast customizedcast = new IOSCustomizedcast(IOSAPPKey,IOSAPPMasterSecret);
+		// TODO Set your alias and alias_type here, and use comma to split them if there are multiple alias.
+		// And if you have many alias, you can also upload a file containing these alias, then
+		// use file_id to send customized notification.
+		customizedcast.setAlias(userId+"", "ZAJA");
+		customizedcast.setAlert("经纪人跟您发了一条订单信息");
+		customizedcast.setBadge( 0);
+		customizedcast.setSound( "default");
+		// TODO set 'production_mode' to 'true' if your app is under production mode
+		customizedcast.setTestMode();
 		client.send(customizedcast);
 	}
 
