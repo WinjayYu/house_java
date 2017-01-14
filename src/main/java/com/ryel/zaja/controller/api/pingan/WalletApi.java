@@ -738,7 +738,7 @@ public class WalletApi {
     /**
      * 提现
      * @param userId 提现用户id
-     * @param TranAmount 交易金额
+     * @param tranAmount 交易金额
      * @param acctIdName 提现账户名称（身份证上的姓名）
      */
     @RequestMapping(value = "withdraw")
