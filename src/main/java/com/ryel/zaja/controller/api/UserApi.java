@@ -513,7 +513,7 @@ public class UserApi {
 
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("type", user.getType());
-            dataMap.put("agentStatus", user.getAgentStatus());
+            dataMap.put("agentStatus", user.getAgentStatus() == null ? "" : user.getAgentStatus());
 
             Result result = Result.success().msg("").data(dataMap);
             return JsonUtil.obj2ApiJson(result);
