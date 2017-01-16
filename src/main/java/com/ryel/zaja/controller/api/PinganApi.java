@@ -223,7 +223,7 @@ public class PinganApi {
                 // 短信发送成功
 
                 Map pay = new HashMap<>();
-                pay.put("orderId", output.getDataValue("orderId"));
+                pay.put("pinganOrderId", output.getDataValue("orderId"));
                 pay.put("amount", output.getDataValue("amount"));
                 pay.put("paydate", output.getDataValue("paydate"));
 
@@ -277,7 +277,7 @@ public class PinganApi {
      * @param verifyCode 短信验证码
      */
     @RequestMapping(value = "commissionsubmit")
-    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId, String paydate, String verifyCode) {
+    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId,String pinanOrderId, String paydate, String verifyCode) {
         try {
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
 
@@ -286,13 +286,13 @@ public class PinganApi {
 
             String masterId = WalletConstant.QUICK_PAYMENT_ID;
             input.put("masterId", masterId);
-            input.put("orderId", orderId);
+            input.put("orderId", pinanOrderId);
             input.put("currency", "RMB");
             input.put("amount", amount);
             input.put("objectName", "Commission for agent");
             input.put("paydate", paydate);
             input.put("validtime", "0");//订单有效期(毫秒)，0不生效
-            input.put("remark", "commission");
+            input.put("remark", orderId);
             input.put("customerId", userId);
             input.put("OpenId", openId);
 //        input.put("NOTIFYURL", "https://testebank.sdb.com.cn/corporbank/unionpayNotify.jsp");

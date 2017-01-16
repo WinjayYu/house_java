@@ -76,7 +76,7 @@ public class WalletApi {
             parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
             parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
             parmaKeyDict.put("FuncFlag", "1"); // 功能标志1：开户
-            parmaKeyDict.put("ThirdCustId", user.getId().toString()); // 交易网会员代码
+            parmaKeyDict.put("ThirdCustId", user.getId()); // 交易网会员代码
             parmaKeyDict.put("CustProperty", "00"); // 会员属性
             parmaKeyDict.put("NickName", nickname); // 会员昵称
             parmaKeyDict.put("MobilePhone", mobile); // 手机号码
