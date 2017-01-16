@@ -412,10 +412,6 @@ public class HouseApi {
         }
         Page<House> houses = houseService.findByUid(uid, UserType.USER.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
 
-//        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
-        if (0 == houses.getContent().size()) {
-            return Result.success().msg("").data(new HashMap<>());
-        }
         Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);
     }

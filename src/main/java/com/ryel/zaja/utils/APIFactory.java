@@ -31,7 +31,7 @@ public class APIFactory{
         pageMap.put("totalPage", page.getTotalPages());
         pageMap.put("currentPage", page.getNumber() + 1);
 
-              //数据过滤
+        //数据过滤
         List newList = new ArrayList();
         for (Object ob : list) {
             if(ob instanceof House)
