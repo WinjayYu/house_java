@@ -1,23 +1,18 @@
 package com.ryel.zaja.controller.api.pingan;
 
-import com.ecc.emp.data.KeyedCollection;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.PinganApiEnum;
 import com.ryel.zaja.config.enums.TradeRecordStatus;
+import com.ryel.zaja.entity.SuperBankInfo;
 import com.ryel.zaja.entity.TradeRecord;
 import com.ryel.zaja.entity.User;
 import com.ryel.zaja.entity.UserWalletAccount;
 import com.ryel.zaja.pingan.PinganUtils;
 import com.ryel.zaja.pingan.WalletConstant;
 import com.ryel.zaja.pingan.ZJJZ_API_GW;
-import com.ryel.zaja.service.PinganApiLogService;
-import com.ryel.zaja.service.TradeRecordService;
-import com.ryel.zaja.service.UserService;
-import com.ryel.zaja.service.UserWalletAccountService;
+import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.JsonUtil;
-import com.ryel.zaja.utils.VerifyCodeUtil;
-import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController()
@@ -44,6 +40,8 @@ public class WalletApi {
     private UserWalletAccountService userWalletAccountService;
     @Autowired
     private TradeRecordService tradeRecordService;
+    @Autowired
+    private SuperBankInfoService superBankInfoService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -829,6 +827,20 @@ public class WalletApi {
         } finally {
             pinganApiLogService.create(PinganApiEnum.WITHDRAW,
                     JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
+        }
+    }
+
+    /**
+     * 查询超级网银号信息
+     */
+    @RequestMapping(value = "superbank")
+    public Result getSuperBankInfo() {
+        try {
+            List<SuperBankInfo> list = superBankInfoService.findAll();
+            return Result.success().data(list);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 }
