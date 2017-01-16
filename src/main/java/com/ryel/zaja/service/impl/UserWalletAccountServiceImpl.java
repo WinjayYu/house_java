@@ -39,6 +39,7 @@ public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAcc
     }
 
     @Override
+    @Transactional
     public UserWalletAccount create(UserWalletAccount userWalletAccount) {
         return userWalletAccountDao.save(userWalletAccount);
     }
