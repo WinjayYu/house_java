@@ -41,6 +41,8 @@ public class WalletApi {
     private TradeRecordService tradeRecordService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private SuperBankInfoService superBankInfoService;
 
     /**
      * 创建见证宝账户
