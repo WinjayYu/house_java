@@ -253,9 +253,6 @@ public class HouseApi {
 
             Page<SellHouse> page = sellHouseService.pageByUserId(userId, pageNum, pageSize);
 
-            if (0 == page.getContent().size()) {
-                return Result.error().msg("").data(new HashMap<>());
-            }
 
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
@@ -326,9 +323,7 @@ public class HouseApi {
                 pageSize = 1;
             }
             Page<House> page = houseService.pageBySellHouse(sellHouseId,new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id") );
-            if(null == page){
-                return Result.success().msg("").data(new HashMap<>());
-            }
+
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
         }catch (Exception e){
@@ -412,10 +407,7 @@ public class HouseApi {
         }
         Page<House> houses = houseService.findByUid(uid, UserType.USER.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
 
-//        Page<House> houses = houseService.findByUid(uid, UserType.USER.getType(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.ASC, "id"));
-        if (0 == houses.getContent().size()) {
-            return Result.success().msg("").data(new HashMap<>());
-        }
+
         Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);
     }

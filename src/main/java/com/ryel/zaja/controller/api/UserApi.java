@@ -649,20 +649,16 @@ public class UserApi {
      * @return
      */
     @RequestMapping(value = "/comment/listcomment")
-    public String listComment(Integer userId, Integer pageNum, Integer pageSize){
-        try{
+    public String listComment(Integer userId, Integer pageNum, Integer pageSize) {
+        try {
             Page<Comment> page = commentService.findByAgentId(userId, pageNum, pageSize);
-            if(0 != page.getContent().size()){
-                Map<String, Object> dataMap = APIFactory.fitting(page);
-                Result result = Result.success().msg("").data(dataMap);
-                return JsonUtil.obj2ApiJson(result);
-            }
-            Result result = Result.success().msg("");
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            Result result = Result.success().msg("").data(dataMap);
             return JsonUtil.obj2ApiJson(result);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             Result result = Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
-            return JsonUtil.obj2ApiJson(result,"houseOrder");
+            return JsonUtil.obj2ApiJson(result, "houseOrder");
         }
     }
 
@@ -783,9 +779,9 @@ public class UserApi {
      * @return
      */
     @RequestMapping(value = "/collect/listcollect", method = RequestMethod.POST)
-    public Result listCollect(Integer userId, Integer pageNum, Integer pageSize){
+    public Result listCollect(Integer userId, Integer pageNum, Integer pageSize) {
 
-        try{
+        try {
             if (null == pageNum) {
                 pageNum = 1;
             }
@@ -793,13 +789,10 @@ public class UserApi {
                 pageSize = 1;
             }
             Page<House> page = collectService.pageByUserId(userId, pageNum, pageSize);
-            if(null != page) {
-                Map<String, Object> dataMap = APIFactory.fitting(page);
-                return Result.success().data(dataMap);
-            }else{
-                return Result.success().msg("").data(new HashMap<>());
-            }
-        }catch (Exception e){
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            return Result.success().data(dataMap);
+
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }

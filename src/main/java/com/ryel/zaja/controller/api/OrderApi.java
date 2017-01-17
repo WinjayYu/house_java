@@ -87,9 +87,6 @@ public class OrderApi {
             Map<String, Object> map = new HashMap<>();
             Page<HouseOrder> page = houseOrderService.pageByUserId(userId, new PageRequest(pageNum-1, pageSize, Sort.Direction.DESC, "id"));
 
-            if (0 == page.getContent().size()) {
-                return Result.success().msg("").data(new HashMap<>());
-            }
 
             Map<String, Object> dataMap = APIFactory.fitting(page);
             return Result.success().msg("").data(dataMap);
