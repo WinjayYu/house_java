@@ -277,7 +277,7 @@ public class PinganApi {
      * @param verifyCode 短信验证码
      */
     @RequestMapping(value = "commissionsubmit")
-    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId,String pinanOrderId, String paydate, String verifyCode) {
+    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId,String pinganOrderId, String paydate, String verifyCode) {
         try {
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
 
@@ -286,7 +286,7 @@ public class PinganApi {
 
             String masterId = WalletConstant.QUICK_PAYMENT_ID;
             input.put("masterId", masterId);
-            input.put("orderId", pinanOrderId);
+            input.put("orderId", pinganOrderId);
             input.put("currency", "RMB");
             input.put("amount", amount);
             input.put("objectName", "Commission for agent");
@@ -295,7 +295,6 @@ public class PinganApi {
             input.put("remark", orderId);
             input.put("customerId", userId);
             input.put("OpenId", openId);
-//        input.put("NOTIFYURL", "https://testebank.sdb.com.cn/corporbank/unionpayNotify.jsp");
             input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/commissionnotify");
             input.put("verifyCode", verifyCode);// 短信验证码
 

@@ -3,7 +3,7 @@
 	<contextName>SpringBlog</contextName>
 
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 /app/sv/logs -->
-	<property name="LOG_HOME" value="/data/zajalog"/>
+	<property name="LOG_HOME" value="${catalina.base}/data/zajalog"/>
 
 	<appender name="APPLICATION-APPENDER"
 			  class="ch.qos.logback.core.rolling.RollingFileAppender">
