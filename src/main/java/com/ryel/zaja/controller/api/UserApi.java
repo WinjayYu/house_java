@@ -820,7 +820,8 @@ public class UserApi {
 
             Map<String, Object> dataMap = new HashMap<>();
 
-            if(!apk.getVersion().equals(latestApk.getVersion())){
+            //如果前台发的version小于最新版本则返回最新的版本信息，否则返回为空
+            if(Double.parseDouble(apk.getVersion()) < Double.parseDouble(latestApk.getVersion())){
                 dataMap.put("version",latestApk.getVersion());
                 dataMap.put("path", latestApk.getPath());
                 return Result.success().msg("").data(dataMap);
