@@ -14,7 +14,7 @@ public interface ApkDao extends JpaRepository<Apk, Integer>,JpaSpecificationExec
 
     Apk findByVersionAndType(String version, String type);
 
-    @Query("select a from Apk a where a.addTime = (select MAX(a.version) from Apk a where a.type = ?1) and a.type = ?1")
+    @Query("select a from Apk a where a.version = (select MAX(a.version) from Apk a where a.type = ?1) and a.type = ?1")
     Apk findLatestVersion(String type);
 
 }

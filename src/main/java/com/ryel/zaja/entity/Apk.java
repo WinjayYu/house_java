@@ -32,6 +32,8 @@ public class Apk implements Serializable{
     @Column(name = "add_time")
     private Date addTime;
 
+    private String remark;
+
     public Apk(){}
 
     public Integer getId() {
@@ -72,5 +74,13 @@ public class Apk implements Serializable{
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

@@ -12,8 +12,8 @@ spring:
     hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         hbm2ddl.auto: update
-        show_sql: false
-        format_sql: false
+        show_sql: true
+        format_sql: true
 
     redis:
       port: 6379
