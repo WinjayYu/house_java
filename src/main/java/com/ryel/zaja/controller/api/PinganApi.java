@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -319,8 +320,13 @@ public class PinganApi {
     }
 
     @RequestMapping(value = "commissionnotify")
-    public void submitNotify(String orig, String sign) {
+    public void submitNotify(HttpServletRequest request) {
         try {
+
+            String orig = request.getParameter("orig");
+            String sign = request.getParameter("sign");
+            logger.info("---orig---" + orig);
+            logger.info("---sign---" + sign);
 
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
             KeyedCollection output = new KeyedCollection("output");
