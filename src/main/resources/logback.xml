@@ -39,5 +39,5 @@
 		<appender-ref ref="APPLICATION-APPENDER"/>
 	</root>
 
-	<logger name="me.binf.ivf" level="ALL" />
+	<logger name="com.ryel.zaja" level="ALL" />
 </configuration>

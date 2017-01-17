@@ -50,8 +50,8 @@ public class WalletApi {
      */
     @RequestMapping(value = "createaccount")
     public Result createAccount(Integer userId) {
-        HashMap parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
-        HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
+        HashMap parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+        HashMap retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
         try {
             // 校验用户信息
             if(userId == null){
