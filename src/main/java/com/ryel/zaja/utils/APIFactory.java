@@ -8,6 +8,7 @@ import com.ryel.zaja.entity.User;
 import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -30,7 +31,7 @@ public class APIFactory{
         pageMap.put("totalPage", page.getTotalPages());
         pageMap.put("currentPage", page.getNumber() + 1);
 
-              //数据过滤
+        //数据过滤
         List newList = new ArrayList();
         for (Object ob : list) {
             if(ob instanceof House)
@@ -165,8 +166,7 @@ public class APIFactory{
         Map<String, Object> sellHouseMap = new HashMap<String, Object>();
         sellHouseMap.put("id",sellHouse.getId());
         sellHouseMap.put("status",sellHouse.getStatus());
-        sellHouseMap.put("addTime",sellHouse.getAddTime());
-        sellHouseMap.put("lastModifiedTime",sellHouse.getLastModifiedTime());
+        sellHouseMap.put("addTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(sellHouse.getAddTime()));
         sellHouseMap.put("community",sellHouse.getCommunity());
         sellHouseMap.put("layout",sellHouse.getLayout());
         sellHouseMap.put("price",sellHouse.getPrice());
@@ -174,6 +174,7 @@ public class APIFactory{
         sellHouseMap.put("area",sellHouse.getArea());
         sellHouseMap.put("houseNum",sellHouse.getHouseNum());
         sellHouseMap.put("num",sellHouse.getNum()*3 + new Random().nextInt(3));
+        sellHouseMap.put("user",filterUser(sellHouse.getUser()));
 
         return  sellHouseMap;
     }

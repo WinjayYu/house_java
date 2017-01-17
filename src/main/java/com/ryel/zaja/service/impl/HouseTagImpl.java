@@ -8,6 +8,7 @@ import com.ryel.zaja.service.HouseTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class HouseTagImpl extends AbsCommonService<HouseTag> implements HouseTag
     private HouseTagDao tagDao;
 
     @Override
+    @Transactional
     public void create(HouseTag tag) {
         if(tagDao.findByTag(tag.getTag()) != null ){
             throw new BizException("房屋标签已存在！");
@@ -34,6 +36,7 @@ public class HouseTagImpl extends AbsCommonService<HouseTag> implements HouseTag
     }
 
     @Override
+    @Transactional
     public void upDateTagNum(String tag) {
         HouseTag houseTag = tagDao.findByTag(tag);
         if(null == houseTag)
