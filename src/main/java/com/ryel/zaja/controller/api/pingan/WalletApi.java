@@ -1,23 +1,15 @@
 package com.ryel.zaja.controller.api.pingan;
 
-import com.ecc.emp.data.KeyedCollection;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.PinganApiEnum;
 import com.ryel.zaja.config.enums.TradeRecordStatus;
-import com.ryel.zaja.entity.TradeRecord;
-import com.ryel.zaja.entity.User;
-import com.ryel.zaja.entity.UserWalletAccount;
+import com.ryel.zaja.entity.*;
 import com.ryel.zaja.pingan.PinganUtils;
 import com.ryel.zaja.pingan.WalletConstant;
 import com.ryel.zaja.pingan.ZJJZ_API_GW;
-import com.ryel.zaja.service.PinganApiLogService;
-import com.ryel.zaja.service.TradeRecordService;
-import com.ryel.zaja.service.UserService;
-import com.ryel.zaja.service.UserWalletAccountService;
+import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.JsonUtil;
-import com.ryel.zaja.utils.VerifyCodeUtil;
-import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController()
@@ -335,6 +329,108 @@ public class WalletApi {
         }
     }
 
+
+    /**
+     * 功能子账户余额查询
+     */
+    @RequestMapping(value = "getcommonbalanceinfo")
+    public Result getCommonBalanceInfo() {
+        HashMap parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
+        HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
+        try {
+
+            parmaKeyDict.put("TranFunc", "6010"); // 交易码，此处以【6000】接口为例子
+            parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
+            parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
+            parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
+//		parmaKeyDict.put("CustAcctId", WalletConstant.COMMON_ACCT_ID); // 资金汇总账号
+            parmaKeyDict.put("SelectFlag", "3"); // 1：全部 2：普通会员子账号 3：功能子账号
+            parmaKeyDict.put("PageNum", "1"); // 交易网会员代码
+            parmaKeyDict.put("Reserve", "会员开户"); // 保留域
+
+            System.out.println("请求报文==============" + parmaKeyDict);
+
+            ZJJZ_API_GW msg = new ZJJZ_API_GW();
+            String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+            System.out.println("第一部分：生成发送银行的请求的报文的实例");
+            System.out.println(tranMessage);
+            System.out.println("-------------------------------");
+
+            msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+            String recvMessage = (String) retKeyDict.get("RecvMessage");// 银行返回的报文
+
+            System.out.println("第二部分：获取银行返回的报文");
+            System.out.println(recvMessage);
+            System.out.println("-------------------------------");
+
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            System.out.println("返回报文:=" + retKeyDict);
+
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            String rspCode = (String) retKeyDict.get("RspCode");
+            if ("000000".equals(rspCode)) {
+                String TotalCount =(String)retKeyDict.get("TotalCount");
+                Integer iCount = Integer.valueOf(TotalCount);
+                String ArrayContent =(String)retKeyDict.get("ArrayContent"); //ArrayContent为固定名称。
+                String [] array=ArrayContent.split("&");
+
+//		子账户	CustAcctId	C(32)	必输	可重复
+//		子账户属性	CustType	C(1)	必输	可重复（1：普通会员子账号 2：挂账子账号  3：手续费子账号 4：利息子账号5：平台担保子账号）
+//		交易网会员代码	ThirdCustId	C(32)	必输	可重复
+//		子账户名称	CustName	C(120)	必输	可重复
+//		账户可用余额	TotalBalance	9(15)	必输	可重复
+//		账户可提现金额	TotalTranOutAmount	9(15)	必输	可重复
+//		维护日期	TranDate	C(8)	必输	可重复（开户日期或修改日期）
+                String[] CustAcctId = new String[iCount];
+                String[] CustType = new String[iCount];
+                String[] ThirdCustId = new String[iCount];
+                String[] CustName = new String[iCount];
+                String[] TotalBalance = new String[iCount];
+                String[] TotalTranOutAmount = new String[iCount];
+                String[] TranDate = new String[iCount];
+                int i;
+                int j;
+
+                for(i=0,j=0;i<35;i=i+7,j++)
+                {
+                    CustAcctId[j]=array[i];
+                    CustType[j]=array[i+1];
+                    ThirdCustId[j]=array[i+2];
+                    CustName[j]=array[i+3];
+                    TotalBalance[j]=array[i+4];
+                    TotalTranOutAmount[j]=array[i+5];
+                    TranDate[j]=array[i+6];
+                }
+                System.out.println("CustAcctId:" + CustAcctId);
+                System.out.println("CustType:" + CustType);
+                System.out.println("ThirdCustId:" + ThirdCustId);
+                System.out.println("CustName:" + CustName);
+                System.out.println("TotalBalance:" + TotalBalance);
+                System.out.println("TotalTranOutAmount:" + TotalTranOutAmount);
+                System.out.println("TranDate:" + TranDate);
+
+                List<CommonAccountInfo> commonAccountInfoList = new ArrayList<CommonAccountInfo>();
+                for (int o = 0; o < CustAcctId.length; o++) {
+                    System.out.println(CustName[o] + "   " + CustAcctId[o] + "   " + TotalBalance[o] + "   " + TotalTranOutAmount[o]);
+                    CommonAccountInfo commonAccountInfo = new CommonAccountInfo();
+                    commonAccountInfo.setCustAcctId(CustAcctId[o]);
+                    commonAccountInfo.setCustName(CustName[o]);
+                    commonAccountInfo.setCustType(CustType[o]);
+                    commonAccountInfo.setThirdCustId(ThirdCustId[o]);
+                    commonAccountInfo.setTotalBalance(TotalBalance[o]);
+                    commonAccountInfo.setTotalTranOutAmount(TotalTranOutAmount[o]);
+                    commonAccountInfoList.add(commonAccountInfo);
+                }
+                return Result.success().data(commonAccountInfoList);
+            } else {
+                return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
+        }
+    }
 
     /**
      * 绑定提现账户
@@ -1196,6 +1292,20 @@ public class WalletApi {
         } finally {
             pinganApiLogService.create(PinganApiEnum.WITHDRAW,
                     JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
+        }
+    }
+
+    /**
+     * 查询超级网银号信息
+     */
+    @RequestMapping(value = "superbank")
+    public Result getSuperBankInfo() {
+        try {
+            List<SuperBankInfo> list = superBankInfoService.findAll();
+            return Result.success().data(list);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
 }
