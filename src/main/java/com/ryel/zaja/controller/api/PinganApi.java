@@ -120,12 +120,13 @@ public class PinganApi {
 
             output = util.parseOrigData(orig);
 
-            String payStatus = (String) output.getDataValue("status");
-            if (StringUtils.equals("01", payStatus)) {
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+
+            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
                 // 开卡成功
                 logger.info("开卡成功（快捷支付）====================");
             } else {
-                String errorMsg = (String) output.getDataValue("errorMsg");
                 logger.info("开卡失败（快捷支付）：" + errorMsg);
             }
         } catch (Exception e) {
@@ -153,7 +154,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.equals(""))&& (errorMsg == null || errorMsg.equals(""))){
+            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
                 IndexedCollection icoll = (IndexedCollection) output.getDataElement("unionInfo");
 
                 List<Map> list = new ArrayList<>();
@@ -219,7 +220,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.equals(""))&& (errorMsg == null || errorMsg.equals(""))){
+            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
                 // 短信发送成功
 
                 Map pay = new HashMap<>();
@@ -300,18 +301,18 @@ public class PinganApi {
 
             output = util.execute(input, "UnionAPI_Submit"); //执行发送，并返回结果对象
 
-            String status = (String) output.getDataValue("status");
 
-            if (status.equals("01")) {
-                String orderIdf = (String) output.getDataValue("orderId");
-                String paydatef = (String) output.getDataValue("paydate");
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+
+
+            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
                 return Result.success().msg("").data(new HashMap<>());
-            }else
-            {
-                String errorCode = (String) output.getDataValue("errorCode");
-                String errorMsg = (String) output.getDataValue("errorMsg");
+            } else {
+
                 return Result.error().msg(errorMsg).data(new HashMap<>());
             }
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -361,8 +362,10 @@ public class PinganApi {
 //            errorCode	varchar	8	错误返回相应的错误码, 正常返回为空
 //            errorMsg	varchar	100	错误码对应的错误说明，正常返回为空
 
-            String payStatus = (String) output.getDataValue("status");
-            if (StringUtils.equals("01", payStatus)) {
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+
+            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
                 // 成功
                 PinanOrder order = new PinanOrder();
                 order.setMasterId((String) output.getDataValue("masterId"));
@@ -378,9 +381,13 @@ public class PinganApi {
                 order.setCurrency((String) output.getDataValue("currency"));
                 order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
                 order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
+
+                OrderApi api = new OrderApi();
+                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
+
                 pinanOrderService.create(order);
+
             } else {
-                String errorMsg = (String) output.getDataValue("errorMsg");
                 logger.info("失败原因====================" + errorMsg);
             }
 
