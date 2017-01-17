@@ -295,7 +295,6 @@ public class PinganApi {
             input.put("remark", orderId);
             input.put("customerId", userId);
             input.put("OpenId", openId);
-//        input.put("NOTIFYURL", "https://testebank.sdb.com.cn/corporbank/unionpayNotify.jsp");
             input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/commissionnotify");
             input.put("verifyCode", verifyCode);// 短信验证码
 
