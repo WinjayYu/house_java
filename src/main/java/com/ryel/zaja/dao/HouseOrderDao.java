@@ -37,4 +37,7 @@ public interface HouseOrderDao extends JpaRepository<HouseOrder, Integer> ,JpaSp
     @Query("select sum(o.commission) from HouseOrder o where o.agent.id = ?1")
     Long countByAgentId(Integer agentId);
 
+    @Query("select h from HouseOrder h where h.house.id = ?1")
+    List<HouseOrder> findAllOrderByHouseId(Integer houseId);
+
 }
