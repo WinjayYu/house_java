@@ -25,7 +25,7 @@ public class ApkServiceImpl extends AbsCommonService<Apk> implements ApkService 
     }
 
     @Override
-    public Apk check(String version, String type) {
+    public Apk check(Double version, String type) {
         return apkDao.findByVersionAndType(version, type);
     }
 

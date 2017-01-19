@@ -7,7 +7,7 @@ import com.ryel.zaja.entity.Apk;
  */
 public interface ApkService extends ICommonService<Apk>{
 
-    Apk check(String version, String type);
+    Apk check(Double version, String type);
 
     Apk findLatestVersion(String type);
 
