@@ -140,6 +140,8 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
         }
         houseOrder.setStatus(HouseOrderStatus.IN_CONNECT.getCode());//房屋交接中
         if(null != houseOrder.getHouse()) {
+
+            //用户支付成功,对应的房屋进入交接中的状态
             if (null != houseOrder.getHouse().getSellHouse()) {
                 List<House> houses = houseDao.listBySellHouse(houseOrder.getHouse().getSellHouse().getId());
                 for (House house : houses) {
@@ -147,6 +149,13 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
                     houseService.update(house);
                 }
 
+            }
+
+            //用户支付成功，对应的房屋所有其他的订单进入关闭状态
+            List<HouseOrder> houseOrders = houseOrderDao.findAllOrderByHouseId(houseOrder.getHouse().getId());
+            for(HouseOrder houseOrder1 : houseOrders){
+                houseOrder1.setStatus(HouseOrderStatus.CLOSED.getCode());
+                update(houseOrder);
             }
         }
         return update(houseOrder);

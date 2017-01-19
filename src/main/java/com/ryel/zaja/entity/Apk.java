@@ -23,7 +23,7 @@ public class Apk implements Serializable{
 
     private String path;
 
-    private String version;
+    private Double version;
 
     private String type;
 
@@ -52,11 +52,11 @@ public class Apk implements Serializable{
         this.path = path;
     }
 
-    public String getVersion() {
+    public Double getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(Double version) {
         this.version = version;
     }
 
