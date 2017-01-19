@@ -1,5 +1,6 @@
 package com.ryel.zaja.fillter;
 
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 

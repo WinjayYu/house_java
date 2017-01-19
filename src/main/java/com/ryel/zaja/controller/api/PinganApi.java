@@ -7,6 +7,8 @@ import com.ryel.zaja.config.PinanBankCodeConfig;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.PinanOrder;
 import com.ryel.zaja.pingan.WalletConstant;
+import com.ryel.zaja.service.HouseOrderService;
+import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.PinanOrderService;
 import com.ryel.zaja.utils.JsonUtil;
 import com.sdb.payclient.bean.exception.CsiiException;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +35,8 @@ public class PinganApi {
 
     @Autowired
     private PinanOrderService pinanOrderService;
+    @Autowired
+    private HouseOrderService houseOrderService;
     /**
      * 通过userId 进行开卡前的加密处理
      *
@@ -307,7 +312,28 @@ public class PinganApi {
             String errorMsg = (String) output.getDataValue("errorMsg");
 
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+             if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+
+                PinanOrder order = new PinanOrder();
+                order.setMasterId((String) output.getDataValue("masterId"));
+                order.setOrderId((String) output.getDataValue("orderId"));
+                order.setAmount((String)output.getDataValue("amount"));
+                order.setCharge((String)output.getDataValue("charge"));
+                order.setValidtime((String) output.getDataValue("validtime"));
+                order.setCustomerId((String) output.getDataValue("customerId"));
+                order.setAccNo((String) output.getDataValue("accNo"));
+                order.setMobile((String) output.getDataValue("telephone"));
+                order.setRemark((String) output.getDataValue("remark"));
+                order.setObjectName((String) output.getDataValue("objectName"));
+                order.setCurrency((String) output.getDataValue("currency"));
+                order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
+                order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
+
+//                OrderApi api = new OrderApi();
+//                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
+                houseOrderService.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
+                pinanOrderService.create(order);
+
                 return Result.success().msg("").data(new HashMap<>());
             } else {
 
@@ -321,11 +347,10 @@ public class PinganApi {
     }
 
     @RequestMapping(value = "commissionnotify")
-    public void submitNotify(HttpServletRequest request) {
+    public void submitNotify(@RequestParam String orig, @RequestParam String sign) {
         try {
 
-            String orig = request.getParameter("orig");
-            String sign = request.getParameter("sign");
+
             logger.info("---orig---" + orig);
             logger.info("---sign---" + sign);
 
@@ -371,31 +396,31 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
-                // 成功
-                PinanOrder order = new PinanOrder();
-                order.setMasterId((String) output.getDataValue("masterId"));
-                order.setOrderId((String) output.getDataValue("orderId"));
-                order.setAmount((BigDecimal) output.getDataValue("amount"));
-                order.setCharge((BigDecimal) output.getDataValue("charge"));
-                order.setValidtime((BigDecimal) output.getDataValue("validtime"));
-                order.setCustomerId((String) output.getDataValue("customerId"));
-                order.setAccNo((String) output.getDataValue("accNo"));
-                order.setMobile((String) output.getDataValue("telephone"));
-                order.setRemark((String) output.getDataValue("remark"));
-                order.setObjectName((String) output.getDataValue("objectName"));
-                order.setCurrency((String) output.getDataValue("currency"));
-                order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
-                order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
-
-                OrderApi api = new OrderApi();
-                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
-
-                pinanOrderService.create(order);
-
-            } else {
-                logger.info("失败原因====================" + errorMsg);
-            }
+//            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+//                // 成功
+//                PinanOrder order = new PinanOrder();
+//                order.setMasterId((String) output.getDataValue("masterId"));
+//                order.setOrderId((String) output.getDataValue("orderId"));
+//                order.setAmount((BigDecimal) output.getDataValue("amount"));
+//                order.setCharge((BigDecimal) output.getDataValue("charge"));
+//                order.setValidtime((BigDecimal) output.getDataValue("validtime"));
+//                order.setCustomerId((String) output.getDataValue("customerId"));
+//                order.setAccNo((String) output.getDataValue("accNo"));
+//                order.setMobile((String) output.getDataValue("telephone"));
+//                order.setRemark((String) output.getDataValue("remark"));
+//                order.setObjectName((String) output.getDataValue("objectName"));
+//                order.setCurrency((String) output.getDataValue("currency"));
+//                order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
+//                order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
+//
+//                OrderApi api = new OrderApi();
+//                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
+//
+//                pinanOrderService.create(order);
+//
+//            } else {
+//                logger.info("失败原因====================" + errorMsg);
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();

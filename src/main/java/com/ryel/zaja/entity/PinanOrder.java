@@ -31,9 +31,9 @@ public class PinanOrder implements Serializable {
 
     private String customerId;//会员号
 
-    private BigDecimal amount;//订单金额
+    private String amount;//订单金额
 
-    private BigDecimal charge;//手续费
+    private String charge;//手续费
 
     private String currency;//币种 RMB
 
@@ -47,7 +47,7 @@ public class PinanOrder implements Serializable {
     @Column(name = "payTime")
     private Date payTime;//支付时间 对应平安 date
 
-    private BigDecimal validtime;//订单有效时间
+    private String validtime;//订单有效时间
 
     private String objectName;//款项描述
 
@@ -90,20 +90,28 @@ public class PinanOrder implements Serializable {
         this.customerId = customerId;
     }
 
-    public BigDecimal getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 
-    public BigDecimal getCharge() {
+    public String getCharge() {
         return charge;
     }
 
-    public void setCharge(BigDecimal charge) {
+    public void setCharge(String charge) {
         this.charge = charge;
+    }
+
+    public String getValidtime() {
+        return validtime;
+    }
+
+    public void setValidtime(String validtime) {
+        this.validtime = validtime;
     }
 
     public String getCurrency() {
@@ -130,13 +138,6 @@ public class PinanOrder implements Serializable {
         this.payTime = payTime;
     }
 
-    public BigDecimal getValidtime() {
-        return validtime;
-    }
-
-    public void setValidtime(BigDecimal validtime) {
-        this.validtime = validtime;
-    }
 
     public String getObjectName() {
         return objectName;

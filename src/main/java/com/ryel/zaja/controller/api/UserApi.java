@@ -486,7 +486,7 @@ public class UserApi {
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(e.getCode()).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
