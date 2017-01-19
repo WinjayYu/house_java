@@ -340,7 +340,7 @@ public class UserApi {
     }
 
     @RequestMapping(value = "/user/thiredlogin", method = RequestMethod.POST)
-    public String thirdLogin(String openid, String type, String nickname,
+    public Result thirdLogin(String openid, String type, String nickname,
                              String headUrl) {
         try {
             ThirdUser thirdUser = thirdUserService.findByOpenid(openid);
@@ -348,24 +348,22 @@ public class UserApi {
                 if (null != thirdUser.getUser()) {
                     int id = thirdUser.getUser();
                     User user = userService.findById(id);
-                    Result result = Result.success().msg("").data(user2map(user));
-                    return JsonUtil.obj2ApiJson(result);
+                    return Result.success().msg("").data(user2map(user));
                 } else {
                     Map<String, String> map = new HashMap<>();
                     map.put("status", "0");//"0"代表没有绑定手机号
-                    Result result = Result.success().msg("").data(map);
-                    return JsonUtil.obj2ApiJson(result);
+                    return Result.success().msg("").data(map);
                 }
 
             } else {
-                ThirdUser thirdUser1 = thirdUserService.create(type, openid, headUrl, nickname);
-                Result result = Result.success().msg("").data(thirdUser1);
-                return JsonUtil.obj2ApiJson(result);
+                thirdUserService.create(type, openid, headUrl, nickname);
+                Map<String, String> map = new HashMap<>();
+                map.put("status", "0");//"0"代表没有绑定手机号
+                return Result.success().msg("").data(map);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0025);
-            return JsonUtil.obj2ApiJson(result);
+            return Result.error().msg(Error_code.ERROR_CODE_0025);
         }
     }
 
