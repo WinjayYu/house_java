@@ -94,8 +94,9 @@ public class QiNiuService {
         try {
             bucketManager.delete(bucketname, key);
         }catch (QiniuException e){
-            Response r = e.response;
-            throw new BizException(r.toString());
+            //不抛异常，否则如果七牛没有对应的图片将无法继续执行
+//            Response r = e.response;
+//            throw new BizException(r.toString());
         }
     }
 
@@ -107,8 +108,8 @@ public class QiNiuService {
                 bucketManager.delete(bucketname, img);
             }
         }catch (QiniuException e){
-            Response r = e.response;
-            throw new BizException(r.toString());
+//            Response r = e.response;
+//            throw new BizException(r.toString());
         }
     }
 

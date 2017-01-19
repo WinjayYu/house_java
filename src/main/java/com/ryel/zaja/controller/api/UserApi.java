@@ -214,16 +214,18 @@ public class UserApi {
     //@RequestParam(value = "head", required = true) MultipartFile file
     @RequestMapping(value = "/user/head")
     public Result headUpload(Integer userId,
-                             @RequestParam(required = true) MultipartFile image) throws Exception {
-
-        try {
+                             @RequestParam(required = true) MultipartFile image) throws BizException,Exception{
 
             User user = userService.findById(userId);
             if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){
                 String head = user.getHead();
-                String filename = head.substring(head.indexOf("user"));
-                qiNiuService.deleteOneFile(filename);
+                if(-1 != head.indexOf("user")) {
+                    String filename = head.substring(head.indexOf("user"));
+                    qiNiuService.deleteOneFile(filename);
+                }
             }
+
+        try {
 
             String path = bizUploadFile.uploadUserImageToQiniu(image, userId);
             user.setId(userId);
@@ -805,7 +807,7 @@ public class UserApi {
      * @return
      */
     @RequestMapping(value = "/checkapkversion", method = RequestMethod.POST)
-    public Result apkVersion(String version, String type){
+    public Result apkVersion(Double version, String type){
         try{
             if(null == version || null == type){
                 return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
