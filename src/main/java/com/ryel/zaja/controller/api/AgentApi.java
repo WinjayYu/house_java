@@ -406,6 +406,7 @@ public class AgentApi {
             }
             Page<BuyHouse> page = null;
 
+            //List的作用：去掉经纪人自己发的需求和已经接单过的需求
             List<Integer> list = agentBuyHouseService.findBuyHouseByAgentId(agentId);
             list.addAll(buyHouseService.findByUserIdAsId(agentId));
             //给一个默认值，防止list为null的时候sql报错
@@ -792,7 +793,7 @@ public class AgentApi {
             }
             house.setImgs(JsonUtil.obj2Json(imagePathList));
             houseService.update(house);
-            return JsonUtil.obj2ApiJson(Result.success());
+            return JsonUtil.obj2ApiJson(Result.success().msg("").data(new HashMap<>()));
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
             return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0001).data(e.getMessage()));
@@ -965,7 +966,7 @@ public class AgentApi {
             return Result.success().msg("").data(new HashMap<>());
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(e.getCode());
+            return Result.error().msg(e.getCode()).data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());

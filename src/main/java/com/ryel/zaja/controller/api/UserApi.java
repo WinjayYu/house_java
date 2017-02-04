@@ -122,6 +122,7 @@ public class UserApi {
             user.setHead(USERHEADURL);
             user.setNickname("");
             user.setUsername("");
+            user.setAgentStatus("");
             if (null == user.getSex()) {
                 user.setSex("30");//未设置
             }

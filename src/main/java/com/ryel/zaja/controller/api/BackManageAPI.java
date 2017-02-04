@@ -59,7 +59,7 @@ public class BackManageAPI {
     private DefaultUploadFile defaultUploadFile;
 
 
-    private final String remoteUrlHead = "http://oi0y2qwer.bkt.clouddn.com/";
+    private final String remoteUrlHead = "http://img.zaja.xin/";
 
     /**
      * 获取未审核经纪人列表

@@ -9,6 +9,7 @@ import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.GetDistanceUtil;
+import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,7 +339,7 @@ public class HouseApi {
      * @return
      */
     @RequestMapping(value = "/similar", method = RequestMethod.POST)
-    public Result similarHouse(Integer houseId) {
+    public String similarHouse(Integer houseId) {
         House house = houseService.findById(houseId);
 
         Map<String, Object> similarHouse = new HashMap<String, Object>();
@@ -357,10 +358,11 @@ public class HouseApi {
                 }
             }
             similarHouse.put("list", houses);
-            return Result.success().msg("").data(similarHouse);
+            return JsonUtil.obj2ApiJson(Result.success().msg("").data(similarHouse));
 
         } else {
-            return Result.success().msg("").data(similarHouse.put("list", recommendService.findByStatus("10")));
+            return JsonUtil.obj2ApiJson(Result.success().msg("").data(similarHouse.put("list", recommendService.findByStatus("10"))));
+
         }
     }
 
