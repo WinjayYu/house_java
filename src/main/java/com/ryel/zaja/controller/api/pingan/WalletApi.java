@@ -44,6 +44,8 @@ public class WalletApi {
     @Autowired
     private SuperBankInfoService superBankInfoService;
 
+
+
     /**
      * 创建见证宝账户
      * @param userId 用户id
@@ -125,9 +127,6 @@ public class WalletApi {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
-        } finally {
-            pinganApiLogService.create(PinganApiEnum.CREATE_ACCOUNT,
-                    JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
         }
     }
 
@@ -333,8 +332,8 @@ public class WalletApi {
      * 查询见证宝余额信息
      * @param userId 用户id
      */
-    @RequestMapping(value = "getwalletbalanceinfo")
-    public Result getWalletBalanceInfo(Integer userId) {
+    @RequestMapping(value = "walletinfo")
+    public Result walletinfo(Integer userId) {
         HashMap parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
         try {
@@ -343,11 +342,11 @@ public class WalletApi {
                 logger.info("userId:" + userId);
                 return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
-//            UserWalletAccount userWalletAccount = userWalletAccountService.findByUserId(userId);
-//            if(userWalletAccount == null){
-//                logger.info("userWalletAccount is null");
-//                return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-//            }
+            UserWalletAccount userWalletAccount = userWalletAccountService.findByUserId(userId);
+            if(userWalletAccount == null){
+                logger.info("userWalletAccount is null");
+                return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
+            }
 
             parmaKeyDict.put("TranFunc", "6037");
             parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码

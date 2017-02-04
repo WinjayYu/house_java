@@ -1,5 +1,14 @@
 package com.ryel.zaja.pingan;
 
+import com.ryel.zaja.config.Error_code;
+import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.entity.UserWalletAccount;
+import com.ryel.zaja.service.UserWalletAccountService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+
 /**
  * 见证宝钱宝相关配置参数
  */
@@ -36,7 +45,5 @@ public class WalletConstant {
 	 * 正式：2000766918
 	 */
 	public static final String QUICK_PAYMENT_ID = "2000766918";
-
-
 
 }
