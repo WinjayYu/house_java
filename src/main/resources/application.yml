@@ -14,6 +14,7 @@ spring:
         hbm2ddl.auto: update
         show_sql: false
         format_sql: false
+        
 
     redis:
       port: 6379

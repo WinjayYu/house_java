@@ -49,14 +49,14 @@ public class WalletApi {
      * @param userId 用户id
      */
     @RequestMapping(value = "createaccount")
-    public Result createAccount(Integer userId) {
+    public Result createAccount(Integer userId,Integer type) {
         HashMap parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
         try {
             // 校验用户信息
             if(userId == null){
                 logger.info("userId:" + userId);
-                return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             User user = userService.findById(userId);
             if(user == null){
@@ -74,8 +74,8 @@ public class WalletApi {
             parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
             parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
             parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
-            parmaKeyDict.put("FuncFlag", "1"); // 功能标志1：开户
-            parmaKeyDict.put("ThirdCustId", user.getId()+""); // 交易网会员代码
+            parmaKeyDict.put("FuncFlag", type+""); // 功能标志1：开户 3销户
+            parmaKeyDict.put("ThirdCustId", userId +""); // 交易网会员代码
             parmaKeyDict.put("CustProperty", "00"); // 会员属性
             parmaKeyDict.put("NickName", nickname); // 会员昵称
             parmaKeyDict.put("MobilePhone", mobile); // 手机号码
@@ -116,7 +116,10 @@ public class WalletApi {
                 userWalletAccount.setNickName(nickname);
                 userWalletAccountService.create(userWalletAccount);
                 return Result.success().data(new HashMap<>());
-            } else {
+            } else if("ERR114".equals(rspCode)) {
+                return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
+            }else
+            {
                 return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -125,6 +128,149 @@ public class WalletApi {
         } finally {
             pinganApiLogService.create(PinganApiEnum.CREATE_ACCOUNT,
                     JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
+        }
+    }
+
+    @RequestMapping(value = "removeaccount")
+    public Result removeAccount(Integer userId) {
+        HashMap parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+        HashMap retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
+        try {
+            // 校验用户信息
+            if(userId == null){
+                logger.info("userId:" + userId);
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
+            }
+            User user = userService.findById(userId);
+            if(user == null){
+                logger.info("user is null");
+                return Result.error().msg(Error_code.ERROR_CODE_0042).data(new HashMap<>());
+            }
+            String mobile = user.getMobile();
+            String nickname = user.getUsername();
+            if(StringUtils.isBlank(mobile) || mobile.length() != 11 || StringUtils.isBlank(nickname)){
+                logger.info("user:" + JsonUtil.obj2Json(user));
+                return Result.error().msg(Error_code.ERROR_CODE_0042).data(new HashMap<>());
+            }
+
+            parmaKeyDict.put("TranFunc", "6000"); // 交易码，此处以【6000】接口为例子
+            parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
+            parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
+            parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
+            parmaKeyDict.put("FuncFlag", "3"); // 功能标志1：开户 3销户
+            parmaKeyDict.put("ThirdCustId", user.getId()+""); // 交易网会员代码
+            parmaKeyDict.put("CustProperty", "00"); // 会员属性
+            parmaKeyDict.put("NickName", nickname); // 会员昵称
+            parmaKeyDict.put("MobilePhone", mobile); // 手机号码
+            parmaKeyDict.put("Email", ""); // 邮箱
+            parmaKeyDict.put("Reserve", "会员开户"); // 保留域
+
+            System.out.println("请求报文==============" + parmaKeyDict);
+
+            ZJJZ_API_GW msg = new ZJJZ_API_GW();
+            String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+            System.out.println("第一部分：生成发送银行的请求的报文的实例");
+            System.out.println(tranMessage);
+            System.out.println("-------------------------------");
+
+            msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+            String recvMessage = (String) retKeyDict.get("RecvMessage");// 银行返回的报文
+
+            System.out.println("第二部分：获取银行返回的报文");
+            System.out.println(recvMessage);
+            System.out.println("-------------------------------");
+
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            System.out.println("返回报文:=" + retKeyDict);
+            /**
+             * 第三部分：解析银行返回的报文的实例
+             */
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            String custAcctId = (String) retKeyDict.get("CustAcctId");
+            String rspCode = (String) retKeyDict.get("RspCode");
+            if ("000000".equals(rspCode) && StringUtils.isNotEmpty(custAcctId)) {
+                //移除成功
+                return Result.success().data(new HashMap<>());
+            }else
+            {
+                return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+        }
+    }
+
+    @RequestMapping(value = "allacount")
+    public Result allAcount(Integer page, String type, String custAcctId) {
+        HashMap parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+        HashMap retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
+        try {
+
+
+            parmaKeyDict.put("TranFunc", "6010"); // 交易码，此处以【6000】接口为例子
+            parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
+            parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
+
+            parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
+            parmaKeyDict.put("SelectFlag", type); // 1：全部 2：普通会员子账号 3：功能子账号
+            parmaKeyDict.put("PageNum", page+""); // 交易网会员代码
+            parmaKeyDict.put("CustAcctId", custAcctId); // 交易网会员代码
+            parmaKeyDict.put("Reserve", "所有的子账户查询"); // 保留域
+
+
+            ZJJZ_API_GW msg = new ZJJZ_API_GW();
+            String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+
+            msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+            String recvMessage = (String) retKeyDict.get("RecvMessage");// 银行返回的报文
+
+
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            System.out.println("返回报文:=" + retKeyDict);
+            /**
+             * 第三部分：解析银行返回的报文的实例
+             */
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            String rspCode = (String) retKeyDict.get("RspCode");
+
+            String TotalCount =(String)retKeyDict.get("TotalCount");
+            String Reserve =(String)retKeyDict.get("Reserve");
+
+            String arrayContent =(String)retKeyDict.get("ArrayContent"); //ArrayContent为固定名称。
+            String [] array = arrayContent.split("&");
+
+            List list = new ArrayList();
+
+            for(int i=0, j=0;i< 20;i=i+7,j++)
+            {
+                Map map = new HashMap<>();
+                map.put("CustAcctId",array[i]);
+                map.put("CustType",array[i+1]);
+                map.put("ThirdCustId",array[i+2]);
+                map.put("CustName",array[i+3]);
+                map.put("TotalBalance",array[i+4]);
+                map.put("TotalTranOutAmount",array[i+5]);
+                map.put("TranDate",array[i+6]);
+                list.add(map);
+            }
+
+            Map data = new HashMap<>();
+            data.put("list",list);
+
+
+            if ("000000".equals(rspCode)) {
+                //移除成功
+                return Result.success().data(data);
+            }else
+            {
+                return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
         }
     }
 
@@ -146,13 +292,13 @@ public class WalletApi {
 
         if(userId == null){
             logger.info("userId:" + userId);
-            return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
         }
 
 
         parmaKeyDict.put("TranFunc", "6065");
-            parmaKeyDict.put("Qydm", WalletConstant.QYDM);
-            parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
+        parmaKeyDict.put("Qydm", WalletConstant.QYDM);
+        parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
         parmaKeyDict.put("FuncFlag", "1"); // 功能标志1：移除
         parmaKeyDict.put("SupAcctId",WalletConstant.SUP_ACCT_ID);
         parmaKeyDict.put("ThirdCustId", userId+"");
@@ -195,7 +341,7 @@ public class WalletApi {
             // 校验用户信息
             if(userId == null){
                 logger.info("userId:" + userId);
-                return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
 //            UserWalletAccount userWalletAccount = userWalletAccountService.findByUserId(userId);
 //            if(userWalletAccount == null){
@@ -249,8 +395,8 @@ public class WalletApi {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         } finally {
-            pinganApiLogService.create(PinganApiEnum.GET_WALLET_BALANCE_INFO,
-                    JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
+//            pinganApiLogService.create(PinganApiEnum.GET_WALLET_BALANCE_INFO,
+//                    JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),userId);
         }
     }
 
@@ -267,7 +413,7 @@ public class WalletApi {
             // 校验用户信息
             if (userId == null) {
                 logger.info("userId:" + userId);
-                return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             UserWalletAccount userWalletAccount = userWalletAccountService.findByUserId(userId);
             if(userWalletAccount == null){
@@ -454,7 +600,7 @@ public class WalletApi {
             if(userId == null || StringUtils.isBlank(idCard) || StringUtils.isBlank(acctId)
                     || StringUtils.isBlank(bankType) || StringUtils.isBlank(bankCode) || StringUtils.isBlank(bankName)){
                 // 必填参数为空
-                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             if(!"1".equals(bankType) && !"2".equals(bankType)){
                 // bankType错误
@@ -558,7 +704,7 @@ public class WalletApi {
             // 参数校验
             if(userId == null || StringUtils.isBlank(messageCode)){
                 // 必填参数为空
-                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             // 校验用户信息
             User user = userService.findById(userId);
@@ -872,7 +1018,7 @@ public class WalletApi {
             // 参数校验
             if(outUserId == null || inUserId == null || StringUtils.isBlank(messageCode)){
                 // 必填参数为空
-                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             // 校验用户信息
             User outUser = userService.findById(outUserId);
@@ -1006,7 +1152,7 @@ public class WalletApi {
             // 参数校验
             if(outUserId == null || inUserId == null || StringUtils.isBlank(messageCode) || StringUtils.isBlank(thirdHtId)){
                 // 必填参数为空
-                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             // 校验用户信息
             User outUser = userService.findById(outUserId);
@@ -1125,7 +1271,7 @@ public class WalletApi {
             // 参数校验
             if(outUserId == null || StringUtils.isBlank(TranAmount)){
                 // 必填参数为空
-                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             // 校验用户信息
             User outUser = userService.findById(outUserId);
@@ -1215,7 +1361,7 @@ public class WalletApi {
             // 参数校验
             if(userId == null || StringUtils.isBlank(tranAmount) || StringUtils.isBlank(acctIdName)){
                 // 必填参数为空
-                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
             // 校验用户信息
             User user = userService.findById(userId);
