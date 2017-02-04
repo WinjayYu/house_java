@@ -78,6 +78,14 @@ class JpaConfig implements TransactionManagementConfigurer {
         jpaProperties.put(org.hibernate.cfg.Environment.HBM2DDL_AUTO, hbm2ddlAuto);
         jpaProperties.put(org.hibernate.cfg.Environment.SHOW_SQL, showSql);
         jpaProperties.put(org.hibernate.cfg.Environment.FORMAT_SQL,formatSql);
+        //3.0 hibernate
+        jpaProperties.put(Environment.C3P0_ACQUIRE_INCREMENT,3);
+        jpaProperties.put(Environment.C3P0_IDLE_TEST_PERIOD,10);
+        jpaProperties.put(Environment.C3P0_MIN_SIZE,5);
+        jpaProperties.put(Environment.C3P0_MAX_SIZE,75);
+        jpaProperties.put(Environment.C3P0_MAX_STATEMENTS,10);
+        jpaProperties.put(Environment.C3P0_TIMEOUT,50);
+
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
         return entityManagerFactoryBean;
