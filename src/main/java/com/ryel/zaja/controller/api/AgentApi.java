@@ -308,7 +308,6 @@ public class AgentApi {
             Page<HouseOrder> page = houseOrderService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
 
-
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
             for (HouseOrder order : page.getContent()) {
