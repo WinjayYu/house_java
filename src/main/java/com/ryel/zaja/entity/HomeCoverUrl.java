@@ -1,13 +1,14 @@
 package com.ryel.zaja.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by billyu on 2016/12/10.
  */
 @Entity
 @Table(name = "home_cover_url")
-public class HomeCoverUrl {
+public class HomeCoverUrl implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

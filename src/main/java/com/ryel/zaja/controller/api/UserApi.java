@@ -478,6 +478,8 @@ public class UserApi {
             User user = new User();
             user.setHead(thirdUser.getHead());
             user.setPassword("");
+            user.setUsername("");
+            user.setAgentStatus("");
             user.setNickname(thirdUser.getNickname());
             user.setType(UserType.USER.getCode());
             user.setSex("30");//"30"表示未设置性别
