@@ -386,7 +386,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         if (UserType.USER.getCode().equals(type)) {
             buyHouses = buyHouseService.findByUserId(userId);
         }
-        if (buyHouses.isEmpty()) {
+        if (0 == buyHouses.size()) {
             return recommendService.findByStatus("10");
         } else {
             //随机获取一条数据
@@ -411,7 +411,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
             //如果小于5条数据则返回结果
             if (houses.size() <= 5) {
                 List<House> recoHouses = recommendService.findByStatus("10");
-                for (int i = 0; houses.size() < 5; ) {
+                for (int i = 0; houses.size() < recoHouses.size(); ) {
                     houses.add(recoHouses.get(i));
                     i++;
                 }
