@@ -6,18 +6,22 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.PinanBankCodeConfig;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.PinanOrder;
+import com.ryel.zaja.entity.ZjjzCnapsBankinfo;
 import com.ryel.zaja.pingan.WalletConstant;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.PinanOrderService;
+import com.ryel.zaja.service.ZjjzCnapsBankinfoService;
 import com.ryel.zaja.utils.JsonUtil;
 import com.sdb.payclient.bean.exception.CsiiException;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +41,9 @@ public class PinganApi {
     private PinanOrderService pinanOrderService;
     @Autowired
     private HouseOrderService houseOrderService;
+    @Autowired
+    private ZjjzCnapsBankinfoService zjjzCnapsBankinfoService;
+
     /**
      * 通过userId 进行开卡前的加密处理
      *
@@ -61,7 +68,7 @@ public class PinganApi {
             com.ecc.emp.data.KeyedCollection signDataput = new com.ecc.emp.data.KeyedCollection("signDataput");
 
             input.put("masterId", masterId);//商户号，注意生产环境上要替换成商户自己的生产商户号
-            input.put("orderId",getOderId(masterId, datetamp));//订单号，严格遵守格式：商户号+8位日期YYYYMMDD+8位流水
+            input.put("orderId", getOderId(masterId, datetamp));//订单号，严格遵守格式：商户号+8位日期YYYYMMDD+8位流水
             input.put("customerId", userId);//会员号
             input.put("dateTime", timestamp);//下单时间，YYYYMMDDHHMMSS
 
@@ -129,7 +136,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
                 // 开卡成功
                 logger.info("开卡成功（快捷支付）====================");
             } else {
@@ -160,7 +167,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
                 IndexedCollection icoll = (IndexedCollection) output.getDataElement("unionInfo");
 
                 List<Map> list = new ArrayList<>();
@@ -178,11 +185,91 @@ public class PinganApi {
                 Map data = new HashMap<String, String>();
                 data.put("list", list);
                 return Result.success().msg("").data(data);
-            }else
-            {
+            } else {
                 return Result.error().msg(errorMsg).data(new HashMap<>());
             }
 
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 发起银行卡关闭（UnionAPI_OPNCL）
+     *
+     * @param userId 用户id
+     * @param number 需要关闭的数量，从userid向上递增
+     * @return
+     */
+    @RequestMapping(value = "bankclose")
+    public Result UnionAPI_OPNCL(Integer userId, Integer number) {
+
+        try {
+
+            number = number == null ? 1 : number;
+
+            Map data = new HashMap<String, String>();
+            Map errData = new HashMap<String, String>();
+
+            //最后返回的map
+            Map resultMap = new HashMap<String, ObjectFactory>();
+
+            for (int i = 0; i < number; i++) {
+                Integer lastId = userId + i;
+                Result result = UnionAPI_Opened(lastId);
+                if (result.getStatus() != 1) {
+
+                    ArrayList resuList = (ArrayList) ((HashMap) result.getData()).get("list");
+
+                    for (int k = 0; k < resuList.size(); k++) {
+                        PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+
+                        com.ecc.emp.data.KeyedCollection input = new com.ecc.emp.data.KeyedCollection("input");
+                        com.ecc.emp.data.KeyedCollection output = new com.ecc.emp.data.KeyedCollection("output");
+
+                        input.put("masterId", WalletConstant.QUICK_PAYMENT_ID);
+                        input.put("customerId", lastId);
+                        input.put("OpenId", ((HashMap) resuList.get(k)).get("openId"));
+
+                        output = util.execute(input, "UnionAPI_OPNCL");
+
+                        String errorCode = (String) output.getDataValue("errorCode");
+                        String errorMsg = (String) output.getDataValue("errorMsg");
+                        String masterId = (String) output.getDataValue("masterId");
+                        String customerId = (String) output.getDataValue("customerId");
+                        String status = (String) output.getDataValue("status");
+                        String openId = (String) output.getDataValue("OpenId");
+
+                        if (status.equals("01")) {
+                            Map bank = new HashMap<String, String>();
+                            bank.put("masterId", masterId);
+                            bank.put("openId", openId);
+                            bank.put("customerId", customerId);
+                            bank.put("telephone", (String) output.getDataValue("telephone"));
+                            bank.put("accNo", (String) output.getDataValue("accNo"));
+
+
+                            data.put(lastId + "-" + (k+1), bank);
+                        } else {
+                            Map errMap = new HashMap<String, String>();
+                            errMap.put("errorCode", errorCode);
+                            errMap.put("errorMsg", errorMsg);
+                            errMap.put("masterId", masterId);
+                            errMap.put("customerId", customerId);
+                            errMap.put("openId", openId);
+
+                            errData.put(lastId + "-" + k, errMap);
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            }
+            resultMap.put("data", data);
+            resultMap.put("errData", errData);
+
+            return Result.success().msg("").data(resultMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -222,11 +309,10 @@ public class PinganApi {
             System.out.println("---output---" + output);
 
 
-
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
                 // 短信发送成功
 
                 Map pay = new HashMap<>();
@@ -284,7 +370,7 @@ public class PinganApi {
      * @param verifyCode 短信验证码
      */
     @RequestMapping(value = "commissionsubmit")
-    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId,String pinganOrderId, String paydate, String verifyCode) {
+    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId, String pinganOrderId, String paydate, String verifyCode) {
         try {
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
 
@@ -312,13 +398,13 @@ public class PinganApi {
             String errorMsg = (String) output.getDataValue("errorMsg");
 
 
-             if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
 
                 PinanOrder order = new PinanOrder();
                 order.setMasterId((String) output.getDataValue("masterId"));
                 order.setOrderId((String) output.getDataValue("orderId"));
-                order.setAmount((String)output.getDataValue("amount"));
-                order.setCharge((String)output.getDataValue("charge"));
+                order.setAmount((String) output.getDataValue("amount"));
+                order.setCharge((String) output.getDataValue("charge"));
                 order.setValidtime((String) output.getDataValue("validtime"));
                 order.setCustomerId((String) output.getDataValue("customerId"));
                 order.setAccNo((String) output.getDataValue("accNo"));
@@ -331,7 +417,7 @@ public class PinganApi {
 
 //                OrderApi api = new OrderApi();
 //                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
-                houseOrderService.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
+                houseOrderService.payment(Integer.parseInt(order.getCustomerId()), Integer.parseInt(order.getRemark()));
                 pinanOrderService.create(order);
 
                 return Result.success().msg("").data(new HashMap<>());
@@ -433,7 +519,7 @@ public class PinganApi {
      * @param pinantime
      * @return
      */
-    public  Date pinganTimeToDate(String pinantime)  {
+    public Date pinganTimeToDate(String pinantime) {
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             Date date = formatter.parse(pinantime);
@@ -442,6 +528,47 @@ public class PinganApi {
             e.printStackTrace();
         }
         return new Date();
+    }
+
+
+    /**
+     * 通过银行代码城市代码查询bankno,bankname
+     * @param bankclscode
+     * @param citycode
+     * @return
+     */
+    @RequestMapping(value = "queryBanknameAndNo", method = RequestMethod.POST)
+    public Result queryBanknameAndNo(String bankclscode, String citycode){
+
+        try{
+            Map data = new HashMap<String, Object>();
+            List<Object> list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycode(bankclscode, citycode);
+            data.put("list", list);
+            return Result.success().msg("").data(data);
+        }catch (Exception e){
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+
+    }
+
+    /**
+     * 通过银行代码城市代码和关键字查询bankno,bankname
+     * @param bankclscode
+     * @param citycode
+     * @return
+     */
+    @RequestMapping(value = "queryBanknameAndNo2", method = RequestMethod.POST)
+    public Result queryBanknameAndNo2(String bankclscode, String citycode,String bankname){
+
+        try{
+            Map<String, Object> data = new HashMap<String, Object>();
+            List<Object> list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycodeAndBankname(bankclscode, citycode, bankname);
+            data.put("list", list);
+            return Result.success().msg("").data(data);
+        }catch (Exception e){
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+
     }
 }
 
