@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Created by burgl on 2016/8/16.
  */
-@Service
+@Service("UserServiceImpl")
 @Transactional(readOnly = true)
 public class UserServiceImpl extends AbsCommonService<User> implements UserService {
 

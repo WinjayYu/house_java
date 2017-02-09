@@ -82,17 +82,6 @@ public class Push {
 	
 	public void sendAndroidGroupcast() throws Exception {
 		AndroidGroupcast groupcast = new AndroidGroupcast(appkey,appMasterSecret);
-		/*  TODO
-		 *  Construct the filter condition:
-		 *  "where": 
-		 *	{
-    	 *		"and": 
-    	 *		[
-      	 *			{"tag":"test"},
-      	 *			{"tag":"Test"}
-    	 *		]
-		 *	}
-		 */
 		JSONObject filterJson = new JSONObject();
 		JSONObject whereJson = new JSONObject();
 		JSONArray tagArray = new JSONArray();
@@ -195,16 +184,7 @@ public class Push {
 	
 	public void sendIOSGroupcast() throws Exception {
 		IOSGroupcast groupcast = new IOSGroupcast(appkey,appMasterSecret);
-		/*  TODO
-		 *  Construct the filter condition:
-		 *  "where": 
-		 *	{
-    	 *		"and": 
-    	 *		[
-      	 *			{"tag":"iostest"}
-    	 *		]
-		 *	}
-		 */
+
 		JSONObject filterJson = new JSONObject();
 		JSONObject whereJson = new JSONObject();
 		JSONArray tagArray = new JSONArray();

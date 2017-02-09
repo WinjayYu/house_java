@@ -16,7 +16,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-@Service
+@Service("TradeRecordServiceImpl")
 @Transactional(readOnly = true)
 public class TradeRecordServiceImpl extends AbsCommonService<TradeRecord> implements TradeRecordService {
     protected final static Logger logger = LoggerFactory.getLogger(TradeRecordServiceImpl.class);
@@ -26,19 +26,11 @@ public class TradeRecordServiceImpl extends AbsCommonService<TradeRecord> implem
 
     @Override
     public TradeRecord findByThirdHtId(String thirdHtId) {
-        List<TradeRecord> list = tradeRecordDao.findByThirdHtId(thirdHtId);
-        if(CollectionUtils.isEmpty(list)){
-            return null;
-        }else {
-            if(list.size() > 1){
-                throw new BizException("查询到多条TradeRecord,thirdHtId=" + thirdHtId);
-            }else {
-                return list.get(0);
-            }
-        }
+        return  tradeRecordDao.findByThirdHtId(thirdHtId);
     }
 
     @Override
+    @Transactional
     public TradeRecord create(TradeRecord tradeRecord) {
         return tradeRecordDao.save(tradeRecord);
     }
@@ -48,6 +40,15 @@ public class TradeRecordServiceImpl extends AbsCommonService<TradeRecord> implem
     public TradeRecord update(TradeRecord tradeRecord) {
         TradeRecord dest  = findById(tradeRecord.getId());
         ClassUtil.copyProperties(dest, tradeRecord);
+        return save(dest);
+    }
+
+    @Override
+    @Transactional
+    public TradeRecord updateStatus(String thirdHtId,String status) {
+        TradeRecord dest  = findByThirdHtId(thirdHtId);
+        dest.setStatus(status);
+//        ClassUtil.copyProperties(dest, tradeRecord);
         return save(dest);
     }
 

@@ -1,17 +1,16 @@
 package com.ryel.zaja.pingan;
 
-import com.ryel.zaja.config.Error_code;
-import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.TradeRecordStatus;
-import com.ryel.zaja.entity.TradeRecord;
-import com.ryel.zaja.entity.User;
-import com.ryel.zaja.entity.UserWalletAccount;
 import com.ryel.zaja.service.TradeRecordService;
 import com.ryel.zaja.service.UserService;
 import com.ryel.zaja.service.UserWalletAccountService;
+import com.ryel.zaja.entity.TradeRecord;
+import com.ryel.zaja.entity.User;
+import com.ryel.zaja.entity.UserWalletAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 /**
  * 见证宝钱宝相关配置参数
  */
+@Service
 public class WalletConstant {
 
 	protected final static Logger logger = LoggerFactory.getLogger(WalletConstant.class);
@@ -65,12 +65,13 @@ public class WalletConstant {
 		return SingletonHolder.INSTANCE;
     }
 
-	@Autowired
+    @Autowired
 	private UserService userService;
-	@Autowired
-	private UserWalletAccountService userWalletAccountService;
+
+
 	@Autowired
 	private TradeRecordService tradeRecordService;
+
 
 
 	/**
@@ -78,7 +79,7 @@ public class WalletConstant {
 	 * @param userId
 	 * @return
 	 */
-	public UserWalletAccount openAccount(Integer userId)
+	public User openAccount(Integer userId)
 	{
 		User user = userService.findById(userId);
 		if(user == null){
@@ -114,14 +115,9 @@ public class WalletConstant {
 			String rspCode = (String) retKeyDict.get("RspCode");
 			if ("000000".equals(rspCode)) {
 				// 创建成功，写入数据库
-				UserWalletAccount userWalletAccount = new UserWalletAccount();
-				userWalletAccount.setUserId(user.getId());
-				userWalletAccount.setThirdCustId(user.getId() + "");
-				userWalletAccount.setCustAcctId(custAcctId);
-				userWalletAccount.setMobilePhone(user.getMobile());
-				userWalletAccount.setNickName(user.getUsername());
-				userWalletAccountService.create(userWalletAccount);
-				return userWalletAccount;
+				user.setCustAcctId(custAcctId);
+				userService.update(user);
+				return user;
 			} else {
 				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
 				return null;
@@ -141,7 +137,7 @@ public class WalletConstant {
 	 */
 	public  boolean rechargeMoney(Integer userId, String amount)
 	{
-		UserWalletAccount account = userWalletAccountService.findByUserId(userId);
+		User account = userService.findById(userId);
 		if(account == null){
 			account = openAccount(userId);
 		}
@@ -155,7 +151,7 @@ public class WalletConstant {
 			parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
 
 			parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID);
-			parmaKeyDict.put("ThirdCustId", account.getThirdCustId());
+			parmaKeyDict.put("ThirdCustId", account.getId()+"");
 			parmaKeyDict.put("CustAcctId", account.getCustAcctId());
 			parmaKeyDict.put("TranAmount", amount);
 			parmaKeyDict.put("CcyCode", "RMB");
@@ -203,8 +199,8 @@ public class WalletConstant {
 	 */
 	public  boolean transactionMoney(String flag,Integer outUserId,Integer inUserId,String amount) {
 
-		UserWalletAccount outUserWalletAccount = userWalletAccountService.findByUserId(outUserId);
-		UserWalletAccount inUserWalletAccount = userWalletAccountService.findByUserId(inUserId);
+		User outUserWalletAccount = userService.findById(outUserId);
+		User inUserWalletAccount = userService.findById(inUserId);
 		if(outUserWalletAccount == null){
 			outUserWalletAccount = openAccount(outUserId);
 		}
@@ -216,18 +212,19 @@ public class WalletConstant {
 		HashMap<String,String> retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
 		try {
 			String OutCustAcctId = outUserWalletAccount.getCustAcctId();
-			String OutThirdCustId = outUserWalletAccount.getThirdCustId();
-			String OutCustName = outUserWalletAccount.getNickName();
+			String OutThirdCustId = outUserWalletAccount.getId()+"";
+			String OutCustName = outUserWalletAccount.getUsername();
 
 			String InCustAcctId = inUserWalletAccount.getCustAcctId();
-			String InThirdCustId = inUserWalletAccount.getCustAcctId();
-			String InCustName = inUserWalletAccount.getNickName();
+			String InThirdCustId = inUserWalletAccount.getId()+"";
+			String InCustName = inUserWalletAccount.getUsername();
 
 			String ThirdHtId = PinganUtils.generateThirdHtId();
 
 			parmaKeyDict.put("TranFunc", "6034");
 			parmaKeyDict.put("Qydm", WalletConstant.QYDM);
 			parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo());
+
 			parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID);
 			// 功能标志
 			parmaKeyDict.put("FuncFlag", flag);
@@ -252,6 +249,8 @@ public class WalletConstant {
 			parmaKeyDict.put("CcyCode", "RMB");
 			// 交易单号
 			parmaKeyDict.put("ThirdHtId", ThirdHtId);
+			parmaKeyDict.put("ThirdHtMsg", OutThirdCustId + "——" + InThirdCustId + "资金进入担保账户");
+			parmaKeyDict.put("Note", "资金进入担保账户");
 
 			ZJJZ_API_GW msg = new ZJJZ_API_GW();
 			String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
@@ -282,6 +281,233 @@ public class WalletConstant {
 				tradeRecord.setStatus(TradeRecordStatus.COMMON_ACCOUNT.getCode());
 				tradeRecord.setAddTime(new Date());
 				tradeRecordService.create(tradeRecord);
+				return true;
+			} else {
+				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
+				return false;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		return false;
+	}
+
+	/**
+	 * 会员冻结资金
+	 * @param flag
+	 *  1：冻结（会员→担保）
+	    2：解冻（担保→会员）
+	    3：清分+冻结
+	 * @param outUserId
+	 * @param inUserId
+	 * @param amount
+	 * @return
+	 */
+	public  boolean frozennMoney(String flag,Integer outUserId,Integer inUserId,String amount,String orderId) {
+		User outUserWalletAccount = userService.findById(outUserId);
+		User inUserWalletAccount = userService.findById(inUserId);
+		if(outUserWalletAccount == null){
+			outUserWalletAccount = openAccount(outUserId);
+		}
+		if(inUserWalletAccount == null){
+			inUserWalletAccount = openAccount(inUserId);
+		}
+
+		HashMap<String,String> parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+		HashMap<String,String> retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
+		try {
+			String OutCustAcctId = outUserWalletAccount.getCustAcctId();
+			String OutThirdCustId = outUserWalletAccount.getId() + "";
+			String OutCustName = outUserWalletAccount.getUsername();
+
+			String InCustAcctId = inUserWalletAccount.getCustAcctId();
+			String InThirdCustId = inUserWalletAccount.getId() + "";
+			String InCustName = inUserWalletAccount.getUsername();
+
+			String ThirdHtId = PinganUtils.generateThirdHtId();
+
+			parmaKeyDict.put("TranFunc", "6007");
+			parmaKeyDict.put("Qydm", WalletConstant.QYDM);
+			parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo());
+
+			parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID);
+			// 功能标志
+			parmaKeyDict.put("FuncFlag", flag);
+			// 转入账户
+			parmaKeyDict.put("CustAcctId", InCustAcctId);
+			// 转入账户名称
+			parmaKeyDict.put("ThirdCustId", InThirdCustId);
+			// 转入金额
+			parmaKeyDict.put("TranAmount", amount);
+			// 交易费用
+			parmaKeyDict.put("HandFee", "0");//平台手续费
+			parmaKeyDict.put("CcyCode", "RMB");
+			// 交易单号
+			parmaKeyDict.put("ThirdHtId", ThirdHtId);
+			parmaKeyDict.put("ThirdHtMsg", OutThirdCustId + "——" + InThirdCustId + "资金冻结操作:" + flag);
+
+			ZJJZ_API_GW msg = new ZJJZ_API_GW();
+			String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+
+			msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+			String recvMessage =  retKeyDict.get("RecvMessage");// 银行返回的报文
+
+
+			retKeyDict = msg.parsingTranMessageString(recvMessage);
+			System.out.println("返回报文:=" + retKeyDict);
+			/**
+			 * 第三部分：解析银行返回的报文的实例
+			 */
+			retKeyDict = msg.parsingTranMessageString(recvMessage);
+			String rspCode = (String) retKeyDict.get("RspCode");
+
+			String logNo = retKeyDict.get("FrontLogNo");
+
+			if ("000000".equals(rspCode)) {
+				// 交易成功，记录交易日志
+				TradeRecord tradeRecord = new TradeRecord();
+				tradeRecord.setThirdHtId(ThirdHtId);
+				tradeRecord.setOutCustAcctId(OutCustAcctId);
+				tradeRecord.setOutThirdCustId(OutThirdCustId);
+				tradeRecord.setOutCustName(OutCustName);
+				tradeRecord.setInCustAcctId(InCustAcctId);
+				tradeRecord.setInThirdCustId(InThirdCustId);
+				tradeRecord.setInCustName(InCustName);
+				tradeRecord.setTranAmount(amount);
+				tradeRecord.setStatus(TradeRecordStatus.COMMON_ACCOUNT.getCode());
+				tradeRecord.setAddTime(new Date());
+				tradeRecord.setOrderId(orderId);
+				tradeRecord.setFrontLogNo(logNo);
+				tradeRecordService.create(tradeRecord);
+				return true;
+			} else {
+				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
+				return false;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		return false;
+	}
+
+	/**
+	 * 解除冻结资金
+	 * @param userId
+	 * @param amount
+	 * @param thirdHtId trade 交易流水订单号
+	 * @return
+	 */
+	public  boolean unFrozennMoney(Integer userId,String amount,String thirdHtId) {
+		User userWalletAccount = userService.findById(userId);
+		if(userWalletAccount == null){
+			userWalletAccount = openAccount(userId);
+		}
+		HashMap<String,String> parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+		HashMap<String,String> retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
+		try {
+			String custAcctId = userWalletAccount.getCustAcctId();
+			String thirdCustId = userWalletAccount.getId() + "";
+			String custName = userWalletAccount.getUsername();
+
+
+
+			parmaKeyDict.put("TranFunc", "6007");
+			parmaKeyDict.put("Qydm", WalletConstant.QYDM);
+			parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo());
+
+			parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID);
+			// 功能标志
+			parmaKeyDict.put("FuncFlag", "2");
+			// 转入账户
+			parmaKeyDict.put("CustAcctId", custAcctId);
+			// 转入账户名称
+			parmaKeyDict.put("ThirdCustId", thirdCustId);
+			// 转入金额
+			parmaKeyDict.put("TranAmount", amount);
+			// 交易费用
+			parmaKeyDict.put("HandFee", "0");//平台手续费
+			parmaKeyDict.put("CcyCode", "RMB");
+			// 交易单号
+			parmaKeyDict.put("ThirdHtId", thirdHtId);
+			parmaKeyDict.put("ThirdHtMsg",  thirdCustId + "资金解冻结操作:");
+
+			ZJJZ_API_GW msg = new ZJJZ_API_GW();
+			String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+
+			msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+			String recvMessage =  retKeyDict.get("RecvMessage");// 银行返回的报文
+
+
+			retKeyDict = msg.parsingTranMessageString(recvMessage);
+			System.out.println("返回报文:=" + retKeyDict);
+			/**
+			 * 第三部分：解析银行返回的报文的实例
+			 */
+			retKeyDict = msg.parsingTranMessageString(recvMessage);
+			String rspCode = (String) retKeyDict.get("RspCode");
+			if ("000000".equals(rspCode)) {
+				// 更新交易状态
+				tradeRecordService.updateStatus(thirdHtId,"20");
+				return true;
+			} else {
+				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
+				return false;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		return false;
+	}
+
+	/**
+	 * 交易撤销
+	 * 1：清分撤销（对应撤销6056接口）
+	   2：清分冻结撤销（对应撤销6007接口FuncFlag3）
+	 * @param logNo 交易网流水号
+	 * @param thirdHtId 交易订单
+	 * @return
+	 */
+	public boolean reFundCommission(String logNo,String thirdHtId)
+	{
+		HashMap<String,String> parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+		HashMap<String,String> retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
+		try {
+
+			parmaKeyDict.put("TranFunc", "6077");
+			parmaKeyDict.put("Qydm", WalletConstant.QYDM);
+			parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo());
+
+			parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID);
+			// 功能标志
+			parmaKeyDict.put("FuncFlag", "2");
+			// 转入账户
+			parmaKeyDict.put("OrigThirdLogNo", logNo);
+			// 转入账户名称
+			parmaKeyDict.put("Reserve", "佣金退款");
+
+			ZJJZ_API_GW msg = new ZJJZ_API_GW();
+			String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+
+			msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+			String recvMessage =  retKeyDict.get("RecvMessage");// 银行返回的报文
+
+
+			retKeyDict = msg.parsingTranMessageString(recvMessage);
+			System.out.println("返回报文:=" + retKeyDict);
+			/**
+			 * 第三部分：解析银行返回的报文的实例
+			 */
+			retKeyDict = msg.parsingTranMessageString(recvMessage);
+			String rspCode = (String) retKeyDict.get("RspCode");
+			if ("000000".equals(rspCode)) {
+				// 更新交易状态
+				tradeRecordService.updateStatus(thirdHtId,"30");
 				return true;
 			} else {
 				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));

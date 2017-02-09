@@ -53,6 +53,8 @@ public class PinganApi {
     private HouseOrderService houseOrderService;
     @Autowired
     private ZjjzCnapsBankinfoService zjjzCnapsBankinfoService;
+    @Autowired
+    private WalletConstant wallet;
 
     /**
      * 通过userId 进行开卡前的加密处理
@@ -372,7 +374,8 @@ public class PinganApi {
     /**
      * 后台发出佣金的交易申请
      *
-     * @param userId     会员号
+     * @param fromUserId     from会员号
+     * @param toUserId     to会员号
      * @param openId     银行卡号
      * @param amount     价格
      * @param orderId    订单号
@@ -380,7 +383,7 @@ public class PinganApi {
      * @param verifyCode 短信验证码
      */
     @RequestMapping(value = "commissionsubmit")
-    public Result UnionAPI_Submit(Integer userId, String openId, String amount, String orderId, String pinganOrderId, String paydate, String verifyCode) {
+    public Result UnionAPI_Submit(Integer fromUserId,Integer toUserId, String openId, String amount, String orderId, String pinganOrderId, String paydate, String verifyCode) {
         try {
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
 
@@ -396,7 +399,7 @@ public class PinganApi {
             input.put("paydate", paydate);
             input.put("validtime", "0");//订单有效期(毫秒)，0不生效
             input.put("remark", orderId);
-            input.put("customerId", userId);
+            input.put("customerId", fromUserId);
             input.put("OpenId", openId);
             input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/commissionnotify");
             input.put("verifyCode", verifyCode);// 短信验证码
@@ -425,10 +428,11 @@ public class PinganApi {
                 order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
                 order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
 
-//                OrderApi api = new OrderApi();
-//                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
                 houseOrderService.payment(Integer.parseInt(order.getCustomerId()), Integer.parseInt(order.getRemark()));
                 pinanOrderService.create(order);
+
+                //资金进入会员子账户 和 冻结资金到担保账户
+                wallet.frozennMoney("3",fromUserId,toUserId,amount,orderId);
 
                 return Result.success().msg("").data(new HashMap<>());
             } else {

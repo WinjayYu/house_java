@@ -162,13 +162,15 @@ public class BackManageAPI {
                     String rspCode = (String) retKeyDict.get("RspCode");
                     if ("000000".equals(rspCode) && StringUtils.isNotEmpty(custAcctId)) {
                         // 创建成功，写入数据库
-                        UserWalletAccount userWalletAccount = new UserWalletAccount();
-                        userWalletAccount.setUserId(userId);
-                        userWalletAccount.setThirdCustId(userId.toString());
-                        userWalletAccount.setCustAcctId(custAcctId);
-                        userWalletAccount.setMobilePhone(agent.getMobile());
-                        userWalletAccount.setNickName(username);
-                        userWalletAccountService.create(userWalletAccount);
+//                        UserWalletAccount userWalletAccount = new UserWalletAccount();
+//                        userWalletAccount.setUserId(userId);
+//                        userWalletAccount.setThirdCustId(userId.toString());
+//                        userWalletAccount.setCustAcctId(custAcctId);
+//                        userWalletAccount.setMobilePhone(agent.getMobile());
+//                        userWalletAccount.setNickName(username);
+//                        userWalletAccountService.create(userWalletAccount);
+                        agent.setCustAcctId(custAcctId);
+                        userService.update(agent);
                     } else
                     {
                         logger.error("创建见证宝",retKeyDict.get("RspMsg"));

@@ -35,6 +35,26 @@ public class TradeRecord implements Serializable {
 
     private String Status;
 
+    private String OrderId;
+
+    private String FrontLogNo;
+
+    public String getFrontLogNo() {
+        return FrontLogNo;
+    }
+
+    public void setFrontLogNo(String frontLogNo) {
+        FrontLogNo = frontLogNo;
+    }
+
+    public String getOrderId() {
+        return OrderId;
+    }
+
+    public void setOrderId(String orderId) {
+        OrderId = orderId;
+    }
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
     private Date AddTime;
