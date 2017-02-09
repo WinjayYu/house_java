@@ -435,7 +435,7 @@ public class PinganApi {
                 pinanOrderService.create(order);
 
                  //交易进入担保账户
-                 WalletConstant.getInstance().transactionMoney("8",fromUserId,toUserId,amount);
+                wallet.frozennMoney("3",fromUserId,toUserId,amount,orderId);
 
                 return Result.success().msg("").data(new HashMap<>());
             } else {
@@ -451,10 +451,10 @@ public class PinganApi {
 
 
     @RequestMapping(value = "test")
-    public Result test(Integer fromUserId,Integer toUserId,  String amount) {
+    public Result test(Integer fromUserId,Integer toUserId,  String amount,String type) {
         try {
                 //交易进入担保账户
-                wallet.transactionMoney("8",fromUserId,toUserId,amount);
+                wallet.frozennMoney(type,fromUserId,toUserId,amount,"");
                 return Result.success().msg("").data(new HashMap<>());
 
 
