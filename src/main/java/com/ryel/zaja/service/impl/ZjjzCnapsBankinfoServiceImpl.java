@@ -2,6 +2,7 @@ package com.ryel.zaja.service.impl;
 
 import com.ryel.zaja.dao.ZjjzCnapsBankinfoDao;
 import com.ryel.zaja.entity.ZjjzCnapsBankinfo;
+import com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.ZjjzCnapsBankinfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,12 @@ public class ZjjzCnapsBankinfoServiceImpl extends AbsCommonService<ZjjzCnapsBank
     private ZjjzCnapsBankinfoDao zjjzCnapsBankinfoDao;
 
     @Override
-    public List<Object> findByBankclscodeAndCitycodeAndBankname(String bankclscode, String citycode, String bankname) {
+    public List<ZjjzCnapsBankinfoVo> findByBankclscodeAndCitycodeAndBankname(String bankclscode, String citycode, String bankname) {
         return zjjzCnapsBankinfoDao.findByBankclscodeAndCitycodeAndBankname(bankclscode, citycode, bankname);
     }
 
     @Override
-    public List<Object> findByBankclscodeAndCitycode(String bankclscode, String citycode) {
+    public List<ZjjzCnapsBankinfoVo> findByBankclscodeAndCitycode(String bankclscode, String citycode) {
         return zjjzCnapsBankinfoDao.findByBankclscodeAndCitycode(bankclscode, citycode);
     }
 

@@ -7,6 +7,7 @@ import com.ryel.zaja.config.PinanBankCodeConfig;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.PinanOrder;
 import com.ryel.zaja.entity.ZjjzCnapsBankinfo;
+import com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo;
 import com.ryel.zaja.pingan.WalletConstant;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
@@ -542,7 +543,7 @@ public class PinganApi {
 
         try{
             Map<String, Object> data = new HashMap<String, Object>();
-            List<Object> list;
+            List<ZjjzCnapsBankinfoVo> list;
             if(null != bankname){
                 list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycodeAndBankname(bankclscode, citycode, bankname);
 

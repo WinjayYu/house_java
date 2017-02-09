@@ -1,6 +1,7 @@
 package com.ryel.zaja.dao;
 
 import com.ryel.zaja.entity.ZjjzCnapsBankinfo;
+import com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -13,9 +14,9 @@ import java.util.Map;
  */
 public interface ZjjzCnapsBankinfoDao extends JpaRepository<ZjjzCnapsBankinfo, Integer>,JpaSpecificationExecutor<ZjjzCnapsBankinfo> {
 
-    @Query(value = "select z.bankno as bankno, z.bankname as banknamw from zjjz_cnaps_bankinfo z where z.bankclscode=?1 and z.citycode=?2", nativeQuery = true)
-    List<Object> findByBankclscodeAndCitycode(String bankclscode, String citycode);
+    @Query("select new com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo(z.bankno,z.bankname) from ZjjzCnapsBankinfo z where z.bankclscode=?1 and z.citycode=?2")
+    List<com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo> findByBankclscodeAndCitycode(String bankclscode, String citycode);
 
-    @Query(value = "select z.bankno as bankno, z.bankname as banknamw from zjjz_cnaps_bankinfo z where z.bankclscode=?1 and z.citycode=?2 and z.bankname like CONCAT('%',?3, '%')",nativeQuery = true)
-    List<Object> findByBankclscodeAndCitycodeAndBankname(String bankclscode, String citycode, String bankname);
+    @Query("select new com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo(z.bankno,z.bankname) from ZjjzCnapsBankinfo z where z.bankclscode=?1 and z.citycode=?2 and z.bankname like CONCAT('%',?3, '%')")
+    List<com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo> findByBankclscodeAndCitycodeAndBankname(String bankclscode, String citycode, String bankname);
 }
