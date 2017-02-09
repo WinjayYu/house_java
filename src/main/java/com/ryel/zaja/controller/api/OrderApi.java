@@ -144,8 +144,28 @@ public class OrderApi {
      * @return
      */
     @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
-    public Result receiveOrder(Integer userId, Integer houseOrderId){
-        return changeStatus(userId, houseOrderId,HouseOrderStatus.WAIT_PAYMENT.getCode());
+    public Result receiveOrder(Integer userId, Integer houseOrderId, String idcard, String floor, String username){
+        try{
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
+
+            houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
+            houseOrder.setIdcard(idcard);
+            houseOrder.setFloor(floor);
+            houseOrder.setUsername(username);
+            houseOrderService.update(houseOrder);
+            //更新用户信息
+            User user = new User();
+            user.setId(userId);
+            user.setUsername(username);
+            userService.update(user);
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
     }
 
 
@@ -234,9 +254,9 @@ public class OrderApi {
     /**
      * 用户发起订单
      */
-    @RequestMapping(value = "publishorder")
-    public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
-                               String toMobile, String idcard, String floor, String username, Integer authorId) {
+    @RequestMapping(value = "userpublishorder")
+    public Result publishorder(Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
+                               String toMobile, String idcard, String floor, String username) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -277,7 +297,7 @@ public class OrderApi {
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
-            houseOrder.setAuthorId(authorId);
+            houseOrder.setAuthor(user);
             houseOrder.setUsername(username);
             houseOrder.setFloor(floor);
             houseOrder.setIdcard(idcard);

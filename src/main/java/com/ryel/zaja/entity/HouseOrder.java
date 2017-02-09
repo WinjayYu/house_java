@@ -71,8 +71,9 @@ public class HouseOrder implements Serializable {
 
     private String username;
 
-    @Column(name = "author_id")
-    private Integer authorId;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
 
     public HouseOrder(){}
 
@@ -212,11 +213,11 @@ public class HouseOrder implements Serializable {
         this.username = username;
     }
 
-    public Integer getAuthorId() {
-        return authorId;
+    public User getAuthor() {
+        return author;
     }
 
-    public void setAuthorId(Integer authorId) {
-        this.authorId = authorId;
+    public void setAuthor(User author) {
+        this.author = author;
     }
 }
