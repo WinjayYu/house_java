@@ -1196,5 +1196,28 @@ public class AgentApi {
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
         }
     }
+
+    /**
+     * 经纪人确认接单,状态值从"10"变成"20"
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "agentreceiveorder", method = RequestMethod.POST)
+    public Result agentReceiveOrder(Integer userId, Integer houseOrderId){
+        try{
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
+
+            houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
+            houseOrderService.update(houseOrder);
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
 }
 
