@@ -48,6 +48,10 @@ public class PinganApi {
     private HouseOrderService houseOrderService;
     @Autowired
     private UserWalletAccountService userWalletAccountService;
+
+    @Autowired
+    private WalletConstant wallet;
+
     /**
      * 通过userId 进行开卡前的加密处理
      *
@@ -345,14 +349,28 @@ public class PinganApi {
                 pinanOrderService.create(order);
 
                  //交易进入担保账户
-                 WalletConstant wallet = WalletConstant.getInstance();
-                 wallet.transactionMoney("8",fromUserId,toUserId,amount);
+                 WalletConstant.getInstance().transactionMoney("8",fromUserId,toUserId,amount);
 
                 return Result.success().msg("").data(new HashMap<>());
             } else {
 
                 return Result.error().msg(errorMsg).data(new HashMap<>());
             }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+
+    @RequestMapping(value = "test")
+    public Result test(Integer fromUserId,Integer toUserId,  String amount) {
+        try {
+                //交易进入担保账户
+                wallet.transactionMoney("8",fromUserId,toUserId,amount);
+                return Result.success().msg("").data(new HashMap<>());
+
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
