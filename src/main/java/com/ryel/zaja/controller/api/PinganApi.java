@@ -538,31 +538,17 @@ public class PinganApi {
      * @return
      */
     @RequestMapping(value = "queryBanknameAndNo", method = RequestMethod.POST)
-    public Result queryBanknameAndNo(String bankclscode, String citycode){
-
-        try{
-            Map data = new HashMap<String, Object>();
-            List<Object> list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycode(bankclscode, citycode);
-            data.put("list", list);
-            return Result.success().msg("").data(data);
-        }catch (Exception e){
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-
-    }
-
-    /**
-     * 通过银行代码城市代码和关键字查询bankno,bankname
-     * @param bankclscode
-     * @param citycode
-     * @return
-     */
-    @RequestMapping(value = "queryBanknameAndNo2", method = RequestMethod.POST)
-    public Result queryBanknameAndNo2(String bankclscode, String citycode,String bankname){
+    public Result queryBanknameAndNo(String bankclscode, String citycode,String bankname){
 
         try{
             Map<String, Object> data = new HashMap<String, Object>();
-            List<Object> list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycodeAndBankname(bankclscode, citycode, bankname);
+            List<Object> list;
+            if(null != bankname){
+                list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycodeAndBankname(bankclscode, citycode, bankname);
+
+            }else {
+                list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycode(bankclscode, citycode);
+            }
             data.put("list", list);
             return Result.success().msg("").data(data);
         }catch (Exception e){
@@ -570,5 +556,6 @@ public class PinganApi {
         }
 
     }
+
 }
 
