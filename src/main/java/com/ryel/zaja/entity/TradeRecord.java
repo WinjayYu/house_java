@@ -17,47 +17,36 @@ public class TradeRecord implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String ThirdHtId;
+    private String thirdHtId;
 
-    private String OutCustAcctId;
+    private String outCustAcctId;
 
-    private String OutThirdCustId;
+    @ManyToOne
+    @JoinColumn(name = "outThirdCustId")
+    private User outThirdCustId;
 
-    private String OutCustName;
+    private String outCustName;
 
-    private String InCustAcctId;
+    private String inCustAcctId;
 
-    private String InThirdCustId;
+    @ManyToOne
+    @JoinColumn(name = "inThirdCustId")
+    private User inThirdCustId;
 
-    private String InCustName;
+    private String inCustName;
 
-    private String TranAmount;
+    private String tranAmount;
 
-    private String Status;
+    private String status;
 
-    private String OrderId;
+    private String orderId;
 
-    private String FrontLogNo;
+    private String frontLogNo;
 
-    public String getFrontLogNo() {
-        return FrontLogNo;
-    }
-
-    public void setFrontLogNo(String frontLogNo) {
-        FrontLogNo = frontLogNo;
-    }
-
-    public String getOrderId() {
-        return OrderId;
-    }
-
-    public void setOrderId(String orderId) {
-        OrderId = orderId;
-    }
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
-    private Date AddTime;
+    private Date addTime;
 
     public TradeRecord(){}
 
@@ -71,83 +60,99 @@ public class TradeRecord implements Serializable {
         this.id = id;
     }
 
+    public User getOutThirdCustId() {
+        return outThirdCustId;
+    }
+
+    public void setOutThirdCustId(User outThirdCustId) {
+        this.outThirdCustId = outThirdCustId;
+    }
+
+    public User getInThirdCustId() {
+        return inThirdCustId;
+    }
+
+    public void setInThirdCustId(User inThirdCustId) {
+        this.inThirdCustId = inThirdCustId;
+    }
+
     public String getThirdHtId() {
-        return ThirdHtId;
+        return thirdHtId;
     }
 
     public void setThirdHtId(String thirdHtId) {
-        ThirdHtId = thirdHtId;
+        this.thirdHtId = thirdHtId;
     }
 
     public String getOutCustAcctId() {
-        return OutCustAcctId;
+        return outCustAcctId;
     }
 
     public void setOutCustAcctId(String outCustAcctId) {
-        OutCustAcctId = outCustAcctId;
-    }
-
-    public String getOutThirdCustId() {
-        return OutThirdCustId;
-    }
-
-    public void setOutThirdCustId(String outThirdCustId) {
-        OutThirdCustId = outThirdCustId;
+        this.outCustAcctId = outCustAcctId;
     }
 
     public String getOutCustName() {
-        return OutCustName;
+        return outCustName;
     }
 
     public void setOutCustName(String outCustName) {
-        OutCustName = outCustName;
+        this.outCustName = outCustName;
     }
 
     public String getInCustAcctId() {
-        return InCustAcctId;
+        return inCustAcctId;
     }
 
     public void setInCustAcctId(String inCustAcctId) {
-        InCustAcctId = inCustAcctId;
-    }
-
-    public String getInThirdCustId() {
-        return InThirdCustId;
-    }
-
-    public void setInThirdCustId(String inThirdCustId) {
-        InThirdCustId = inThirdCustId;
+        this.inCustAcctId = inCustAcctId;
     }
 
     public String getInCustName() {
-        return InCustName;
+        return inCustName;
     }
 
     public void setInCustName(String inCustName) {
-        InCustName = inCustName;
+        this.inCustName = inCustName;
     }
 
     public String getTranAmount() {
-        return TranAmount;
+        return tranAmount;
     }
 
     public void setTranAmount(String tranAmount) {
-        TranAmount = tranAmount;
+        this.tranAmount = tranAmount;
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(String status) {
-        Status = status;
+        this.status = status;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getFrontLogNo() {
+        return frontLogNo;
+    }
+
+    public void setFrontLogNo(String frontLogNo) {
+        this.frontLogNo = frontLogNo;
     }
 
     public Date getAddTime() {
-        return AddTime;
+        return addTime;
     }
 
     public void setAddTime(Date addTime) {
-        AddTime = addTime;
+        this.addTime = addTime;
     }
 }

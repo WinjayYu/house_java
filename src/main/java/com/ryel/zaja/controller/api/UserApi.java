@@ -170,13 +170,6 @@ public class UserApi {
                 String rspCode = (String) retKeyDict.get("RspCode");
                 if ("000000".equals(rspCode) && StringUtils.isNotEmpty(custAcctId)) {
                     // 创建成功，写入数据库
-//                    UserWalletAccount userWalletAccount = new UserWalletAccount();
-//                    userWalletAccount.setUserId(user.getId());
-//                    userWalletAccount.setThirdCustId(user.getId() +"");
-//                    userWalletAccount.setCustAcctId(custAcctId);
-//                    userWalletAccount.setMobilePhone(user.getMobile());
-//                    userWalletAccount.setNickName(user.getUsername());
-//                    userWalletAccountService.create(userWalletAccount);
                     user.setCustAcctId(custAcctId);
                     userService.update(user);
                 } else
@@ -380,7 +373,6 @@ public class UserApi {
         stringRedisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
-
 
             JSONObject jsonObj = new JSONObject(textEntity);
             int error_code = jsonObj.getInt("error");

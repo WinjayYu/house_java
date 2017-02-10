@@ -272,10 +272,10 @@ public class WalletConstant {
 				TradeRecord tradeRecord = new TradeRecord();
 				tradeRecord.setThirdHtId(ThirdHtId);
 				tradeRecord.setOutCustAcctId(OutCustAcctId);
-				tradeRecord.setOutThirdCustId(OutThirdCustId);
+				tradeRecord.setOutThirdCustId(outUserWalletAccount);
 				tradeRecord.setOutCustName(OutCustName);
 				tradeRecord.setInCustAcctId(InCustAcctId);
-				tradeRecord.setInThirdCustId(InThirdCustId);
+				tradeRecord.setInThirdCustId(inUserWalletAccount);
 				tradeRecord.setInCustName(InCustName);
 				tradeRecord.setTranAmount(amount);
 				tradeRecord.setStatus(TradeRecordStatus.COMMON_ACCOUNT.getCode());
@@ -370,10 +370,10 @@ public class WalletConstant {
 				TradeRecord tradeRecord = new TradeRecord();
 				tradeRecord.setThirdHtId(ThirdHtId);
 				tradeRecord.setOutCustAcctId(OutCustAcctId);
-				tradeRecord.setOutThirdCustId(OutThirdCustId);
+				tradeRecord.setOutThirdCustId(outUserWalletAccount);
 				tradeRecord.setOutCustName(OutCustName);
 				tradeRecord.setInCustAcctId(InCustAcctId);
-				tradeRecord.setInThirdCustId(InThirdCustId);
+				tradeRecord.setInThirdCustId(inUserWalletAccount);
 				tradeRecord.setInCustName(InCustName);
 				tradeRecord.setTranAmount(amount);
 				tradeRecord.setStatus(TradeRecordStatus.COMMON_ACCOUNT.getCode());

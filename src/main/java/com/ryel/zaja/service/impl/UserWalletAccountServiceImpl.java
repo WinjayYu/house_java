@@ -1,6 +1,5 @@
 package com.ryel.zaja.service.impl;
 
-import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.UserWalletAccountDao;
 import com.ryel.zaja.entity.UserWalletAccount;
 import com.ryel.zaja.service.AbsCommonService;
@@ -12,11 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-@Service("UserWalletAccountServiceImpl")
+@Service
 @Transactional(readOnly = true)
 public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAccount> implements UserWalletAccountService {
     protected final static Logger logger = LoggerFactory.getLogger(UserWalletAccountServiceImpl.class);
@@ -25,17 +23,8 @@ public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAcc
     private UserWalletAccountDao userWalletAccountDao;
 
     @Override
-    public UserWalletAccount findByUserId(Integer userId) {
-        List<UserWalletAccount> list = userWalletAccountDao.findByUserId(userId);
-        if(CollectionUtils.isEmpty(list)){
-            return null;
-        }else {
-            if(list.size() > 1){
-                throw new BizException("查询到多条UserWalletAccount,userId=" + userId);
-            }else {
-                return list.get(0);
-            }
-        }
+    public List<UserWalletAccount> findByUserId(Integer userId) {
+        return  userWalletAccountDao.findByUserId(userId);
     }
 
     @Override
@@ -50,6 +39,11 @@ public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAcc
         UserWalletAccount dest  = findById(userWalletAccount.getId());
         ClassUtil.copyProperties(dest, userWalletAccount);
         return save(dest);
+    }
+
+    @Override
+    public UserWalletAccount findByACcId(String aCcId) {
+        return userWalletAccountDao.findByACctId(aCcId);
     }
 
     @Override

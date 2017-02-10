@@ -82,7 +82,7 @@ public class AgentApi {
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public Result login(String mobile, String password) {
-        try {
+            try {
             if (StringUtils.isBlank(mobile) || StringUtils.isBlank(password)) {
                 return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }

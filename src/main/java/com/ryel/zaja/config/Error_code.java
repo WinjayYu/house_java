@@ -80,5 +80,7 @@ public interface Error_code {
 
     String ERROR_CODE_0051 = "error_51";   //  【平安】提现异常
 
+    String ERROR_CODE_0052 = "error_52";   //  【平安】此卡号已被绑定
+
 
 }

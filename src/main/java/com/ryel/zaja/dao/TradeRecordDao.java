@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface TradeRecordDao extends JpaRepository<TradeRecord, Integer> ,JpaSpecificationExecutor<TradeRecord> {
-    @Query("select t from TradeRecord t where t.ThirdHtId = ?1")
+    @Query("select t from TradeRecord t where t.thirdHtId = ?1")
     TradeRecord findByThirdHtId(String thirdHtId);
 }

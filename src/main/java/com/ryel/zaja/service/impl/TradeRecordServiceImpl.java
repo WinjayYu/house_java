@@ -16,7 +16,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-@Service("TradeRecordServiceImpl")
+@Service
 @Transactional(readOnly = true)
 public class TradeRecordServiceImpl extends AbsCommonService<TradeRecord> implements TradeRecordService {
     protected final static Logger logger = LoggerFactory.getLogger(TradeRecordServiceImpl.class);
