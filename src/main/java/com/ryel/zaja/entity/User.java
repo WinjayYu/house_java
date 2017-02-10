@@ -47,6 +47,8 @@ public class User implements Serializable {
 
     private String custAcctId;
 
+    private String idcard;
+
     public String getCustAcctId() {
         return custAcctId;
     }
@@ -139,5 +141,13 @@ public class User implements Serializable {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
+    }
+
+    public String getIdcard() {
+        return idcard;
+    }
+
+    public void setIdcard(String idcard) {
+        this.idcard = idcard;
     }
 }

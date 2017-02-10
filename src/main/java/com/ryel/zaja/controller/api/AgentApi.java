@@ -941,7 +941,7 @@ public class AgentApi {
      */
     @RequestMapping(value = "publishorder")
     public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
-                                    String toMobile) {
+                                    String toMobile, BigDecimal discount) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -998,6 +998,9 @@ public class AgentApi {
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
+
+            discount = discount == null ? BigDecimal.ZERO : discount;
+            houseOrder.setDiscount(discount);
 
             houseOrderService.save(houseOrder);
 
@@ -1258,11 +1261,14 @@ public class AgentApi {
      * @return
      */
     @RequestMapping(value = "agentreceiveorder", method = RequestMethod.POST)
-    public Result agentReceiveOrder(Integer userId, Integer houseOrderId){
+    public Result agentReceiveOrder(Integer userId, Integer houseOrderId, BigDecimal discount){
         try{
             HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
+
+            discount = discount == null ? BigDecimal.ZERO : discount;
+            houseOrder.setDiscount(discount);
             houseOrderService.update(houseOrder);
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){

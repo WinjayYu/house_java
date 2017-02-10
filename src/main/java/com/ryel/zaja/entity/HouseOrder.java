@@ -75,6 +75,8 @@ public class HouseOrder implements Serializable {
     @JoinColumn(name = "author_id")
     private User author;
 
+    private BigDecimal discount;
+
     public HouseOrder(){}
 
     public Integer getId() {
@@ -219,5 +221,13 @@ public class HouseOrder implements Serializable {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
     }
 }

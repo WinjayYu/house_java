@@ -149,13 +149,14 @@ public class OrderApi {
             HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
-            houseOrder.setIdcard(idcard);
             houseOrder.setFloor(floor);
+            houseOrder.setIdcard(idcard);
             houseOrder.setUsername(username);
             houseOrderService.update(houseOrder);
             //更新用户信息
             User user = new User();
             user.setId(userId);
+            user.setIdcard(idcard);
             user.setUsername(username);
             userService.update(user);
             return Result.success().msg("").data(new HashMap<>());
@@ -298,11 +299,16 @@ public class OrderApi {
             houseOrder.setPrice(price);
             houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
             houseOrder.setAuthor(user);
-            houseOrder.setUsername(username);
             houseOrder.setFloor(floor);
             houseOrder.setIdcard(idcard);
+            houseOrder.setUsername(username);
 
             houseOrderService.save(houseOrder);
+
+            //更新用户信息
+            user.setUsername(username);
+            user.setIdcard(idcard);
+            userService.update(user);
 
             //发送推送信息
             PushDevice pushDevice = pushService.findByUser(agent);
