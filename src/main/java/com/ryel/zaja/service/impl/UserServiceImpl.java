@@ -194,6 +194,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             //更新用户
             agent.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             agent.setType(UserType.AGENT.getCode());
+            agent.setIdcard(agentMaterial.getIdcard());
             update(agent);
 
             user = agent;
@@ -203,6 +204,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             user.setHead(AGENT_HEAD);//默认头像
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
+            user.setIdcard(agentMaterial.getIdcard());
             create(user);
         }
         // 上传图片

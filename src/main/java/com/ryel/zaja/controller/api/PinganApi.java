@@ -271,7 +271,7 @@ public class PinganApi {
                             errMap.put("customerId", customerId);
                             errMap.put("openId", openId);
 
-                            errData.put(lastId + "-" + k, errMap);
+                            errData.put(lastId + "-" + (k+1), errMap);
                         }
                     }
                 } else {

@@ -129,6 +129,7 @@ public class UserApi {
             user.setNickname("");
             user.setUsername("");
             user.setAgentStatus("");
+            user.setIdcard("");
             if (null == user.getSex()) {
                 user.setSex("30");//未设置
             }
