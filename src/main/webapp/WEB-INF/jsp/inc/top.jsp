@@ -6,7 +6,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="dashboard">后台管理系统</a>
+    <a class="navbar-brand" href="home"><img src="static/images/logo.png" alt=""></a>
 </div>
 <!-- /.navbar-header -->
 

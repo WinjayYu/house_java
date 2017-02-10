@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ryel</groupId>
-    <artifactId>zaja</artifactId>
+    <artifactId>house</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -31,49 +31,29 @@
 
 
     <profiles>
-        <profile>
-            <id>gaoll</id>
-            <properties>
-                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
-                <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>1234</spring.dataSource.password>
-                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
-                <pro.upload.path>D:/work/tomcat/apache-tomcat-7.0.65/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
-            </properties>
-        </profile>
+
         <profile>
             <id>ywj</id>
             <properties>
-                <spring.dataSource.url>jdbc:mysql://106.75.93.24:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.url>jdbc:mysql://115.159.95.132:3306/house?characterEncoding=utf-8</spring.dataSource.url>
                 <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>Za123ja2016</spring.dataSource.password>
-                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
+                <spring.dataSource.password>helloworld</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/house</doc.base.url>
                 <pro.upload.path>D:/tomcat-8.5.8/webapps/files/upload/</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>
-        <profile>
-            <id>hefei</id>
-        <properties>
-            <spring.dataSource.url>jdbc:mysql://106.75.93.24:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
-            <spring.dataSource.username>root</spring.dataSource.username>
-            <spring.dataSource.password>Za123ja2016</spring.dataSource.password>
-            <doc.base.url>http://localhost:8080/zaja</doc.base.url>
-            <pro.upload.path>/usr/local/apache-tomcat-8.5.9/webapps/files/upload/</pro.upload.path>
-            <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
-        </properties>
-        </profile>
+
 
         <profile>
             <id>web</id>
             <properties>
-                <spring.dataSource.url>jdbc:mysql://106.75.93.24:3306/zaja?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.url>jdbc:mysql://115.159.95.132:3306/house?characterEncoding=utf-8</spring.dataSource.url>
                 <spring.dataSource.username>root</spring.dataSource.username>
-                <spring.dataSource.password>Za123ja2016</spring.dataSource.password>
-                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
+                <spring.dataSource.password>helloworld</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/house</doc.base.url>
                 <pro.upload.path>/usr/local/tomcat8.5/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>https://zaja.xin/files/upload/</pro.upload.url>
+                <pro.upload.url>https://ylili.cn/files/upload/</pro.upload.url>
             </properties>
         </profile>
     </profiles>

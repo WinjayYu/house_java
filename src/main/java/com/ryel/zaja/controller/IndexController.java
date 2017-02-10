@@ -71,15 +71,15 @@ public class IndexController extends BaseController{
     @RequestMapping(value = "/")
     public String index(){
 
-        return "redirect:/dashboard";
+        return "redirect:/home";
     }
 
 
-    @RequestMapping(value = "/dashboard")
-    public String dashboard(HttpServletRequest request,
+    @RequestMapping(value = "/home")
+    public String home(HttpServletRequest request,
                             HttpServletResponse response,
                             ModelMap model) {
-        return "控制面板";
+        return "首页";
     }
 
 

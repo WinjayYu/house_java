@@ -13,7 +13,7 @@
     <%@ include file="inc/meta.jsp" %>
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>控制面板</title>
+    <title>首页</title>
     <%@ include file="inc/css.jsp" %>
 </head>
 
@@ -26,7 +26,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">控制面板</h1>
+                <h1 class="page-header">home</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>

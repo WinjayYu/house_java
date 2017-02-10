@@ -6,18 +6,22 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.PinanBankCodeConfig;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.entity.PinanOrder;
+import com.ryel.zaja.entity.ZjjzCnapsBankinfo;
 import com.ryel.zaja.pingan.WalletConstant;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
 import com.ryel.zaja.service.PinanOrderService;
+import com.ryel.zaja.service.ZjjzCnapsBankinfoService;
 import com.ryel.zaja.utils.JsonUtil;
 import com.sdb.payclient.bean.exception.CsiiException;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +41,8 @@ public class PinganApi {
     private PinanOrderService pinanOrderService;
     @Autowired
     private HouseOrderService houseOrderService;
+    @Autowired
+    private ZjjzCnapsBankinfoService zjjzCnapsBankinfoService;
     /**
      * 通过userId 进行开卡前的加密处理
      *
@@ -442,6 +448,26 @@ public class PinganApi {
             e.printStackTrace();
         }
         return new Date();
+    }
+
+    /**
+     * 通过银行代码城市代码查询bankno,bankname
+     * @param bankclscode
+     * @param citycode
+     * @return
+     */
+    @RequestMapping(value = "queryBanknameAndNo", method = RequestMethod.POST)
+    public Result queryBanknameAndNo(String bankclscode, String citycode){
+
+        try{
+            Map data = new HashMap<String, Object>();
+            List<ZjjzCnapsBankinfo> list = zjjzCnapsBankinfoService.findByBankclscodeAndCitycode(bankclscode, citycode);
+            data.put("list", list);
+            return Result.success().msg("").data(data);
+        }catch (Exception e){
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+
     }
 }
 

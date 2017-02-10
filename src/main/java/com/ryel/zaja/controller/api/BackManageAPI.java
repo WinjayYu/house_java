@@ -293,4 +293,38 @@ public class BackManageAPI {
         }
         return newUrl;
     }
+
+    /**
+     * @api {post} /api/user/login 2.APP用户登陆
+     * @apiVersion 0.0.1
+     * @apiName user.login
+     * @apiGroup user
+     * @apiDescription 用户登录
+     * @apiParam {STRING} mobile 手机
+     * @apiParam {STRING} password 密码
+     * @apiSuccess {Result} Result 返回结果
+     * @apiUse UserInfo
+     */
+    @RequestMapping("/user/login")
+    public String login(String mobile, String password) {
+        User origUser = userService.login(mobile, password);
+        if(null == origUser) {
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
+            return JsonUtil.obj2ApiJson(result);
+        }
+        if("".equals(origUser.getPassword())){
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0030);//未设置密码
+            return JsonUtil.obj2ApiJson(result);
+        }
+        origUser.setPassword("");
+        Result result = Result.success().msg("").data(user2map(origUser));
+        return JsonUtil.obj2ApiJson(result);
+    }
+
+
+    private Map<String, Object> user2map(User user) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("user", user);
+        return result;
+    }
 }

@@ -106,6 +106,17 @@ public class HouseController extends BaseController {
                     e.printStackTrace();
                 }
 
+                List<String> newList = new ArrayList<String>();
+                if (!CollectionUtils.isEmpty(imageList)) {
+                    for (String imageUrl : imageList) {
+                        String newUrl = localUrlToQiniuUrl(imageUrl, house.getId().toString());
+                        newList.add(newUrl);
+                    }
+                }
+                String newImgs = JsonUtil.obj2Json(newList);
+                house.setImgs(newImgs);
+                house.setCover(newList.get(0));
+
                 try {
                     //删除本地图片
                     for (String str : imageList) {
@@ -121,16 +132,6 @@ public class HouseController extends BaseController {
                     logger.error("删除本地图片失败！");
                 }
 
-                List<String> newList = new ArrayList<String>();
-                if (!CollectionUtils.isEmpty(imageList)) {
-                    for (String imageUrl : imageList) {
-                        String newUrl = localUrlToQiniuUrl(imageUrl, house.getId().toString());
-                        newList.add(newUrl);
-                    }
-                }
-                String newImgs = JsonUtil.obj2Json(newList);
-                house.setImgs(newImgs);
-                house.setCover(newList.get(0));
             }
         }else {
             house.setStatus(HouseStatus.REJECT.getCode());
