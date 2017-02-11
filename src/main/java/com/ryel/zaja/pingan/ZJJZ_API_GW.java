@@ -1,5 +1,6 @@
 package com.ryel.zaja.pingan;
 
+import com.ryel.zaja.controller.api.pingan.WalletConstant;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;

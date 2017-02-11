@@ -82,5 +82,7 @@ public interface Error_code {
 
     String ERROR_CODE_0052 = "error_52";   //  【平安】此卡号已被绑定
 
+    String ERROR_CODE_0053 = "error_53";   //  【平安】支付短信发送过于频繁，休息一下
+
 
 }

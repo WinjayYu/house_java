@@ -1,10 +1,7 @@
 package com.ryel.zaja.utils;
 
 import com.ryel.zaja.config.bean.Result;
-import com.ryel.zaja.entity.AgentLocation;
-import com.ryel.zaja.entity.House;
-import com.ryel.zaja.entity.SellHouse;
-import com.ryel.zaja.entity.User;
+import com.ryel.zaja.entity.*;
 import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
@@ -40,6 +37,10 @@ public class APIFactory{
             }
             if(ob instanceof SellHouse){
                 newList.add(filterSellHouse((SellHouse)ob));
+            }
+            if(ob instanceof TradeRecord)
+            {
+                newList.add(filterTradeRecord((TradeRecord)ob));
             }
         }
 
@@ -176,6 +177,22 @@ public class APIFactory{
         sellHouseMap.put("num",sellHouse.getNum()*3 + new Random().nextInt(3));
         sellHouseMap.put("user",filterUser(sellHouse.getUser()));
 
+        return  sellHouseMap;
+    }
+
+
+    /**
+     * 过滤交易订单类 TradeRecord
+     * @param tradeRecord
+     * @return
+     */
+    private static Map<String,Object> filterTradeRecord(TradeRecord tradeRecord) {
+        Map<String, Object> sellHouseMap = new HashMap<String, Object>();
+        sellHouseMap.put("id",tradeRecord.getId());
+        sellHouseMap.put("addTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(tradeRecord.getAddTime()));
+        sellHouseMap.put("outUser",tradeRecord.getOutThirdCustId());
+        sellHouseMap.put("status",tradeRecord.getStatus());
+        sellHouseMap.put("tranAmount",tradeRecord.getTranAmount());
         return  sellHouseMap;
     }
 

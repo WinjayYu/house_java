@@ -39,7 +39,7 @@ public class TradeRecord implements Serializable {
 
     private String status;
 
-    private String orderId;
+    private Integer orderId;
 
     private String frontLogNo;
 
@@ -132,11 +132,11 @@ public class TradeRecord implements Serializable {
         this.status = status;
     }
 
-    public String getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 

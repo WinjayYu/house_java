@@ -4,28 +4,23 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.AgentRegisterStatus;
 import com.ryel.zaja.config.enums.HouseStatus;
-import com.ryel.zaja.controller.HouseController;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.pingan.PinganUtils;
-import com.ryel.zaja.pingan.WalletConstant;
+import com.ryel.zaja.controller.api.pingan.WalletConstant;
 import com.ryel.zaja.pingan.ZJJZ_API_GW;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
-import com.ryel.zaja.utils.DataTableFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
+import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -58,7 +53,11 @@ public class BackManageAPI {
     @Autowired
     private DefaultUploadFile defaultUploadFile;
     @Autowired
-    private UserWalletAccountService userWalletAccountService;
+    private TradeRecordService tradeRecordService;
+    @Autowired
+    private WalletConstant wallet;
+    @Autowired
+    private PinganOrderService pinganOrderService;
 
 
     private final String remoteUrlHead = "http://img.zaja.xin/";
@@ -345,4 +344,64 @@ public class BackManageAPI {
         }
         return newUrl;
     }
+
+    /**
+     * 退款订单审核
+     * @param orderId
+     * @return
+     */
+    @RequestMapping("refundOrder")
+    public Result refundOrder(Integer orderId)
+    {
+        try {
+            //见证宝交易撤销
+            TradeRecord tradeRecord = tradeRecordService.findByOrderId(orderId);
+            wallet.reFundCommission(tradeRecord.getFrontLogNo(),tradeRecord.getThirdHtId());
+            //快捷支付退款
+
+            PinganOrder pinganOrder = pinganOrderService.findByOrderId(orderId);
+
+
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+            com.ecc.emp.data.KeyedCollection input = new com.ecc.emp.data.KeyedCollection("input");
+            com.ecc.emp.data.KeyedCollection output = new com.ecc.emp.data.KeyedCollection("output");
+            String timestamp;
+            String datetamp;
+            java.util.Calendar calendar = java.util.Calendar.getInstance();
+            java.util.Date date = calendar.getTime();
+            java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyyMMddHHmmss");
+            timestamp = formatter.format(date);
+            datetamp = timestamp.substring(0, 8);
+
+            String masterId = WalletConstant.QUICK_PAYMENT_ID;
+            input.put("masterId", masterId);
+            input.put("refundNo", pinganOrder.getPinganOrderId());
+            input.put("orderId", PinganUtils.getOderId(masterId, datetamp));
+            input.put("currency", "RMB");
+            input.put("refundAmt", pinganOrder.getAmount());
+            input.put("objectName", "客户达成退款协议，要求退款");
+            input.put("remark", "");
+            input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/refundorder");
+
+            output = util.execute(input, "KH0005");
+
+
+            System.out.println("---output---" + output);
+
+
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
+                // 退款成功
+                return Result.success().msg("").data(new HashMap<>());
+            }else{
+                return Result.error().msg(errorMsg).data(new HashMap<>());
+            }
+        } catch (Exception e) {
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+
+        }
+    }
+
 }

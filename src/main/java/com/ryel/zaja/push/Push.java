@@ -86,11 +86,8 @@ public class Push {
 		JSONObject whereJson = new JSONObject();
 		JSONArray tagArray = new JSONArray();
 		JSONObject testTag = new JSONObject();
-		JSONObject TestTag = new JSONObject();
 		testTag.put("tag", "test");
-		TestTag.put("tag", "Test");
 		tagArray.put(testTag);
-		tagArray.put(TestTag);
 		whereJson.put("and", tagArray);
 		filterJson.put("where", whereJson);
 		System.out.println(filterJson.toString());

@@ -45,7 +45,7 @@ public class PinganApiLogServiceImpl extends AbsCommonService<PinganApiLog> impl
 
     @Override
     @Transactional
-    public PinganApiLog create(PinganApiEnum pinganApiEnum, String request, String response, Integer userId) {
+    public PinganApiLog create(PinganApiEnum pinganApiEnum, String request, String response, String thirdlogno) {
         PinganApiLog pinganApiLog = new PinganApiLog();
         try {
             pinganApiLog.setCode(pinganApiEnum.getCode());
@@ -53,9 +53,8 @@ public class PinganApiLogServiceImpl extends AbsCommonService<PinganApiLog> impl
             pinganApiLog.setPinganCode(pinganApiEnum.getPinganCode());
             pinganApiLog.setRequest(request);
             pinganApiLog.setResponse(response);
-            pinganApiLog.setAddBy(userId);
+            pinganApiLog.setThirdLogNo(thirdlogno);
             pinganApiLog.setAddTime(new Date());
-            logger.info(JsonUtil.obj2Json(pinganApiLog));
             return pinganApiLogDao.save(pinganApiLog);
         } catch (Exception e) {
             logger.error("保存PinganApiLog异常", e);

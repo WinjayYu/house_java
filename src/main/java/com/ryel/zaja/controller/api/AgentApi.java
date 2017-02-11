@@ -75,6 +75,8 @@ public class AgentApi {
     private AgentLocationService agentLocationService;
     @Autowired
     private FeedbackService feedbackService;
+    @Autowired
+    private TradeRecordService tradeRecordService;
 
     /**
      * 登录
@@ -576,21 +578,6 @@ public class AgentApi {
         }
     }
 
-    /**
-     * 我的佣金 前20条
-     */
-    @RequestMapping(value = "mycommission", method = RequestMethod.POST)
-    public Result mycommission(Integer agentId) {
-        try {
-            List<HouseOrder> list = houseOrderService.findPayedOrderByAgentId(agentId);
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("list", list);
-            return Result.success().data(dataMap);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
 
     /**
      * 更新房源
@@ -1256,14 +1243,14 @@ public class AgentApi {
 
     /**
      * 经纪人确认接单,状态值从"10"变成"20"
-     * @param userId
+     * @param agentId
      * @param houseOrderId
      * @return
      */
     @RequestMapping(value = "agentreceiveorder", method = RequestMethod.POST)
-    public Result agentReceiveOrder(Integer userId, Integer houseOrderId, BigDecimal discount){
+    public Result agentReceiveOrder(Integer agentId, Integer houseOrderId, BigDecimal discount){
         try{
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, houseOrderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
 
@@ -1271,6 +1258,26 @@ public class AgentApi {
             houseOrder.setDiscount(discount);
             houseOrderService.update(houseOrder);
             return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 我的佣金历史记录
+     * @param agentId
+     * @return
+     */
+    @RequestMapping(value = "intomoneyhistory", method = RequestMethod.POST)
+    public Result intoMoneyHistory(Integer agentId){
+        try{
+            Page<TradeRecord> page = tradeRecordService.findByInThirdCustId(agentId);
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            return Result.success().msg("").data(dataMap);
         }catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
