@@ -152,6 +152,7 @@ public class APIFactory{
         houseMap.put("community",house.getCommunity());
         houseMap.put("title",house.getTitle());
         houseMap.put("cover",house.getCover());
+        houseMap.put("publishTime",house.getPublishTime());
 
         return  houseMap;
     }
