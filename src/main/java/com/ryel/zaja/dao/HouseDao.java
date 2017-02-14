@@ -72,4 +72,8 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     //用sellHouseId查出所有的通过此sellHouse编辑而成的House
     @Query("select h from House h where h.sellHouse.id = ?1 and h.status = '30'")
     Page<House> PageBySellHouse(Integer sellHouseId, Pageable pageable);
+
+    @Query("select h from House h where h.community.uid in ?1 and h.status in ?2")
+    List<House> listByUids(List<String> uid, List<String> status);
+
 }

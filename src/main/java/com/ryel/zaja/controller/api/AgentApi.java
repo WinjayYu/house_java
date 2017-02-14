@@ -862,7 +862,7 @@ public class AgentApi {
                           String renovation,
                           String floor) {
 
-        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, UserType.AGENT.getCode());
+        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, null, UserType.AGENT.getCode());
         Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);
     }

@@ -40,4 +40,6 @@ public interface HouseOrderDao extends JpaRepository<HouseOrder, Integer> ,JpaSp
     @Query("select h from HouseOrder h where h.house.id = ?1")
     List<HouseOrder> findAllOrderByHouseId(Integer houseId);
 
+    @Query("select h from HouseOrder h where h.house.id = ?1 and h.buyer.id =?2")
+    HouseOrder findByHouseIdAndUserId(Integer houseId, Integer userId);
 }

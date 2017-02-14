@@ -18,7 +18,7 @@ spring:
 
     redis:
       port: 6379
-      host: 106.75.93.24
+      host: localhost
       password:
       pool:
         max-active: -1

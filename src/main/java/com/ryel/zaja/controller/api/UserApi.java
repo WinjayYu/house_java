@@ -371,13 +371,15 @@ public class UserApi {
 
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
 
-            JSONObject jsonObj = new JSONObject(textEntity);
-            int error_code = jsonObj.getInt("error");
-            String error_msg = jsonObj.getString("msg");
-            if(0 != error_code){
-                return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
-            }
-        } catch (JSONException e) {
+            System.out.print(textEntity);
+
+//            JSONObject jsonObj = new JSONObject(textEntity);
+//            int error_code = jsonObj.getInt("error");
+//            String error_msg = jsonObj.getString("msg");
+//            if(0 != error_code){
+//                return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
+//            }
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
         }

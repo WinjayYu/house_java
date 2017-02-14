@@ -17,7 +17,7 @@ public enum HouseOrderStatus {
     IN_CONNECT("30", "房屋交接中"),
     APPLY_REBATE("31", "用户申请退款"),
     AGENT_COMFIRM_REBATE("32", "经纪人确认退款"),
-    MANAGER_COMFIRM_REBATE("33", "退款进行中"),
+//    MANAGER_COMFIRM_REBATE("33", "退款进行中"),
     WAIT_USER_COMFIRM("40", "用户待确认"),
     WAIT_COMMENT("50", "待评价"),
     FINISHED("60", "已完成"),
@@ -44,6 +44,8 @@ public enum HouseOrderStatus {
         List<String> status = new ArrayList<String>();
         status.add(HouseOrderStatus.IN_CONNECT.getCode());
         status.add(HouseOrderStatus.WAIT_USER_COMFIRM.getCode());
+        status.add(HouseOrderStatus.APPLY_REBATE.getCode());
+        status.add(HouseOrderStatus.AGENT_COMFIRM_REBATE.getCode());
         status.add(HouseOrderStatus.WAIT_COMMENT.getCode());
         status.add(HouseOrderStatus.FINISHED.getCode());
         return status;

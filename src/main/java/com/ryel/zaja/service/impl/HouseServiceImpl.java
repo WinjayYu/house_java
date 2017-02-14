@@ -236,6 +236,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                               final String layout,
                               final String renovation,
                               final String floor,
+                              final String city,
                               final String userType) {
         Page<House> page = houseDao.findAll(new Specification<House>() {
             @Override
@@ -297,6 +298,10 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                     predicateList.add(predicate);
                 }
 
+                if(null != city){
+                    Predicate predicate = cb.equal(root.get("city").as(String.class), floor);
+                    predicateList.add(predicate);
+                }
 
                  //  如果是用户则只筛选上架的房源，如果是经纪人则筛选上架和交接中的房源
                if(UserType.USER.getCode().equals(userType)) {
@@ -501,4 +506,93 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
         return page;
     }
 
+    @Override
+    public List<House> listByUids(List<String> uids) {
+        return houseDao.listByUids(uids, HouseStatus.getUserCanSeeStatus());
+    }
+
+    @Override
+    public Page<House> pageByNearbyHouse(int pageNum,
+                                         int pageSize,
+                                         final List<String> uids,
+                                         final String price,
+                                         final String area,
+                                         final String layout,
+                                         final String renovation,
+                                         final String floor) {
+        Page<House> page = houseDao.findAll(new Specification<House>() {
+            @Override
+            public Predicate toPredicate(Root<House> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                List<Predicate> predicateList = new ArrayList<Predicate>();
+                Predicate result = null;
+                if (null != price) {
+                    String[] arr = price.split("\\|");
+                    if (1 == arr.length) {
+                        BigDecimal bg = new BigDecimal(arr[0]);
+                        //double d = Double.parseDouble(arr[0]);
+                        Predicate predicate = cb.lessThan(root.get("price").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    } else if (!StringUtils.isNotBlank(arr[0])) {
+                        BigDecimal bg = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.greaterThan(root.get("price").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    } else {
+                        BigDecimal bg1 = new BigDecimal(arr[0]);
+                        BigDecimal bg2 = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.between(root.get("price").as(BigDecimal.class), bg1, bg2);
+                        predicateList.add(predicate);
+                    }
+                }
+
+                if (null != area) {
+                    String[] arr = area.split("\\|");
+                    if (1 == arr.length) {
+                        BigDecimal bg = new BigDecimal(arr[0]);
+                        //double d = Double.parseDouble(arr[0]);
+                        Predicate predicate = cb.lessThan(root.get("area").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    } else if (!StringUtils.isNotBlank(arr[0])) {
+                        BigDecimal bg = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.greaterThan(root.get("area").as(BigDecimal.class), bg);
+                        predicateList.add(predicate);
+                    } else {
+                        BigDecimal bg1 = new BigDecimal(arr[0]);
+                        BigDecimal bg2 = new BigDecimal(arr[1]);
+                        Predicate predicate = cb.between(root.get("area").as(BigDecimal.class), bg1, bg2);
+                        predicateList.add(predicate);
+                    }
+                }
+
+
+                if (null != layout) {
+                    Predicate predicate = cb.equal(root.get("layout").as(String.class), layout);
+                    predicateList.add(predicate);
+                }
+
+
+                if (null != renovation) {
+                    Predicate predicate = cb.equal(root.get("renovation").as(String.class), renovation);
+                    predicateList.add(predicate);
+                }
+
+                if (null != floor) {
+                    Predicate predicate = cb.equal(root.get("floor").as(String.class), floor);
+                    predicateList.add(predicate);
+                }
+
+                Expression<String> exp = root.get("communityUid").as(String.class);
+                predicateList.add(exp.in(uids));
+
+                if (predicateList.size() > 0) {
+                    result = cb.and(predicateList.toArray(new Predicate[]{}));
+                }
+                if (result != null) {
+                    query.where(result);
+                }
+                return query.getRestriction();
+            }
+        }, new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
+
+        return page;
+    }
 }
