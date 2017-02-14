@@ -5,39 +5,23 @@ import com.ecc.emp.data.KeyedCollection;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.PinanBankCodeConfig;
 import com.ryel.zaja.config.bean.Result;
-import com.ryel.zaja.config.enums.PinganApiEnum;
-import com.ryel.zaja.config.enums.TradeRecordStatus;
-import com.ryel.zaja.entity.PinanOrder;
-import com.ryel.zaja.entity.ZjjzCnapsBankinfo;
-import com.ryel.zaja.entity.TradeRecord;
-import com.ryel.zaja.entity.User;
-import com.ryel.zaja.entity.UserWalletAccount;
-import com.ryel.zaja.pingan.PinganUtils;
+import com.ryel.zaja.entity.PinganOrder;
 import com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo;
-import com.ryel.zaja.pingan.WalletConstant;
-import com.ryel.zaja.pingan.ZJJZ_API_GW;
+import com.ryel.zaja.controller.api.pingan.WalletConstant;
+import com.ryel.zaja.pingan.PinganUtils;
 import com.ryel.zaja.service.HouseOrderService;
-import com.ryel.zaja.service.HouseService;
-import com.ryel.zaja.service.PinanOrderService;
+import com.ryel.zaja.service.PinganOrderService;
 import com.ryel.zaja.service.ZjjzCnapsBankinfoService;
-import com.ryel.zaja.service.UserWalletAccountService;
-import com.ryel.zaja.utils.JsonUtil;
-import com.sdb.payclient.bean.exception.CsiiException;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -48,7 +32,7 @@ public class PinganApi {
 
 
     @Autowired
-    private PinanOrderService pinanOrderService;
+    private PinganOrderService pinganOrderService;
     @Autowired
     private HouseOrderService houseOrderService;
     @Autowired
@@ -80,7 +64,7 @@ public class PinganApi {
             com.ecc.emp.data.KeyedCollection signDataput = new com.ecc.emp.data.KeyedCollection("signDataput");
 
             input.put("masterId", masterId);//商户号，注意生产环境上要替换成商户自己的生产商户号
-            input.put("orderId", getOderId(masterId, datetamp));//订单号，严格遵守格式：商户号+8位日期YYYYMMDD+8位流水
+            input.put("orderId", PinganUtils.getOderId(masterId, datetamp));//订单号，严格遵守格式：商户号+8位日期YYYYMMDD+8位流水
             input.put("customerId", userId);//会员号
             input.put("dateTime", timestamp);//下单时间，YYYYMMDDHHMMSS
 
@@ -306,7 +290,7 @@ public class PinganApi {
             datetamp = timestamp.substring(0, 8);
 
             String masterId = WalletConstant.QUICK_PAYMENT_ID;
-            String orderId = getOderId(masterId, datetamp);
+            String orderId = PinganUtils.getOderId(masterId, datetamp);
             input.put("masterId", masterId);
             input.put("customerId", userId);
             input.put("orderId", orderId);
@@ -336,8 +320,9 @@ public class PinganApi {
                 data.put("paymodel", pay);
 
                 return Result.success().msg("").data(data);
-            } else {
-
+            } else if(errorCode.equals("UKHPY37")){
+                return Result.error().msg(Error_code.ERROR_CODE_0053).data(new HashMap<>());
+            }else{
                 return Result.error().msg(errorMsg).data(new HashMap<>());
             }
 
@@ -348,28 +333,6 @@ public class PinganApi {
         }
     }
 
-    public static String getOderId(String masterId, String datetamp) {
-        int orderid;
-        String orderids;
-        java.util.Random r = new java.util.Random();
-        while (true) {
-            orderid = r.nextInt(99999999);
-            if (orderid < 0)
-                orderid = -orderid;
-            orderids = String.valueOf(orderid);
-            System.out.println("--orderids----" + orderids);
-            if (orderids.length() < 8) {
-                System.out.println("--order22222ids----" + orderids);
-                continue;
-            }
-            if (orderids.length() >= 8) {
-                orderids = orderids.substring(0, 8);
-                System.out.println("--orderids222----" + orderids);
-                break;
-            }
-        }
-        return masterId + datetamp + orderids;
-    }
 
     /**
      * 后台发出佣金的交易申请
@@ -383,7 +346,7 @@ public class PinganApi {
      * @param verifyCode 短信验证码
      */
     @RequestMapping(value = "commissionsubmit")
-    public Result UnionAPI_Submit(Integer fromUserId,Integer toUserId, String openId, String amount, String orderId, String pinganOrderId, String paydate, String verifyCode) {
+    public Result UnionAPI_Submit(Integer fromUserId,Integer toUserId, String openId, String amount, Integer orderId, String pinganOrderId, String paydate, String verifyCode) {
         try {
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
 
@@ -395,13 +358,13 @@ public class PinganApi {
             input.put("orderId", pinganOrderId);
             input.put("currency", "RMB");
             input.put("amount", amount);
-            input.put("objectName", "Commission for agent");
+            input.put("objectName", "Pay Commission to agent");
             input.put("paydate", paydate);
             input.put("validtime", "0");//订单有效期(毫秒)，0不生效
             input.put("remark", orderId);
             input.put("customerId", fromUserId);
             input.put("OpenId", openId);
-            input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/commissionnotify");
+            input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/notify/commissionnotify");
             input.put("verifyCode", verifyCode);// 短信验证码
 
             output = util.execute(input, "UnionAPI_Submit"); //执行发送，并返回结果对象
@@ -413,23 +376,23 @@ public class PinganApi {
 
             if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
 
-                PinanOrder order = new PinanOrder();
+                PinganOrder order = new PinganOrder();
                 order.setMasterId((String) output.getDataValue("masterId"));
-                order.setOrderId((String) output.getDataValue("orderId"));
+                order.setPinganOrderId((String) output.getDataValue("orderId"));
                 order.setAmount((String) output.getDataValue("amount"));
                 order.setCharge((String) output.getDataValue("charge"));
                 order.setValidtime((String) output.getDataValue("validtime"));
                 order.setCustomerId((String) output.getDataValue("customerId"));
                 order.setAccNo((String) output.getDataValue("accNo"));
                 order.setMobile((String) output.getDataValue("telephone"));
-                order.setRemark((String) output.getDataValue("remark"));
+                order.setOrderId(Integer.valueOf((String)output.getDataValue("remark")));
                 order.setObjectName((String) output.getDataValue("objectName"));
                 order.setCurrency((String) output.getDataValue("currency"));
                 order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
                 order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
 
-                houseOrderService.payment(Integer.parseInt(order.getCustomerId()), Integer.parseInt(order.getRemark()));
-                pinanOrderService.create(order);
+                houseOrderService.payment(Integer.parseInt(order.getCustomerId()), order.getOrderId());
+                pinganOrderService.create(order);
 
                 //资金进入会员子账户 和 冻结资金到担保账户
                 wallet.frozennMoney("3",fromUserId,toUserId,amount,orderId);
@@ -446,8 +409,8 @@ public class PinganApi {
         }
     }
 
-    @RequestMapping(value = "commissionnotify")
-    public void submitNotify(@RequestParam String orig, @RequestParam String sign) {
+    @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
+    public void submitNotify(String orig,String sign) {
         try {
 
 
@@ -521,6 +484,44 @@ public class PinganApi {
 //            } else {
 //                logger.info("失败原因====================" + errorMsg);
 //            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 退款回调
+     * @param orig
+     * @param sign
+     */
+    @RequestMapping(value = "refundorder", method = RequestMethod.POST)
+    public void reFundOrder(String orig,String sign) {
+        try {
+
+
+            logger.info("---orig---" + orig);
+            logger.info("---sign---" + sign);
+
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+            KeyedCollection output = new KeyedCollection("output");
+
+            String encoding = "GBK";
+
+
+            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
+            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
+
+
+            boolean result = util.verifyData(sign, orig);
+            logger.info("---通知验签结果---" + result);
+            if (!result) {
+                logger.info("---验签失败---" + result);
+                return;
+            }
+
+            output = util.parseOrigData(orig);
+
 
         } catch (Exception e) {
             e.printStackTrace();

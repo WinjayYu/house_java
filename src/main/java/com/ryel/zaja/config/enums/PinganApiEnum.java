@@ -2,12 +2,15 @@ package com.ryel.zaja.config.enums;
 
 public enum PinganApiEnum {
     CREATE_ACCOUNT                     ("create_account",                       "创建见证宝账户",                "6000"),
-    GET_WALLET_BALANCE_INFO            ("get_wallet_balance_info",              "查询见证宝余额信息",            "6037"),
-    BIND_WITHDRAW_CARD                 ("bind_withdraw_card",                   "绑定提现账户",                  "6066"),
-    SEND_MSG_FOR_BIND_WITHDRAW_CARD    ("send_msg_for_bind_withdraw_card",      "绑定提现账户发送验证码",       "6067"),
-    OUT_ACCOUNT_TO_COMMON_ACCOUNT      ("out_account_to_common_account",        "从付款账号转账到公共账户FuncFlag=1", "6034"),
-    COMMON_ACCOUNT_TO_IN_ACCOUNT       ("common_account_to_in_account",         "从公共账户账号到公共账户FuncFlag=2", "6034"),
-    WITHDRAW                           ("withdraw",                             "提现",                          "6033"),
+    GET_WALLET_BALANCE_INFO            ("get_wallet_balance_info",              "查询见证宝余额信息",             "6037"),
+    BIND_WITHDRAW_CARD_SEND_MSG        ("bind_withdraw_card_send_msg",          "绑定提现账户发送验证码",          "6066"),
+    BIND_WITHDRAW_CARD                 ("bind_withdraw_card",                   "绑定提现账户",                  "6067"),
+    REMOVE_WITHDRAW_CARD               ("remove_withdraw_card",                 "解除提现银行卡绑定",             "6065"),
+    WITHDRAW_MONEY_SEND_MSG            ("withdraw_money_send_msg",              "提现短信验证",                   "6082"),
+    WITHDRAW                           ("withdraw",                             "提现",                          "6085"),
+    RECHARGE_FROZEN_MONEY              ("recharge_frozen_money",                "会员清分+冻结资金",                "6007"),
+    UNFROZEN_MONEY                     ("unfrozen_money",                "会员解冻资金",                "6007"),
+    REFUND_COMMISSION                     ("refund_commission",             "会员清分冻结交易撤销",                "6077")
     ;
 
     PinganApiEnum(String code, String name, String pinganCode) {

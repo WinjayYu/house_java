@@ -18,14 +18,14 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "pingan_order")
-public class PinanOrder implements Serializable {
+public class PinganOrder implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String orderId;
+    private String pinganOrderId;
 
     private String masterId;
 
@@ -51,7 +51,7 @@ public class PinanOrder implements Serializable {
 
     private String objectName;//款项描述
 
-    private String remark;//备注字段
+    private Integer orderId;//备注字段
 
     private String accNo;//银行卡后4位
 
@@ -66,13 +66,6 @@ public class PinanOrder implements Serializable {
         this.id = id;
     }
 
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
 
     public String getMasterId() {
         return masterId;
@@ -147,12 +140,20 @@ public class PinanOrder implements Serializable {
         this.objectName = objectName;
     }
 
-    public String getRemark() {
-        return remark;
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public String getPinganOrderId() {
+        return pinganOrderId;
+    }
+
+    public void setPinganOrderId(String pinganOrderId) {
+        this.pinganOrderId = pinganOrderId;
     }
 
     public String getAccNo() {

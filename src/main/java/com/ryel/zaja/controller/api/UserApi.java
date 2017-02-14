@@ -6,14 +6,13 @@ import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.pingan.PinganUtils;
-import com.ryel.zaja.pingan.WalletConstant;
+import com.ryel.zaja.controller.api.pingan.WalletConstant;
 import com.ryel.zaja.pingan.ZJJZ_API_GW;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
-import com.ryel.zaja.utils.bean.FileBo;;
-import com.sun.org.apache.xml.internal.utils.SerializableLocatorImpl;
+;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,14 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -170,13 +167,6 @@ public class UserApi {
                 String rspCode = (String) retKeyDict.get("RspCode");
                 if ("000000".equals(rspCode) && StringUtils.isNotEmpty(custAcctId)) {
                     // 创建成功，写入数据库
-//                    UserWalletAccount userWalletAccount = new UserWalletAccount();
-//                    userWalletAccount.setUserId(user.getId());
-//                    userWalletAccount.setThirdCustId(user.getId() +"");
-//                    userWalletAccount.setCustAcctId(custAcctId);
-//                    userWalletAccount.setMobilePhone(user.getMobile());
-//                    userWalletAccount.setNickName(user.getUsername());
-//                    userWalletAccountService.create(userWalletAccount);
                     user.setCustAcctId(custAcctId);
                     userService.update(user);
                 } else
@@ -380,7 +370,6 @@ public class UserApi {
         stringRedisTemplate.expire(mobile, 5, TimeUnit.MINUTES);
 
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
-
 
             JSONObject jsonObj = new JSONObject(textEntity);
             int error_code = jsonObj.getInt("error");

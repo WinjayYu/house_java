@@ -9,6 +9,9 @@ import com.ryel.zaja.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-@Service("TradeRecordServiceImpl")
+@Service
 @Transactional(readOnly = true)
 public class TradeRecordServiceImpl extends AbsCommonService<TradeRecord> implements TradeRecordService {
     protected final static Logger logger = LoggerFactory.getLogger(TradeRecordServiceImpl.class);
@@ -50,6 +53,16 @@ public class TradeRecordServiceImpl extends AbsCommonService<TradeRecord> implem
         dest.setStatus(status);
 //        ClassUtil.copyProperties(dest, tradeRecord);
         return save(dest);
+    }
+
+    @Override
+    public TradeRecord findByOrderId(Integer orderId) {
+        return tradeRecordDao.findByOrderId(orderId);
+    }
+
+    @Override
+    public Page<TradeRecord> findByInThirdCustId(Integer userId) {
+        return tradeRecordDao.findByInThirdCustId(userId,new PageRequest(0,20, Sort.Direction.DESC, "id"));
     }
 
     @Override

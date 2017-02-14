@@ -1,12 +1,15 @@
-package com.ryel.zaja.pingan;
+package com.ryel.zaja.controller.api.pingan;
 
+import com.ryel.zaja.config.enums.PinganApiEnum;
 import com.ryel.zaja.config.enums.TradeRecordStatus;
+import com.ryel.zaja.pingan.PinganUtils;
+import com.ryel.zaja.pingan.ZJJZ_API_GW;
+import com.ryel.zaja.service.PinganApiLogService;
 import com.ryel.zaja.service.TradeRecordService;
 import com.ryel.zaja.service.UserService;
-import com.ryel.zaja.service.UserWalletAccountService;
 import com.ryel.zaja.entity.TradeRecord;
 import com.ryel.zaja.entity.User;
-import com.ryel.zaja.entity.UserWalletAccount;
+import com.ryel.zaja.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +71,8 @@ public class WalletConstant {
     @Autowired
 	private UserService userService;
 
+	@Autowired
+	private PinganApiLogService pinganApiLogService;
 
 	@Autowired
 	private TradeRecordService tradeRecordService;
@@ -124,6 +129,8 @@ public class WalletConstant {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		}finally {
+			pinganApiLogService.create(PinganApiEnum.CREATE_ACCOUNT, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
 		}
 		return null;
 	}
@@ -272,10 +279,10 @@ public class WalletConstant {
 				TradeRecord tradeRecord = new TradeRecord();
 				tradeRecord.setThirdHtId(ThirdHtId);
 				tradeRecord.setOutCustAcctId(OutCustAcctId);
-				tradeRecord.setOutThirdCustId(OutThirdCustId);
+				tradeRecord.setOutThirdCustId(outUserWalletAccount);
 				tradeRecord.setOutCustName(OutCustName);
 				tradeRecord.setInCustAcctId(InCustAcctId);
-				tradeRecord.setInThirdCustId(InThirdCustId);
+				tradeRecord.setInThirdCustId(inUserWalletAccount);
 				tradeRecord.setInCustName(InCustName);
 				tradeRecord.setTranAmount(amount);
 				tradeRecord.setStatus(TradeRecordStatus.COMMON_ACCOUNT.getCode());
@@ -304,7 +311,7 @@ public class WalletConstant {
 	 * @param amount
 	 * @return
 	 */
-	public  boolean frozennMoney(String flag,Integer outUserId,Integer inUserId,String amount,String orderId) {
+	public  boolean frozennMoney(String flag,Integer outUserId,Integer inUserId,String amount,Integer orderId) {
 		User outUserWalletAccount = userService.findById(outUserId);
 		User inUserWalletAccount = userService.findById(inUserId);
 		if(outUserWalletAccount == null){
@@ -370,10 +377,10 @@ public class WalletConstant {
 				TradeRecord tradeRecord = new TradeRecord();
 				tradeRecord.setThirdHtId(ThirdHtId);
 				tradeRecord.setOutCustAcctId(OutCustAcctId);
-				tradeRecord.setOutThirdCustId(OutThirdCustId);
+				tradeRecord.setOutThirdCustId(outUserWalletAccount);
 				tradeRecord.setOutCustName(OutCustName);
 				tradeRecord.setInCustAcctId(InCustAcctId);
-				tradeRecord.setInThirdCustId(InThirdCustId);
+				tradeRecord.setInThirdCustId(inUserWalletAccount);
 				tradeRecord.setInCustName(InCustName);
 				tradeRecord.setTranAmount(amount);
 				tradeRecord.setStatus(TradeRecordStatus.COMMON_ACCOUNT.getCode());
@@ -383,11 +390,13 @@ public class WalletConstant {
 				tradeRecordService.create(tradeRecord);
 				return true;
 			} else {
-				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
+				logger.error("见证宝错误信息", retKeyDict.get("RspMsg")+"订单ID:"+orderId);
 				return false;
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		}finally {
+			pinganApiLogService.create(PinganApiEnum.RECHARGE_FROZEN_MONEY, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
 		}
 
 		return false;
@@ -396,15 +405,17 @@ public class WalletConstant {
 	/**
 	 * 解除冻结资金
 	 * @param userId
-	 * @param amount
 	 * @param thirdHtId trade 交易流水订单号
 	 * @return
 	 */
-	public  boolean unFrozennMoney(Integer userId,String amount,String thirdHtId) {
+	public  boolean unFrozennMoney(Integer userId,String thirdHtId) {
 		User userWalletAccount = userService.findById(userId);
 		if(userWalletAccount == null){
 			userWalletAccount = openAccount(userId);
 		}
+
+		TradeRecord tradeRecord = tradeRecordService.findByThirdHtId(thirdHtId);
+
 		HashMap<String,String> parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
 		HashMap<String,String> retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
 		try {
@@ -426,7 +437,7 @@ public class WalletConstant {
 			// 转入账户名称
 			parmaKeyDict.put("ThirdCustId", thirdCustId);
 			// 转入金额
-			parmaKeyDict.put("TranAmount", amount);
+			parmaKeyDict.put("TranAmount", tradeRecord.getTranAmount());
 			// 交易费用
 			parmaKeyDict.put("HandFee", "0");//平台手续费
 			parmaKeyDict.put("CcyCode", "RMB");
@@ -451,7 +462,8 @@ public class WalletConstant {
 			String rspCode = (String) retKeyDict.get("RspCode");
 			if ("000000".equals(rspCode)) {
 				// 更新交易状态
-				tradeRecordService.updateStatus(thirdHtId,"20");
+				tradeRecord.setStatus("20");
+				tradeRecordService.update(tradeRecord);
 				return true;
 			} else {
 				logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
@@ -459,6 +471,8 @@ public class WalletConstant {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		}finally {
+			pinganApiLogService.create(PinganApiEnum.UNFROZEN_MONEY, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
 		}
 
 		return false;
@@ -515,6 +529,8 @@ public class WalletConstant {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		}finally {
+			pinganApiLogService.create(PinganApiEnum.REFUND_COMMISSION, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
 		}
 
 		return false;
