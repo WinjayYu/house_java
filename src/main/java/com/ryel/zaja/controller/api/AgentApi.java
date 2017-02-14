@@ -145,7 +145,7 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "/changeaccount", method = RequestMethod.POST)
+    @RequestMapping(value = "changeaccount", method = RequestMethod.POST)
     public Result changeAccount(Integer agentId, String mobile, String password, String verCode) {
         try {
             User user = userService.findById(agentId);

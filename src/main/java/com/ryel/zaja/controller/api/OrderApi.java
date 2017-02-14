@@ -266,8 +266,8 @@ public class OrderApi {
      * 用户发起订单
      */
     @RequestMapping(value = "userpublishorder")
-    public Result publishorder(Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
-                               String toMobile, String idcard, String floor, String username) {
+    public Result publishorder(Integer userId,Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
+                               String idcard, String floor, String username) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -276,7 +276,7 @@ public class OrderApi {
                 throw new BizException(Error_code.ERROR_CODE_0023, "查询用户信息为空");
             }
             // 查买房人
-            User user = userService.findByMobile(toMobile);
+            User user = userService.findById(userId);
             if (user == null) {
                 throw new BizException(Error_code.ERROR_CODE_0023, "根据toMobile查询user为空");
             }
@@ -293,14 +293,14 @@ public class OrderApi {
             if (null != house.getSellHouse()) {
                 houseOrder.setSeller(house.getSellHouse().getUser());
             } else {
-                houseOrder.setSeller(userService.findById(agentId));
+                houseOrder.setSeller(userService.findById(userId));
             }
 
             // 生产订单号
             String code = BizUtil.getOrderCode();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setBuyerMobile(toMobile);
+            houseOrder.setBuyerMobile(user.getMobile());
             houseOrder.setStatus(HouseOrderStatus.NO_ORDER.getCode());
             houseOrder.setType(HouseOrderType.FROM_HOUSE.getCode());
             houseOrder.setAddTime(new Date());

@@ -364,7 +364,7 @@ public class PinganApi {
             input.put("remark", orderId);
             input.put("customerId", fromUserId);
             input.put("OpenId", openId);
-            input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/commissionnotify");
+            input.put("NOTIFYURL", "https://zaja.xin/zaja/api/pingan/notify/commissionnotify");
             input.put("verifyCode", verifyCode);// 短信验证码
 
             output = util.execute(input, "UnionAPI_Submit"); //执行发送，并返回结果对象
