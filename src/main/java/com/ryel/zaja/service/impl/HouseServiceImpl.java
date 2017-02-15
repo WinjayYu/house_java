@@ -299,7 +299,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                 }
 
                 if(null != city){
-                    Predicate predicate = cb.equal(root.get("city").as(String.class), floor);
+                    Predicate predicate = cb.equal(root.get("city").as(String.class), city);
                     predicateList.add(predicate);
                 }
 
@@ -580,7 +580,7 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
                     predicateList.add(predicate);
                 }
 
-                Expression<String> exp = root.get("communityUid").as(String.class);
+                Expression<String> exp = root.get("community").get("uid").as(String.class);
                 predicateList.add(exp.in(uids));
 
                 if (predicateList.size() > 0) {

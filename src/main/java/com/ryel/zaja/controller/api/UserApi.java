@@ -14,6 +14,9 @@ import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
 ;
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -372,14 +375,25 @@ public class UserApi {
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
 
             System.out.print(textEntity);
+            SAXReader saxReader = new SAXReader();
 
+            Document document = saxReader.read(textEntity);
+            Element rootElement = document.getRootElement();
+            String s =  rootElement.getStringValue();
+            if(!s.contains("Success")){
+                throw new BizException(Error_code.ERROR_CODE_0008, s);
+
+            }
 //            JSONObject jsonObj = new JSONObject(textEntity);
 //            int error_code = jsonObj.getInt("error");
 //            String error_msg = jsonObj.getString("msg");
 //            if(0 != error_code){
 //                return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
 //            }
-        } catch (Exception e) {
+        } catch(BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
+        } catch(Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
         }

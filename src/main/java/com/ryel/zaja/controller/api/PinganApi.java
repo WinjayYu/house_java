@@ -273,6 +273,57 @@ public class PinganApi {
     }
 
     /**
+     * 发起单张银行卡关闭
+     */
+    @RequestMapping(value = "bankclose2", method = RequestMethod.POST)
+    public Result UnionAPI_OPNCL2(Integer userId, String OpenId){
+        try {
+            Map data = new HashMap<String, String>();
+
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+
+            com.ecc.emp.data.KeyedCollection input = new com.ecc.emp.data.KeyedCollection("input");
+            com.ecc.emp.data.KeyedCollection output = new com.ecc.emp.data.KeyedCollection("output");
+
+            input.put("masterId", WalletConstant.QUICK_PAYMENT_ID);
+            input.put("customerId", userId);
+            input.put("OpenId", OpenId);
+
+            output = util.execute(input, "UnionAPI_OPNCL");
+
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+            String masterId = (String) output.getDataValue("masterId");
+            String customerId = (String) output.getDataValue("customerId");
+            String status = (String) output.getDataValue("status");
+            String openId = (String) output.getDataValue("OpenId");
+
+            if (status.equals("01")) {
+
+                data.put("masterId", masterId);
+                data.put("openId", openId);
+                data.put("customerId", customerId);
+                data.put("telephone", (String) output.getDataValue("telephone"));
+                data.put("accNo", (String) output.getDataValue("accNo"));
+
+
+                return Result.success().msg("").data(data);
+            } else {
+                data.put("errorCode", errorCode);
+                data.put("errorMsg", errorMsg);
+                data.put("masterId", masterId);
+                data.put("customerId", customerId);
+                data.put("openId", openId);
+
+                return Result.error().msg(Error_code.ERROR_CODE_0001).data(data);
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
      * 入金钱发生短信验证码
      */
     @RequestMapping(value = "ordersms")

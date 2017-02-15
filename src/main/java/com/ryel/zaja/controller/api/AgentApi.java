@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -77,6 +78,10 @@ public class AgentApi {
     private FeedbackService feedbackService;
     @Autowired
     private TradeRecordService tradeRecordService;
+    @Autowired
+    private ImgWallService imgWallService;
+    @Autowired
+    private QiNiuService qiNiuService;
 
     /**
      * 登录
@@ -1281,6 +1286,71 @@ public class AgentApi {
         }catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 经纪人上传照片墙
+     * @param agentId
+     * @param imgs
+     * @return
+     */
+    @RequestMapping(value = "imgwall", method = RequestMethod.POST)
+    public Result imgWall(Integer agentId, MultipartFile[] imgs){
+        try{
+
+            List<ImgWall> imgWalls = imgWallService.findByAgentId(agentId);
+            if(imgWalls.size() > 5){
+                throw new Exception();
+            }
+            for(MultipartFile img: imgs){
+                ImgWall imgWall = new ImgWall();
+                String path = bizUploadFile.uploadUserImageToQiniu(img, agentId);
+                imgWall.setAgent(userService.findById(agentId));
+                imgWall.setImg(path);
+                imgWall.setAddTime(new Date());
+                imgWallService.save(imgWall);
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+        return viewImgWall(agentId);
+    }
+
+    /**
+     * 经纪人删除照片墙中的一张图片
+     * @param agentId
+     * @param url
+     * @return
+     */
+    @RequestMapping(value = "deleteimgwall", method = RequestMethod.POST)
+    public Result deleteImgwall(Integer agentId, String url){
+        try{
+            String filename = url.substring(url.indexOf("user"));
+            qiNiuService.deleteOneFile(filename);
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+        return Result.success().msg("").data(new HashMap<>());
+    }
+
+    /**
+     * 查看照片墙
+     * @return
+     */
+    @RequestMapping(value = "viewimgwall", method = RequestMethod.POST)
+    public Result viewImgWall(Integer agentId){
+
+        try{
+            Map<String, Object> data = new HashMap();
+            List<ImgWall> imgWalls = imgWallService.findByAgentId(agentId);
+            data.put("list", imgWalls);
+            return Result.success().msg("").data(data);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
