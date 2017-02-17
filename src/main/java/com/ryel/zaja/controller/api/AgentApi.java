@@ -1315,7 +1315,7 @@ public class AgentApi {
             for(MultipartFile img: imgs){
                 ImgWall imgWall = new ImgWall();
                 String path = bizUploadFile.uploadUserImageToQiniu(img, agentId);
-                imgWall.setAgent(userService.findById(agentId));
+                imgWall.setUserId(agentId);
                 imgWall.setImg(path);
                 imgWall.setAddTime(new Date());
                 imgWallService.save(imgWall);
