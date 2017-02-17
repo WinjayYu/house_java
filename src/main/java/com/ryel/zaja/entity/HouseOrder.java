@@ -77,6 +77,8 @@ public class HouseOrder implements Serializable {
 
     private BigDecimal discount;
 
+    private BigDecimal sellprice;
+
     public HouseOrder(){}
 
     public Integer getId() {
@@ -229,5 +231,13 @@ public class HouseOrder implements Serializable {
 
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
+    }
+
+    public BigDecimal getSellprice() {
+        return sellprice;
+    }
+
+    public void setSellprice(BigDecimal sellprice) {
+        this.sellprice = sellprice;
     }
 }

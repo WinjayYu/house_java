@@ -933,7 +933,8 @@ public class AgentApi {
      */
     @RequestMapping(value = "publishorder")
     public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
-                                    String toMobile, BigDecimal discount, String username, String idcard, String floor) {
+                                    String toMobile, BigDecimal discount, String username, String idcard, String floor,
+                                        BigDecimal sellprice) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -951,13 +952,13 @@ public class AgentApi {
             if (houseId != null) {
                 type = HouseOrderType.FROM_HOUSE.getCode();
                 House house = houseService.findById(houseId);
-                if (house == null) {
-                    throw new BizException(Error_code.ERROR_CODE_0025, "查询到house is null");
+                if (house == null || !HouseStatus.getAgentCanSeeStatus().contains(house.getStatus())) {
+                    throw new BizException(Error_code.ERROR_CODE_0055, "此房源不在上架状态");
                 }
 
-                HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, agentId);
+                HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, user.getId());
                 if(null != houseOrder1){
-                    throw new BizException(Error_code.ERROR_CODE_0026, "此房源您已发起过订单");
+                    throw new BizException(Error_code.ERROR_CODE_0054, "您已经向这用户已发起过此订单");
                 }
 
                 List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);
@@ -996,7 +997,7 @@ public class AgentApi {
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             //实际佣金等于price*250-discount 单位：元
-            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)).subtract(discount));
+            houseOrder.setCommission(sellprice.multiply(BigDecimal.valueOf(250)).subtract(discount));
 
             houseOrder.setIdcard(idcard);
             houseOrder.setUsername(username);
@@ -1074,7 +1075,13 @@ public class AgentApi {
             }
             order.setStatus(HouseOrderStatus.AGENT_COMFIRM_REBATE.getCode());
             houseOrderService.update(order);
-            return Result.success();
+
+            //对应房源的状态变成上架
+            House house = order.getHouse();
+            house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
+            houseService.update(house);
+
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -1272,6 +1279,7 @@ public class AgentApi {
 
             discount = discount == null ? BigDecimal.ZERO : discount;
             houseOrder.setDiscount(discount);
+            houseOrder.setCommission(houseOrder.getCommission().subtract(discount));
             houseOrderService.update(houseOrder);
 
             //更新用户信息
@@ -1348,10 +1356,13 @@ public class AgentApi {
     @RequestMapping(value = "deleteimgwall", method = RequestMethod.POST)
     public Result deleteImgwall(Integer agentId, String[] urls){
         try{
+
             for(String url : urls){
-                String filename = url.substring(url.indexOf("user"));
-                qiNiuService.deleteOneFile(filename);
-                imgWallService.deleteByUrl(url);
+                if(imgWallService.findByAgentIdAndUrl(agentId, url)) {
+                    String filename = url.substring(url.indexOf("user"));
+                    qiNiuService.deleteOneFile(filename);
+                    imgWallService.deleteByUrl(url);
+                }
             }
         }catch (Exception e){
             logger.error(e.getMessage(), e);

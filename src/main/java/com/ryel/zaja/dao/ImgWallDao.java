@@ -21,4 +21,7 @@ public interface ImgWallDao extends JpaRepository<ImgWall, Integer>,JpaSpecifica
 
     @Query("delete from ImgWall i where i.img = ?1")
     void deleteByUrl(String url);
+
+    @Query("select i from ImgWall i where i.agent.id = ?1 and i.img = ?2")
+    boolean findByAgentIdAndUrl(Integer agentId, String url);
 }

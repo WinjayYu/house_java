@@ -84,5 +84,8 @@ public interface Error_code {
 
     String ERROR_CODE_0053 = "error_53";   //  【平安】支付短信发送过于频繁，休息一下
 
+    String ERROR_CODE_0054 = "error_54";   //  【经纪人发布订单】您已经向这用户已发起过此订单
+
+    String ERROR_CODE_0055 = "error_55";   //  【用户发布订单】此房源不在上架状态
 
 }

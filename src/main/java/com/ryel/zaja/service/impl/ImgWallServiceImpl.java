@@ -47,4 +47,9 @@ public class ImgWallServiceImpl extends AbsCommonService<ImgWall> implements Img
     public void deleteByUrl(String url) {
         imgWallDao.deleteByUrl(url);
     }
+
+    @Override
+    public boolean findByAgentIdAndUrl(Integer agentId, String url) {
+        return imgWallDao.findByAgentIdAndUrl(agentId, url);
+    }
 }

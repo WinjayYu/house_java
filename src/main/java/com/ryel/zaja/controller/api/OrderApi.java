@@ -267,7 +267,7 @@ public class OrderApi {
      */
     @RequestMapping(value = "userpublishorder")
     public Result publishorder(Integer userId,Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
-                               String idcard, String floor, String username) {
+                               String idcard, String floor, String username, BigDecimal sellprice) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -281,8 +281,8 @@ public class OrderApi {
                 throw new BizException(Error_code.ERROR_CODE_0023, "user为空");
             }
             House house = houseService.findById(houseId);
-            if (house == null) {
-                throw new BizException(Error_code.ERROR_CODE_0025, "查询到house is null");
+            if (house == null || !house.getStatus().equals(HouseStatus.PUTAWAY_YET.getCode())) {
+                throw new BizException(Error_code.ERROR_CODE_0055, "此房源不在上架状态");
             }
 
             HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, userId);
@@ -313,11 +313,12 @@ public class OrderApi {
             houseOrder.setCode(code);
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
-            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
+            houseOrder.setCommission(sellprice.multiply(BigDecimal.valueOf(250)));
             houseOrder.setAuthor(user);
             houseOrder.setFloor(floor);
             houseOrder.setIdcard(idcard);
             houseOrder.setUsername(username);
+            houseOrder.setSellprice(sellprice);
 
             houseOrderService.save(houseOrder);
 
