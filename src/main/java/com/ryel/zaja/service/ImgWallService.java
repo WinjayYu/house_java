@@ -11,4 +11,6 @@ public interface ImgWallService extends ICommonService<ImgWall>{
     List<Object> findByAgentId(Integer agentId);
 
     Long countImg(Integer agentId);
+
+    void deleteByUrl(String url);
 }

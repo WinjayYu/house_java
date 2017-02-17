@@ -933,7 +933,7 @@ public class AgentApi {
      */
     @RequestMapping(value = "publishorder")
     public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
-                                    String toMobile, BigDecimal discount) {
+                                    String toMobile, BigDecimal discount, String username, String idcard, String floor) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -995,7 +995,12 @@ public class AgentApi {
             houseOrder.setCode(code);
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
-            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
+            //实际佣金等于price*250-discount 单位：元
+            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)).subtract(discount));
+
+            houseOrder.setIdcard(idcard);
+            houseOrder.setUsername(username);
+            houseOrder.setFloor(floor);
 
             discount = discount == null ? BigDecimal.ZERO : discount;
             houseOrder.setDiscount(discount);
@@ -1268,6 +1273,13 @@ public class AgentApi {
             discount = discount == null ? BigDecimal.ZERO : discount;
             houseOrder.setDiscount(discount);
             houseOrderService.update(houseOrder);
+
+            //更新用户信息
+            User user = houseOrder.getBuyer();
+            user.setUsername(houseOrder.getUsername());
+            user.setIdcard(houseOrder.getIdcard());
+            userService.update(user);
+
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);
@@ -1328,16 +1340,19 @@ public class AgentApi {
     }
 
     /**
-     * 经纪人删除照片墙中的一张图片
+     * 经纪人删除照片墙中的图片
      * @param agentId
-     * @param url
+     * @param urls
      * @return
      */
     @RequestMapping(value = "deleteimgwall", method = RequestMethod.POST)
-    public Result deleteImgwall(Integer agentId, String url){
+    public Result deleteImgwall(Integer agentId, String[] urls){
         try{
-            String filename = url.substring(url.indexOf("user"));
-            qiNiuService.deleteOneFile(filename);
+            for(String url : urls){
+                String filename = url.substring(url.indexOf("user"));
+                qiNiuService.deleteOneFile(filename);
+                imgWallService.deleteByUrl(url);
+            }
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());

@@ -321,11 +321,6 @@ public class OrderApi {
 
             houseOrderService.save(houseOrder);
 
-            //更新用户信息
-            user.setUsername(username);
-            user.setIdcard(idcard);
-            userService.update(user);
-
             //发送推送信息
             PushDevice pushDevice = pushService.findByUser(agent);
             if (null != pushDevice) {

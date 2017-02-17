@@ -18,4 +18,7 @@ public interface ImgWallDao extends JpaRepository<ImgWall, Integer>,JpaSpecifica
 
     @Query("select count(i.agent) from ImgWall i where i.agent.id = ?1")
     Long countImg(Integer agentId);
+
+    @Query("delete from ImgWall i where i.img = ?1")
+    void deleteByUrl(String url);
 }

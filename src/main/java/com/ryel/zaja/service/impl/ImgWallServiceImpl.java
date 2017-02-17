@@ -7,6 +7,7 @@ import com.ryel.zaja.service.ImgWallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  * Created by billyu on 2017/2/15.
  */
 @Service
+@Transactional(readOnly = true)
 public class ImgWallServiceImpl extends AbsCommonService<ImgWall> implements ImgWallService {
 
     @Autowired
@@ -38,5 +40,11 @@ public class ImgWallServiceImpl extends AbsCommonService<ImgWall> implements Img
     @Override
     public Long countImg(Integer agentId) {
         return imgWallDao.countImg(agentId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUrl(String url) {
+        imgWallDao.deleteByUrl(url);
     }
 }
