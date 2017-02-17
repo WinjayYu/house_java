@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Repository
 public interface ImgWallDao extends JpaRepository<ImgWall, Integer>,JpaSpecificationExecutor<ImgWall> {
-    @Query("select i from ImgWall i where i.agent.id = ?1")
+    @Query("select i from ImgWall i where i.userId= ?1")
     List<ImgWall> findByAgentId(Integer agentId);
 
     @Query("select count(i.agent) from ImgWall i where i.userId = ?1")
