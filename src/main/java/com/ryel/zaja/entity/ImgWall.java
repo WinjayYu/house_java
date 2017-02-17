@@ -21,9 +21,8 @@ public class ImgWall implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User agent;
+
+    private Integer userId;
 
     private String img;
 
@@ -40,12 +39,12 @@ public class ImgWall implements Serializable {
         this.id = id;
     }
 
-    public User getAgent() {
-        return agent;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setAgent(User agent) {
-        this.agent = agent;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getImg() {
