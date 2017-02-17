@@ -163,7 +163,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("") || errorCode.equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals("") || errorMsg.equals(""))) {
                 IndexedCollection icoll = (IndexedCollection) output.getDataElement("unionInfo");
 
                 List<Map> list = new ArrayList<>();

@@ -28,4 +28,9 @@ public class ImgWallServiceImpl extends AbsCommonService<ImgWall> implements Img
     public List<ImgWall> findByAgentId(Integer agentId) {
         return imgWallDao.findByAgentId(agentId);
     }
+
+    @Override
+    public Long countImg(Integer agentId) {
+        return imgWallDao.countImg(agentId);
+    }
 }

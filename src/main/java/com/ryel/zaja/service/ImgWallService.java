@@ -9,4 +9,6 @@ import java.util.List;
  */
 public interface ImgWallService extends ICommonService<ImgWall>{
     List<ImgWall> findByAgentId(Integer agentId);
+
+    Long countImg(Integer agentId);
 }

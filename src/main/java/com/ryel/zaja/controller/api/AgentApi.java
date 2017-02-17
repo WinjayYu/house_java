@@ -954,6 +954,12 @@ public class AgentApi {
                 if (house == null) {
                     throw new BizException(Error_code.ERROR_CODE_0025, "查询到house is null");
                 }
+
+                HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, agentId);
+                if(null != houseOrder1){
+                    throw new BizException(Error_code.ERROR_CODE_0026, "此房源您已发起过订单");
+                }
+
                 List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);
                 if (!CollectionUtils.isEmpty(list)) {
                     throw new BizException(Error_code.ERROR_CODE_0026, "房源已经存在已支付的订单");
@@ -1302,8 +1308,8 @@ public class AgentApi {
     public Result imgWall(Integer agentId, MultipartFile[] imgs){
         try{
 
-            List<ImgWall> imgWalls = imgWallService.findByAgentId(agentId);
-            if(imgWalls.size() > 5){
+            Long imgWalls = imgWallService.countImg(agentId);
+            if(imgWalls > 5){
                 throw new Exception();
             }
             for(MultipartFile img: imgs){
@@ -1349,7 +1355,11 @@ public class AgentApi {
         try{
             Map<String, Object> data = new HashMap();
             List<ImgWall> imgWalls = imgWallService.findByAgentId(agentId);
-            data.put("list", imgWalls);
+            List<Object> list = new ArrayList<>();
+            for(ImgWall imgWall : imgWalls){
+                list.add(imgWall.getImg());
+            }
+            data.put("list", list);
             return Result.success().msg("").data(data);
         }catch (Exception e){
             logger.error(e.getMessage(), e);

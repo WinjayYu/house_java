@@ -8,6 +8,8 @@ spring:
         username: @spring.dataSource.username@
         password: @spring.dataSource.password@
         driverClassName: com.mysql.jdbc.Driver
+        testOnBorrow: true
+        validationQuery: SELECT 1
 
     hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
