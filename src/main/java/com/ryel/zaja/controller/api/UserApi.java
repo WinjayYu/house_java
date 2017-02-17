@@ -98,6 +98,9 @@ public class UserApi {
     @Autowired
     private UserWalletAccountService userWalletAccountService;
 
+    @Autowired
+    private ImgWallService imgWallService;
+
 
 //    private static int EXPIRES = 10 * 60; //超时时间10min
 //    private static int captchaW = 200;
@@ -775,7 +778,8 @@ public class UserApi {
             houseCount = houseCount == null ? 0 : houseCount;
             dataMap.put("houseCount", houseCount);
 
-
+            List<Object> imgList = imgWallService.findByAgentId(userId);
+            dataMap.put("imgList", imgList);
 
             return Result.success().msg("").data(dataMap);
 
