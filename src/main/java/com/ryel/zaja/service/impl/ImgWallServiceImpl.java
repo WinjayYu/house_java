@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,8 +26,13 @@ public class ImgWallServiceImpl extends AbsCommonService<ImgWall> implements Img
     }
 
     @Override
-    public List<ImgWall> findByAgentId(Integer agentId) {
-        return imgWallDao.findByAgentId(agentId);
+    public List<Object> findByAgentId(Integer agentId) {
+        List<ImgWall> imgWalls =  imgWallDao.findByAgentId(agentId);
+        List<Object> list = new ArrayList<>();
+        for(ImgWall imgWall : imgWalls){
+            list.add(imgWall.getImg());
+        }
+        return list;
     }
 
     @Override

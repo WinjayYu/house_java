@@ -1309,7 +1309,7 @@ public class AgentApi {
         try{
 
             Long imgWalls = imgWallService.countImg(agentId);
-            if(imgWalls > 5){
+            if(imgWalls > 8){
                 throw new Exception();
             }
             for(MultipartFile img: imgs){
@@ -1354,11 +1354,7 @@ public class AgentApi {
 
         try{
             Map<String, Object> data = new HashMap();
-            List<ImgWall> imgWalls = imgWallService.findByAgentId(agentId);
-            List<Object> list = new ArrayList<>();
-            for(ImgWall imgWall : imgWalls){
-                list.add(imgWall.getImg());
-            }
+            List<Object> list = imgWallService.findByAgentId(agentId);
             data.put("list", list);
             return Result.success().msg("").data(data);
         }catch (Exception e){

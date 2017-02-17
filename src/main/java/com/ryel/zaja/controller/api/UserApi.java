@@ -775,6 +775,8 @@ public class UserApi {
             houseCount = houseCount == null ? 0 : houseCount;
             dataMap.put("houseCount", houseCount);
 
+
+
             return Result.success().msg("").data(dataMap);
 
         }catch (Exception e){
