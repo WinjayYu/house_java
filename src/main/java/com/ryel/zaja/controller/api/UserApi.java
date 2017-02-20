@@ -666,7 +666,6 @@ public class UserApi {
         try{
 
             Comment comment = commentService.create(userId, agentId, houseOrderId, star, content);
-//            Comment comment = commentService.findByHouseOrderId(houseOrderId);
 
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException e){

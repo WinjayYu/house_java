@@ -318,6 +318,7 @@ public class OrderApi {
             houseOrder.setFloor(floor);
             houseOrder.setIdcard(idcard);
             houseOrder.setUsername(username);
+            houseOrder.setDiscount(BigDecimal.ZERO);
 
             houseOrderService.save(houseOrder);
 
