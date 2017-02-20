@@ -211,7 +211,7 @@ public class VerifyCodeUtil {
 
     public static String getVerCode() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 4; i++) {
             sb.append(new Random().nextInt(10));
         }
         return sb.toString();
