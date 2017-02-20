@@ -71,13 +71,10 @@ public class HouseOrder implements Serializable {
 
     private String username;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
+
+    private Integer authorId;
 
     private BigDecimal discount;
-
-    private BigDecimal sellprice;
 
     public HouseOrder(){}
 
@@ -217,12 +214,12 @@ public class HouseOrder implements Serializable {
         this.username = username;
     }
 
-    public User getAuthor() {
-        return author;
+    public Integer getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(User author) {
-        this.author = author;
+    public void setAuthorId(Integer authorId) {
+        this.authorId = authorId;
     }
 
     public BigDecimal getDiscount() {
@@ -233,11 +230,4 @@ public class HouseOrder implements Serializable {
         this.discount = discount;
     }
 
-    public BigDecimal getSellprice() {
-        return sellprice;
-    }
-
-    public void setSellprice(BigDecimal sellprice) {
-        this.sellprice = sellprice;
-    }
 }

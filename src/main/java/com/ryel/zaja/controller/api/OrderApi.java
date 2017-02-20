@@ -267,7 +267,7 @@ public class OrderApi {
      */
     @RequestMapping(value = "userpublishorder")
     public Result publishorder(Integer userId,Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
-                               String idcard, String floor, String username, BigDecimal sellprice) {
+                               String idcard, String floor, String username) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -313,12 +313,11 @@ public class OrderApi {
             houseOrder.setCode(code);
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
-            houseOrder.setCommission(sellprice.multiply(BigDecimal.valueOf(250)));
-            houseOrder.setAuthor(user);
+            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
+            houseOrder.setAuthorId(user.getId());
             houseOrder.setFloor(floor);
             houseOrder.setIdcard(idcard);
             houseOrder.setUsername(username);
-            houseOrder.setSellprice(sellprice);
 
             houseOrderService.save(houseOrder);
 

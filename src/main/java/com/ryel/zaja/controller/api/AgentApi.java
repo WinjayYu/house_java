@@ -322,18 +322,24 @@ public class AgentApi {
                 //说明是二次编辑的房源信息
                 if (HouseType.FIRST.getCode().equals(order.getType())) {
                     neworder.put("house", order.getHouse());
-                } else {
-                    neworder.put("community", order.getCommunity());
-                    neworder.put("area", order.getArea());
-                    neworder.put("price", order.getPrice());
-                    neworder.put("commission", order.getCommission());
                 }
+
+                neworder.put("community", order.getCommunity());
+                neworder.put("area", order.getArea());
+                neworder.put("price", order.getPrice());
+                neworder.put("commission", order.getCommission());
+                neworder.put("discount",order.getDiscount());
 
                 neworder.put("id", order.getId());
                 neworder.put("code", order.getCode());
                 neworder.put("buyer", order.getBuyer());
                 neworder.put("status", order.getStatus());
                 neworder.put("type", order.getType());
+                neworder.put("username", order.getUsername());
+                neworder.put("idcard", order.getIdcard());
+                neworder.put("authorId", order.getAuthorId());
+                neworder.put("floor", order.getFloor());
+                neworder.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm").format(order.getAddTime()));
 
                 list.add(neworder);
             }
@@ -933,8 +939,7 @@ public class AgentApi {
      */
     @RequestMapping(value = "publishorder")
     public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
-                                    String toMobile, BigDecimal discount, String username, String idcard, String floor,
-                                        BigDecimal sellprice) {
+                                    String toMobile, BigDecimal discount, String username, String idcard, String floor) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -988,7 +993,7 @@ public class AgentApi {
             String code = BizUtil.getOrderCode();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setAuthor(agent);
+            houseOrder.setAuthorId(agent.getId());
             houseOrder.setBuyerMobile(toMobile);
             houseOrder.setStatus(HouseOrderStatus.NO_ORDER.getCode());
             houseOrder.setType(type);
@@ -997,13 +1002,13 @@ public class AgentApi {
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             //实际佣金等于price*250-discount 单位：元
-            houseOrder.setCommission(sellprice.multiply(BigDecimal.valueOf(250)).subtract(discount));
+            discount = discount == null ? BigDecimal.ZERO : discount;
+            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)).subtract(discount));
 
             houseOrder.setIdcard(idcard);
             houseOrder.setUsername(username);
             houseOrder.setFloor(floor);
 
-            discount = discount == null ? BigDecimal.ZERO : discount;
             houseOrder.setDiscount(discount);
 
             houseOrderService.save(houseOrder);
@@ -1106,6 +1111,11 @@ public class AgentApi {
     }
 
 
+    /**
+     * 获取经纪人的接单数 房源总数 评分
+     * @param agentId
+     * @return
+     */
     @RequestMapping(value = "count", method = RequestMethod.POST)
     public Result count(Integer agentId){
         try{
@@ -1127,7 +1137,12 @@ public class AgentApi {
             dataMap.put("orderSum", orderSum);
             dataMap.put("houseSum", houseSum);
 
-            return Result.success().msg("").data(dataMap);
+            Map<String, Object> result = new HashMap<>();
+            List<Object> list = imgWallService.findByAgentId(agentId);
+            result.put("list", list);
+            result.put("analysis", dataMap);
+
+            return Result.success().msg("").data(result);
 
         }catch (Exception e){
             logger.error(e.getMessage(), e);
@@ -1325,7 +1340,7 @@ public class AgentApi {
      * @return
      */
     @RequestMapping(value = "imgwall", method = RequestMethod.POST)
-    public Result imgWall(Integer agentId, MultipartFile[] imgs){
+    public Result imgWall(Integer agentId, @RequestParam(value="imgs", required = false) MultipartFile[] imgs){
         try{
 
             Long imgWalls = imgWallService.countImg(agentId);
@@ -1354,14 +1369,16 @@ public class AgentApi {
      * @return
      */
     @RequestMapping(value = "deleteimgwall", method = RequestMethod.POST)
-    public Result deleteImgwall(Integer agentId, String[] urls){
+    public Result deleteImgwall(Integer agentId, String urls){
         try{
 
-            for(String url : urls){
-                if(imgWallService.findByAgentIdAndUrl(agentId, url)) {
+            String[] path = JsonUtil.json2Obj(urls,String[].class);
+            for(String url : path){
+                ImgWall wall =  imgWallService.findByAgentIdAndUrl(agentId, url);
+                if(wall !=null) {
                     String filename = url.substring(url.indexOf("user"));
                     qiNiuService.deleteOneFile(filename);
-                    imgWallService.deleteByUrl(url);
+                    imgWallService.delete(wall);
                 }
             }
         }catch (Exception e){
