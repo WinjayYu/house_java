@@ -515,7 +515,7 @@ public class AgentApi {
     /**
      * 接单
      */
-    @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
+    @RequestMapping(value = "receivedemand", method = RequestMethod.POST)
     public Result receiveorder(Integer demandId, Integer agentId, String type) {
         try {
             if (demandId == null) {
@@ -1213,13 +1213,13 @@ public class AgentApi {
     /**
      * 经纪人确认接单,状态值从"10"变成"20"
      * @param agentId
-     * @param houseOrderId
+     * @param orderId
      * @return
      */
-    @RequestMapping(value = "agentreceiveorder", method = RequestMethod.POST)
-    public Result agentReceiveOrder(Integer agentId, Integer houseOrderId, BigDecimal discount){
+    @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
+    public Result agentReceiveOrder(Integer agentId, Integer orderId, BigDecimal discount){
         try{
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, houseOrderId);
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, orderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
 
@@ -1247,13 +1247,13 @@ public class AgentApi {
     /**
      * 经纪人拒绝接单
      * @param agentId
-     * @param houseOrderId
+     * @param orderId
      * @return
      */
-    @RequestMapping(value = "agentrejectorder", method = RequestMethod.POST)
-    public Result agentRejectOrder(Integer agentId, Integer houseOrderId){
+    @RequestMapping(value = "rejectorder", method = RequestMethod.POST)
+    public Result agentRejectOrder(Integer agentId, Integer orderId){
         try{
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, houseOrderId);
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, orderId);
 
             houseOrder.setStatus(HouseOrderStatus.REJECT.getCode());
             houseOrderService.update(houseOrder);
@@ -1270,16 +1270,16 @@ public class AgentApi {
     /**
      * 经纪人投诉，订单状态值从"10"变成"12"，投诉内容写进数据库
      * @param agentId
-     * @param houseOrderId
+     * @param orderId
      * @param content
      * @return
      */
-    @RequestMapping(value = "agentcomplain", method = RequestMethod.POST)
-    public Result agentComplain(Integer agentId, Integer houseOrderId, String content){
+    @RequestMapping(value = "complain", method = RequestMethod.POST)
+    public Result agentComplain(Integer agentId, Integer orderId, String content){
         try{
-            complainService.create(agentId, houseOrderId, content);
+            complainService.create(agentId, orderId, content);
 
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, houseOrderId);
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, orderId);
             houseOrder.setStatus(HouseOrderStatus.COMPLAIN.getCode());
             houseOrderService.update(houseOrder);
             return Result.success().msg("").data(new HashMap<>());

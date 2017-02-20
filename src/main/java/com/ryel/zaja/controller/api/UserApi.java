@@ -775,7 +775,10 @@ public class UserApi {
             List<Object> imgList = imgWallService.findByAgentId(userId);
             dataMap.put("imgList", imgList);
 
-            return Result.success().msg("").data(dataMap);
+            Map<String, Object> result = new HashMap<>();
+            result.put("analysis",dataMap);
+
+            return Result.success().msg("").data(result);
 
         }catch (Exception e){
             logger.error(e.getMessage(), e);
