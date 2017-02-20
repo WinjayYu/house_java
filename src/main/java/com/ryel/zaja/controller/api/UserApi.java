@@ -2,6 +2,7 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.Constant;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
@@ -93,18 +94,12 @@ public class UserApi {
     @Autowired
     private ApkService apkService;
 
-    private static final String USERHEADURL = "http://oi0y2qwer.bkt.clouddn.com/user_head.png";
-
     @Autowired
     private UserWalletAccountService userWalletAccountService;
 
     @Autowired
     private ImgWallService imgWallService;
 
-
-//    private static int EXPIRES = 10 * 60; //超时时间10min
-//    private static int captchaW = 200;
-//    private static int captchaH = 60;
 
     /**
      * @api {post} /api/user/register 1.APP用户注册
@@ -128,7 +123,7 @@ public class UserApi {
             return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
         }
         try {
-            user.setHead(USERHEADURL);
+            user.setHead(Constant.USER_HEAD.getCode());
             user.setNickname("");
             user.setUsername("");
             user.setAgentStatus("");
@@ -264,7 +259,6 @@ public class UserApi {
      * "data": "http://localhost:8080/files/upload/img/2016/8/558537507501307.jpg"
      * }
      */
-    //@RequestParam(value = "head", required = true) MultipartFile file
     @RequestMapping(value = "/user/head")
     public Result headUpload(Integer userId,
                              @RequestParam(required = true) MultipartFile image) throws BizException,Exception{

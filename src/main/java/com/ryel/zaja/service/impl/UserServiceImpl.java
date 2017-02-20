@@ -3,6 +3,7 @@ package com.ryel.zaja.service.impl;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.AgentRegisterStatus;
+import com.ryel.zaja.config.enums.Constant;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.AgentMaterialDao;
@@ -53,11 +54,8 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     @Autowired
     private BizUploadFile bizUploadFile;
 
-
     @Autowired
     EntityManagerFactory emf;
-
-    public static final String AGENT_HEAD = "https://img.zaja.xin/agent_head.png";
 
     @Transactional
     @Override
@@ -201,7 +199,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         }else{
             //新建用户
             user.setNickname("");
-            user.setHead(AGENT_HEAD);//默认头像
+            user.setHead(Constant.AGENT_HEAD.getCode());//默认头像
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
             user.setIdcard(agentMaterial.getIdcard());
