@@ -132,6 +132,11 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     }
 
     @Override
+    public HouseOrder findByAgentIdAndOrderId(Integer agentId, Integer houseOrderId) {
+        return houseOrderDao.findByAgentIdAndOrderId(agentId, houseOrderId);
+    }
+
+    @Override
     @Transactional
     public HouseOrder payment(Integer userId, Integer houseOrderId) {
         HouseOrder houseOrder = check(houseOrderId);

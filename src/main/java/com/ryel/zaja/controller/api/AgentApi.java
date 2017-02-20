@@ -1219,7 +1219,7 @@ public class AgentApi {
     @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
     public Result agentReceiveOrder(Integer agentId, Integer orderId, BigDecimal discount){
         try{
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, orderId);
+            HouseOrder houseOrder = houseOrderService.findByAgentIdAndOrderId(agentId, orderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
 
@@ -1253,7 +1253,7 @@ public class AgentApi {
     @RequestMapping(value = "rejectorder", method = RequestMethod.POST)
     public Result agentRejectOrder(Integer agentId, Integer orderId){
         try{
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, orderId);
+            HouseOrder houseOrder = houseOrderService.findByAgentIdAndOrderId(agentId, orderId);
 
             houseOrder.setStatus(HouseOrderStatus.REJECT.getCode());
             houseOrderService.update(houseOrder);
