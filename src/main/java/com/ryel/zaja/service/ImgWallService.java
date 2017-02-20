@@ -12,7 +12,7 @@ public interface ImgWallService extends ICommonService<ImgWall>{
 
     Long countImg(Integer agentId);
 
-    void deleteByUrl(String url);
+    void delete(ImgWall wall);
 
-    boolean findByAgentIdAndUrl(Integer agentId, String url);
+    ImgWall findByAgentIdAndUrl(Integer agentId, String url);
 }

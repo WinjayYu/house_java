@@ -6,6 +6,7 @@ import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.ImgWallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,13 +44,14 @@ public class ImgWallServiceImpl extends AbsCommonService<ImgWall> implements Img
     }
 
     @Override
+    @Modifying
     @Transactional
-    public void deleteByUrl(String url) {
-        imgWallDao.deleteByUrl(url);
+    public void delete(ImgWall wall) {
+        imgWallDao.delete(wall);
     }
 
     @Override
-    public boolean findByAgentIdAndUrl(Integer agentId, String url) {
+    public ImgWall findByAgentIdAndUrl(Integer agentId, String url) {
         return imgWallDao.findByAgentIdAndUrl(agentId, url);
     }
 }
