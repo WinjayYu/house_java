@@ -154,21 +154,12 @@ public class OrderApi {
      * @return
      */
     @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
-    public Result receiveOrder(Integer userId, Integer houseOrderId, String idcard, String floor, String username){
+    public Result receiveOrder(Integer userId, Integer houseOrderId){
         try{
             HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
-            houseOrder.setFloor(floor);
-            houseOrder.setIdcard(idcard);
-            houseOrder.setUsername(username);
             houseOrderService.update(houseOrder);
-            //更新用户信息
-            User user = new User();
-            user.setId(userId);
-            user.setIdcard(idcard);
-            user.setUsername(username);
-            userService.update(user);
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);

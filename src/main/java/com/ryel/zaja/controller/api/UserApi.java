@@ -212,9 +212,10 @@ public class UserApi {
             Result result = Result.error().msg(Error_code.ERROR_CODE_0030);//未设置密码
             return JsonUtil.obj2ApiJson(result);
         }
-            origUser.setPassword("");
-            Result result = Result.success().msg("").data(user2map(origUser));
-            return JsonUtil.obj2ApiJson(result);
+            Map<String,Object> user = APIFactory.filterUser(origUser);
+            Map<String, Object> data = new HashMap<>();
+            data.put("user", user);
+            return JsonUtil.obj2ApiJson(data);
     }
 
     /**
@@ -408,7 +409,10 @@ public class UserApi {
                 if (null != thirdUser.getUser()) {
                     int id = thirdUser.getUser();
                     User user = userService.findById(id);
-                    return Result.success().msg("").data(user2map(user));
+                    Map<String,Object> user1 = APIFactory.filterUser(user);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("user", user1);
+                    return Result.success().msg("").data(data);
                 } else {
                     Map<String, String> map = new HashMap<>();
                     map.put("status", "0");//"0"代表没有绑定手机号
@@ -456,19 +460,19 @@ public class UserApi {
             }
 
 
-            if(null != userService.findByMobile(mobile)){
+            User user1;
+            if(null != (user1 = userService.findByMobile(mobile))){
 
-                User user = userService.findByMobile(mobile);
-
+//              User user = userService.findByMobile(mobile);
 
                 //一个账户只能绑定一个微信或者QQ
-                ThirdUser thirdUser1 = thirdUserService.check(user.getId(),thirdUser.getType());
+                ThirdUser thirdUser1 = thirdUserService.check(user1.getId(),thirdUser.getType());
                 if(null != thirdUser1){
                     if(null != thirdUser1.getUser()) {
                         return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
                     }
                 }
-                thirdUser.setUser(user.getId());
+                thirdUser.setUser(user1.getId());
                 thirdUserService.update(thirdUser);
 
                /* String str = JsonUtil.obj2Json(thirdUser1);
@@ -478,7 +482,7 @@ public class UserApi {
 
                 Map<String, Object> dataMap = new HashMap<>();
                 dataMap.put("user",obj.toString());*/
-                return Result.success().msg("").data(user2map(user));
+                return Result.success().msg("").data(user2map(user1));
             }
 
             User user = new User();
@@ -498,7 +502,10 @@ public class UserApi {
             thirdUser.setUser(origUser.getId());
             ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
-          return Result.success().msg("").data(user2map(origUser));
+            Map<String, Object> data = new HashMap<>();
+            data.put("user",APIFactory.filterUser(origUser));
+
+          return Result.success().msg("").data(data);
         } catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());

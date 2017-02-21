@@ -121,6 +121,7 @@ public class APIFactory{
         userMap.put("mobile",user.getMobile());
         userMap.put("type",user.getType());
         userMap.put("head",user.getHead());
+        userMap.put("agentStatus", user.getAgentStatus());
         return  userMap;
     }
 
