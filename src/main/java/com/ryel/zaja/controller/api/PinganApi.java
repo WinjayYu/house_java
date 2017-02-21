@@ -182,7 +182,7 @@ public class PinganApi {
                 data.put("list", list);
                 return Result.success().msg("").data(data);
             } else {
-                return Result.error().msg(errorMsg).data(new HashMap<>());
+                return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
         } catch (Exception e) {
@@ -374,7 +374,7 @@ public class PinganApi {
             } else if(errorCode.equals("UKHPY37")){
                 return Result.error().msg(Error_code.ERROR_CODE_0053).data(new HashMap<>());
             }else{
-                return Result.error().msg(errorMsg).data(new HashMap<>());
+                return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
 
@@ -423,9 +423,55 @@ public class PinganApi {
 
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
-
-
+            String status = (String) output.getDataValue("status");
+            
             if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
+
+                return UnionAPI_OrderQuery(fromUserId,toUserId,(String)output.getDataValue("accNo"),(String)output.getDataValue("telephone"),orderId,pinganOrderId);
+            } else {
+
+                return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 支付交易查询接口
+     * @param fromUserId
+     * @param toUserId
+     * @param accNo
+     * @param telephone
+     * @param orderId
+     * @param pinganOrderId
+     * @return
+     */
+    @RequestMapping(value = "orderquery")
+    public Result UnionAPI_OrderQuery(Integer fromUserId,Integer toUserId,String accNo,String telephone, Integer orderId,String pinganOrderId) {
+        try {
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+
+            com.ecc.emp.data.KeyedCollection input = new com.ecc.emp.data.KeyedCollection("input");
+            com.ecc.emp.data.KeyedCollection output = new com.ecc.emp.data.KeyedCollection("output");
+
+            String masterId = WalletConstant.QUICK_PAYMENT_ID;
+            input.put("masterId", masterId);
+            input.put("orderId", pinganOrderId);
+            input.put("customerId", fromUserId);
+
+
+            output = util.execute(input, "UnionAPI_OrderQuery"); //执行发送，并返回结果对象
+
+
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+
+            String status = (String) output.getDataValue("status");
+
+            if (status.equals("01")) {
 
                 PinganOrder order = new PinganOrder();
                 order.setMasterId((String) output.getDataValue("masterId"));
@@ -433,10 +479,10 @@ public class PinganApi {
                 order.setAmount((String) output.getDataValue("amount"));
                 order.setCharge((String) output.getDataValue("charge"));
                 order.setValidtime((String) output.getDataValue("validtime"));
-                order.setCustomerId((String) output.getDataValue("customerId"));
-                order.setAccNo((String) output.getDataValue("accNo"));
-                order.setMobile((String) output.getDataValue("telephone"));
-                order.setOrderId(Integer.valueOf((String)output.getDataValue("remark")));
+                order.setCustomerId(fromUserId+"");
+                order.setAccNo(accNo);
+                order.setMobile(telephone);
+                order.setOrderId(orderId);
                 order.setObjectName((String) output.getDataValue("objectName"));
                 order.setCurrency((String) output.getDataValue("currency"));
                 order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
@@ -446,98 +492,17 @@ public class PinganApi {
                 pinganOrderService.create(order);
 
                 //资金进入会员子账户 和 冻结资金到担保账户
-                wallet.frozennMoney("3",fromUserId,toUserId,amount,orderId);
+                wallet.frozennMoney("3",fromUserId,toUserId,(String) output.getDataValue("amount"),orderId);
 
                 return Result.success().msg("").data(new HashMap<>());
             } else {
 
-                return Result.error().msg(errorMsg).data(new HashMap<>());
+                return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
-
-    @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
-    public void submitNotify(String orig,String sign) {
-        try {
-
-
-            logger.info("---orig---" + orig);
-            logger.info("---sign---" + sign);
-
-            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
-            KeyedCollection output = new KeyedCollection("output");
-
-            String encoding = "GBK";
-
-
-            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
-            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
-
-
-            boolean result = util.verifyData(sign, orig);
-            logger.info("---通知验签结果---" + result);
-            if (!result) {
-                logger.info("---验签失败---" + result);
-                return;
-            }
-
-            output = util.parseOrigData(orig);
-
-//  orig信息：
-//            status	char	2	01成功，02失败，00未成功
-//            date	varchar	14	支付完成时间，
-//            YYYYMMDDHHMMSS
-//            charge	number	12,2	订单手续费金额，12整数，2小数
-//            masterId	char	10	商户号
-//            orderId	varchar	26	订单号
-//            currency	char	3	币种，目前只支持RMB
-//            amount	number	12,2	订单金额，12整数，2小数
-//            objectName	varchar	200	款项描述
-//            paydate	varchar	14	下单时间，
-//            YYYYMMDDHHMMSS
-//            validtime	number	10	订单有效期(毫秒)，0不生效
-//            remark	varchar	500	备注字段
-//            customerId	varchar	30	商户会员号
-//            accNo	varchar	4	银行卡号后四位
-//            telephone	varchar	20	银行预留手机号
-//            errorCode	varchar	8	错误返回相应的错误码, 正常返回为空
-//            errorMsg	varchar	100	错误码对应的错误说明，正常返回为空
-
-            String errorCode = (String) output.getDataValue("errorCode");
-            String errorMsg = (String) output.getDataValue("errorMsg");
-
-//            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
-//                // 成功
-//                PinanOrder order = new PinanOrder();
-//                order.setMasterId((String) output.getDataValue("masterId"));
-//                order.setOrderId((String) output.getDataValue("orderId"));
-//                order.setAmount((BigDecimal) output.getDataValue("amount"));
-//                order.setCharge((BigDecimal) output.getDataValue("charge"));
-//                order.setValidtime((BigDecimal) output.getDataValue("validtime"));
-//                order.setCustomerId((String) output.getDataValue("customerId"));
-//                order.setAccNo((String) output.getDataValue("accNo"));
-//                order.setMobile((String) output.getDataValue("telephone"));
-//                order.setRemark((String) output.getDataValue("remark"));
-//                order.setObjectName((String) output.getDataValue("objectName"));
-//                order.setCurrency((String) output.getDataValue("currency"));
-//                order.setPayTime(pinganTimeToDate((String) output.getDataValue("date")));
-//                order.setOrderTime(pinganTimeToDate((String) output.getDataValue("paydate")));
-//
-//                OrderApi api = new OrderApi();
-//                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
-//
-//                pinanOrderService.create(order);
-//
-//            } else {
-//                logger.info("失败原因====================" + errorMsg);
-//            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -595,6 +560,21 @@ public class PinganApi {
         }
         return new Date();
     }
+
+    /**
+     * 去掉错误信息的[]
+     * @param msg
+     * @return
+     */
+    public String pinganError(String msg)
+    {
+        int left = msg.indexOf("[");
+        int right = msg.indexOf("]");
+        String replace = msg.substring(left,right);
+        return  msg.replace(replace,"");
+
+    }
+
 
 
     /**

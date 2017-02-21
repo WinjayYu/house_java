@@ -27,18 +27,12 @@ public class NotifyApi {
     protected final static Logger logger = LoggerFactory.getLogger(NotifyApi.class);
 
     @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
-    public Result submitNotify(HttpServletRequest request) {
+    public void submitNotify(HttpServletRequest request) {
         try {
-
-            String textEntity = VerifyCodeUtil.send("15007184046", "回调成功", "1");
-
-
 
             String orig = request.getParameter("orig");
             String sign = request.getParameter("sign");
 
-            logger.info("---orig---" + orig);
-            logger.info("---sign---" + sign);
 
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
             KeyedCollection output = new KeyedCollection("output");
@@ -54,7 +48,6 @@ public class NotifyApi {
             logger.info("---通知验签结果---" + result);
             if (!result) {
                 logger.info("---验签失败---" + result);
-                return Result.error().msg("验证失败").data(new HashMap<>());
             }
 
             output = util.parseOrigData(orig);
@@ -62,12 +55,13 @@ public class NotifyApi {
 
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
+            String status = (String) output.getDataValue("status");
 
-            return Result.success().data(new HashMap<>());
+            logger.info("---支付回调---" + status);
+
 
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error().msg("验证失败").data(new HashMap<>());
 
         }
     }
