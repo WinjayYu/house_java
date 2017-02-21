@@ -8,27 +8,34 @@ import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 /**
  * Created by Nathan on 2017/2/11.
  */
-@RestController()
+@RestController
 @RequestMapping(value = "/api/pingan/notify", produces = "text/html; charset=gbk")
 public class NotifyApi {
 
     protected final static Logger logger = LoggerFactory.getLogger(NotifyApi.class);
 
     @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
-    public Result submitNotify(String orig, String sign) {
+    public Result submitNotify(HttpServletRequest request) {
         try {
 
             String textEntity = VerifyCodeUtil.send("15007184046", "回调成功", "1");
 
+
+
+            String orig = request.getParameter("orig");
+            String sign = request.getParameter("sign");
 
             logger.info("---orig---" + orig);
             logger.info("---sign---" + sign);
