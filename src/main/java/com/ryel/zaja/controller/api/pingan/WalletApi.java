@@ -333,6 +333,84 @@ public class WalletApi {
 
     }
 
+    /**
+     * 会员绑定信息查询
+     */
+    @RequestMapping(value = "querybindinfo")
+    public Result queryBindInfo(Integer page, String type, String custAcctId) {
+        HashMap parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
+        HashMap retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
+        try {
+
+            parmaKeyDict.put("TranFunc", "6098"); // 交易码，此处以【6000】接口为例子
+            parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
+            parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
+
+            parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
+            parmaKeyDict.put("SelectFlag", type); // 1：全部会员 2：单个会员
+            parmaKeyDict.put("PageNum", page + "");
+
+            if(type.equals("2")) {
+                parmaKeyDict.put("CustAcctId", custAcctId); // 交易网会员代码
+            }
+
+            parmaKeyDict.put("Reserve", "会员绑定信息查询"); // 保留域
+
+
+            ZJJZ_API_GW msg = new ZJJZ_API_GW();
+            String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
+
+
+            msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
+            String recvMessage = (String) retKeyDict.get("RecvMessage");// 银行返回的报文
+
+
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            System.out.println("返回报文:=" + retKeyDict);
+            /**
+             * 第三部分：解析银行返回的报文的实例
+             */
+            retKeyDict = msg.parsingTranMessageString(recvMessage);
+            String rspCode = (String) retKeyDict.get("RspCode");
+            if (!"000000".equals(rspCode)) {
+                logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
+                return Result.error().msg(rspCode).data(new HashMap<>());
+            }
+
+            String TotalCount = (String) retKeyDict.get("TotalCount");
+            String Reserve = (String) retKeyDict.get("Reserve");
+
+            String arrayContent = (String) retKeyDict.get("ArrayContent"); //ArrayContent为固定名称。
+            String[] array = arrayContent.split("&");
+
+            List list = new ArrayList();
+
+            for (int i = 0; i < array.length; i = i + 12) {
+                Map map = new HashMap<>();
+                map.put("SupAcctId", array[i]);
+                map.put("CustAcctId", array[i + 1]);
+                map.put("ThirdCustId", array[i + 2]);
+                map.put("CustName", array[i + 3]);
+                map.put("IdType", array[i + 4]);
+                map.put("IdType", array[i + 5]);
+                map.put("AcctId", array[i + 6]);
+                map.put("BankType", array[i + 7]);
+                map.put("BankName", array[i + 8]);
+                map.put("BankCode", array[i + 9]);
+                map.put("SBankCode", array[i + 10]);
+                map.put("MobilePhone", array[i + 11]);
+                list.add(map);
+            }
+
+            Map data = new HashMap<>();
+            data.put("list", list);
+
+            return Result.success().data(data);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+        }
+    }
 
 
     /**
