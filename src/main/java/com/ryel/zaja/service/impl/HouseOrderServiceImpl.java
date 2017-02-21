@@ -143,7 +143,8 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
         List<HouseOrder> houseOrders = houseOrderDao.findAllOrderByHouseId(houseOrder.getHouse().getId());
         for(HouseOrder houseOrder2: houseOrders){
             if(HouseOrderStatus.getPayedList().contains(houseOrder2.getStatus())){
-                throw new BizException(Error_code.ERROR_CODE_0026,"订单存在已支付的订单");
+                houseOrder.setStatus(HouseOrderStatus.CLOSED.getCode());
+                throw new BizException(Error_code.ERROR_CODE_0026,"房源存在已支付的订单");
             }
         }
         if(!HouseOrderStatus.WAIT_PAYMENT.getCode().equals(houseOrder.getStatus())){
@@ -161,13 +162,13 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
                 }
 
             }
-
+/*
             //用户支付成功，对应的房屋所有其他的订单进入关闭状态
             houseOrders.remove(houseOrder);
             for(HouseOrder houseOrder1 : houseOrders){
                 houseOrder1.setStatus(HouseOrderStatus.CLOSED.getCode());
                 update(houseOrder);
-            }
+            }*/
         }
         return update(houseOrder);
     }
