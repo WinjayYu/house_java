@@ -1,6 +1,8 @@
 package com.ryel.zaja.controller.api.pingan;
 
 import com.ecc.emp.data.KeyedCollection;
+import com.ryel.zaja.config.Error_code;
+import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.controller.api.PinganApi;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.slf4j.Logger;
@@ -9,17 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+
 /**
  * Created by Nathan on 2017/2/11.
  */
 @RestController()
-@RequestMapping(value = "/api/pingan/notify", produces = "application/x-www-form-urlencoded; charset=UTF-8")
+@RequestMapping(value = "/api/pingan/notify", produces = "application/json; charset=UTF-8")
 public class NotifyApi {
 
     protected final static Logger logger = LoggerFactory.getLogger(NotifyApi.class);
 
     @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
-    public void submitNotify(String orig,String sign) {
+    public Result submitNotify(String orig, String sign) {
         try {
 
 
@@ -40,7 +44,7 @@ public class NotifyApi {
             logger.info("---通知验签结果---" + result);
             if (!result) {
                 logger.info("---验签失败---" + result);
-                return;
+                return Result.error().msg("验证失败").data(new HashMap<>());
             }
 
             output = util.parseOrigData(orig);
@@ -49,8 +53,12 @@ public class NotifyApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
+            return Result.success().data(new HashMap<>());
+
         } catch (Exception e) {
             e.printStackTrace();
+            return Result.error().msg("验证失败").data(new HashMap<>());
+
         }
     }
 }
