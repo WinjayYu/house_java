@@ -202,20 +202,19 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    public String login(String mobile, String password) {
+    public Result login(String mobile, String password) {
         User origUser = userService.login(mobile, password);
         if(null == origUser) {
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
-            return JsonUtil.obj2ApiJson(result);
+            return Result.error().msg(Error_code.ERROR_CODE_0004).data(new HashMap<>());//用户名或密码错误
+
         }
         if("".equals(origUser.getPassword())){
-            Result result = Result.error().msg(Error_code.ERROR_CODE_0030);//未设置密码
-            return JsonUtil.obj2ApiJson(result);
+            return Result.error().msg(Error_code.ERROR_CODE_0030).data(new HashMap<>());//未设置密码
         }
             Map<String,Object> user = APIFactory.filterUser(origUser);
             Map<String, Object> data = new HashMap<>();
             data.put("user", user);
-            return JsonUtil.obj2ApiJson(data);
+            return Result.success().msg("").data(data);
     }
 
     /**
