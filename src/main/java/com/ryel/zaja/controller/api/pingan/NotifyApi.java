@@ -4,6 +4,7 @@ import com.ecc.emp.data.KeyedCollection;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.controller.api.PinganApi;
+import com.ryel.zaja.utils.VerifyCodeUtil;
 import com.sdb.payclient.core.PayclientInterfaceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import java.util.HashMap;
  * Created by Nathan on 2017/2/11.
  */
 @RestController()
-@RequestMapping(value = "/api/pingan/notify", produces = "application/json; charset=UTF-8")
+@RequestMapping(value = "/api/pingan/notify", produces = "text/html; charset=gbk")
 public class NotifyApi {
 
     protected final static Logger logger = LoggerFactory.getLogger(NotifyApi.class);
@@ -25,6 +26,8 @@ public class NotifyApi {
     @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
     public Result submitNotify(String orig, String sign) {
         try {
+
+            String textEntity = VerifyCodeUtil.send("15007184046", "回调成功", "1");
 
 
             logger.info("---orig---" + orig);
