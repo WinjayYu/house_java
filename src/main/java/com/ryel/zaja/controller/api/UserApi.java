@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -374,7 +375,7 @@ public class UserApi {
             System.out.print(textEntity);
             SAXReader saxReader = new SAXReader();
 
-            Document document = saxReader.read(textEntity);
+            Document document = saxReader.read(new ByteArrayInputStream(textEntity.getBytes("UTF-8")));
             Element rootElement = document.getRootElement();
             String s =  rootElement.getStringValue();
             if(!s.contains("Success")){
