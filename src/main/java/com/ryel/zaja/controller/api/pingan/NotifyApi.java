@@ -21,7 +21,7 @@ import java.util.HashMap;
  * Created by Nathan on 2017/2/11.
  */
 @RestController
-@RequestMapping(value = "/api/pingan/notify", produces = "text/html; charset=gbk")
+@RequestMapping(value = "/api/pingan/notify")
 public class NotifyApi {
 
     protected final static Logger logger = LoggerFactory.getLogger(NotifyApi.class);
