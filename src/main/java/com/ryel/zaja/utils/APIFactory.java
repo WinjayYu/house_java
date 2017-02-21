@@ -154,7 +154,7 @@ public class APIFactory{
         houseMap.put("community",house.getCommunity());
         houseMap.put("title",house.getTitle());
         houseMap.put("cover",house.getCover());
-        houseMap.put("publishTime",house.getPublishTime());
+        houseMap.put("publishTime",new SimpleDateFormat("yyyy-MM-dd").format(house.getPublishTime()));
 
         return  houseMap;
     }
