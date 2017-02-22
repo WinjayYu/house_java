@@ -77,7 +77,7 @@ public class CommentServiceImpl extends AbsCommonService<Comment> implements Com
 
             return commentDao.save(comment);
         }catch (BizException be){
-           throw new BizException(Error_code.ERROR_CODE_0019);
+           throw new BizException(Error_code.ERROR_CODE_0001);
         }
     }
 

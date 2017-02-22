@@ -912,12 +912,12 @@ public class AgentApi {
                 type = HouseOrderType.FROM_HOUSE.getCode();
                 House house = houseService.findById(houseId);
                 if (house == null || !HouseStatus.getAgentCanSeeStatus().contains(house.getStatus())) {
-                    throw new BizException(Error_code.ERROR_CODE_0055, "此房源不在上架状态");
+                    throw new BizException(Error_code.ERROR_CODE_0040, "此房源不在上架状态");
                 }
 
                 HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, user.getId());
                 if(null != houseOrder1){
-                    throw new BizException(Error_code.ERROR_CODE_0054, "您已经向这用户已发起过此订单");
+                    throw new BizException(Error_code.ERROR_CODE_0047, "您已经向这用户已发起过此订单");
                 }
 
                 List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);

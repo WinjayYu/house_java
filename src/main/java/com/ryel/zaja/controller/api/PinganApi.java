@@ -5,6 +5,9 @@ import com.ecc.emp.data.KeyedCollection;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.PinanBankCodeConfig;
 import com.ryel.zaja.config.bean.Result;
+import com.ryel.zaja.config.enums.HouseOrderStatus;
+import com.ryel.zaja.core.exception.BizException;
+import com.ryel.zaja.entity.HouseOrder;
 import com.ryel.zaja.entity.PinganOrder;
 import com.ryel.zaja.entity.vo.ZjjzCnapsBankinfoVo;
 import com.ryel.zaja.controller.api.pingan.WalletConstant;
@@ -39,6 +42,7 @@ public class PinganApi {
     private ZjjzCnapsBankinfoService zjjzCnapsBankinfoService;
     @Autowired
     private WalletConstant wallet;
+
 
     /**
      * 通过userId 进行开卡前的加密处理
@@ -95,53 +99,10 @@ public class PinganApi {
             return Result.success().data(param);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
-
-    /**
-     * 开卡成功回调
-     *
-     * @param orig
-     * @param sign
-     */
-    @RequestMapping(value = "opencardback")
-    public void openCardBack(String orig, String sign) {
-        try {
-
-            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
-            KeyedCollection output = new KeyedCollection("output");
-
-            String encoding = "GBK";
-
-
-            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
-            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
-
-
-            boolean result = util.verifyData(sign, orig);
-            logger.info("---通知验签结果---" + result);
-            if (!result) {
-                logger.info("---验签失败---" + result);
-                return;
-            }
-
-            output = util.parseOrigData(orig);
-
-            String errorCode = (String) output.getDataValue("errorCode");
-            String errorMsg = (String) output.getDataValue("errorMsg");
-
-            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
-                // 开卡成功
-                logger.info("开卡成功（快捷支付）====================");
-            } else {
-                logger.info("开卡失败（快捷支付）：" + errorMsg);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 快捷支付开卡查询
@@ -187,7 +148,7 @@ public class PinganApi {
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
@@ -268,7 +229,7 @@ public class PinganApi {
             return Result.success().msg("").data(resultMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
@@ -315,11 +276,11 @@ public class PinganApi {
                 data.put("customerId", customerId);
                 data.put("openId", openId);
 
-                return Result.error().msg(Error_code.ERROR_CODE_0001).data(data);
+                return Result.error().msg(pinganError(errorMsg)).data(data);
             }
         }catch (Exception e){
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
@@ -372,7 +333,7 @@ public class PinganApi {
 
                 return Result.success().msg("").data(data);
             } else if(errorCode.equals("UKHPY37")){
-                return Result.error().msg(Error_code.ERROR_CODE_0053).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0046).data(new HashMap<>());
             }else{
                 return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
@@ -380,7 +341,7 @@ public class PinganApi {
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
@@ -399,6 +360,17 @@ public class PinganApi {
     @RequestMapping(value = "commissionsubmit")
     public Result UnionAPI_Submit(Integer fromUserId,Integer toUserId, String openId, String amount, Integer orderId, String pinganOrderId, String paydate, String verifyCode) {
         try {
+
+
+            //判断是不是交易中
+            Boolean isTransaction = houseOrderService.checkHouseInTransaction(orderId);
+
+            if (isTransaction)
+            {
+                return Result.error().msg(Error_code.ERROR_CODE_0042).data(new HashMap<>());
+            }
+
+
             PayclientInterfaceUtil util = new PayclientInterfaceUtil();
 
             com.ecc.emp.data.KeyedCollection input = new com.ecc.emp.data.KeyedCollection("input");
@@ -424,7 +396,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
             String status = (String) output.getDataValue("status");
-            
+
             if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
 
                 return UnionAPI_OrderQuery(fromUserId,toUserId,(String)output.getDataValue("accNo"),(String)output.getDataValue("telephone"),orderId,pinganOrderId);
@@ -435,7 +407,7 @@ public class PinganApi {
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
@@ -502,7 +474,7 @@ public class PinganApi {
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
     }
 
@@ -598,7 +570,7 @@ public class PinganApi {
             data.put("list", list);
             return Result.success().msg("").data(data);
         }catch (Exception e){
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
         }
 
     }

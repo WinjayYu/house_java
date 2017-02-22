@@ -85,16 +85,18 @@ public class WalletApi {
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String custAcctId = (String) retKeyDict.get("CustAcctId");
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             if ("000000".equals(rspCode) && StringUtils.isNotEmpty(custAcctId)) {
                 return Result.success().data(new HashMap<>());
             } else if ("ERR114".equals(rspCode)) {
                 return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+                logger.error("创建见证宝账户报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }
     }
 
@@ -139,7 +141,7 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
-
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             String TotalCount = (String) retKeyDict.get("TotalCount");
             String Reserve = (String) retKeyDict.get("Reserve");
 
@@ -165,14 +167,14 @@ public class WalletApi {
 
 
             if ("000000".equals(rspCode)) {
-                //移除成功
                 return Result.success().data(data);
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+                logger.error("查询所有的账户信息报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }
     }
 
@@ -189,15 +191,8 @@ public class WalletApi {
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
         try {
             // 校验用户信息
-            if (userId == null) {
-                logger.info("userId:" + userId);
-                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
-            }
             User user = userService.findById(userId);
-            if (user == null) {
-                logger.info("userWalletAccount is null");
-                return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-            }
+
 
             parmaKeyDict.put("TranFunc", "6056");
             parmaKeyDict.put("Qydm", WalletConstant.QYDM);
@@ -241,10 +236,12 @@ public class WalletApi {
              * 保留域	Reserve	C(120)	可选
              */
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             if ("000000".equals(rspCode)) {
                 return Result.success().data(retKeyDict);
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
+                logger.error("向子账户充钱报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -321,11 +318,12 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             if ("000000".equals(rspCode)) {
                 return Result.success().data(retKeyDict);
             } else {
-                logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
-                return Result.error().msg(retKeyDict.get("RspMsg")).data(new HashMap<>());
+                logger.error("子账户之间的交易信息", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
@@ -408,7 +406,7 @@ public class WalletApi {
             return Result.success().data(data);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0040).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }
     }
 
@@ -422,29 +420,19 @@ public class WalletApi {
     /**
      * 查询见证宝余额信息
      *
-     * @param userId 用户id
+     * @param agentId 用户id
      */
     @RequestMapping(value = "walletinfo")
-    public Result walletinfo(Integer userId) {
+    public Result walletinfo(Integer agentId) {
         HashMap<String,String> parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
         try {
-            // 校验用户信息
-            if (userId == null) {
-                logger.info("userId:" + userId);
-                return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
-            }
-            User user = userService.findById(userId);
-            if (user == null) {
-                logger.info("userWalletAccount is null");
-                return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-            }
 
             parmaKeyDict.put("TranFunc", "6037");
             parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
             parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
             parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID);
-            parmaKeyDict.put("ThirdCustId", userId + "");
+            parmaKeyDict.put("ThirdCustId", agentId + "");
             parmaKeyDict.put("Reserve", "1");
 
             System.out.println("请求报文==============" + parmaKeyDict);
@@ -470,6 +458,7 @@ public class WalletApi {
              * 保留域	Reserve	C(120)	可选
              */
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             if ("000000".equals(rspCode)) {
                 Map data = new HashMap<>();
                 Map response = new HashMap<>();
@@ -479,7 +468,8 @@ public class WalletApi {
                 data.put("wallet", response);
                 return Result.success().data(data);
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
+                logger.error("查询见证宝余额信息报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -521,9 +511,7 @@ public class WalletApi {
     @RequestMapping(value = "sendnote")
     public Result sendOpenCardNote(Integer agentId, String idCode, UserWalletAccount account) {
         User user = userService.findById(agentId);
-        if (user == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-        }
+
         HashMap<String,String> parmaKeyDict = new HashMap<String,String>();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
 
@@ -585,18 +573,21 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
+
             if ("000000".equals(rspCode)) {
                 // 发送验证码
                 return Result.success().data(new HashMap<>());
             } else if("ERR134".equals(rspCode)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0052).data(new HashMap<>());
+                return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
             }else
             {
-                return Result.error().msg(Error_code.ERROR_CODE_0047).data(new HashMap<>());
+                logger.error("开通提现银行卡报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }finally {
             pinganApiLogService.create(PinganApiEnum.BIND_WITHDRAW_CARD_SEND_MSG, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
         }
@@ -614,9 +605,7 @@ public class WalletApi {
     @RequestMapping(value = "tiebank")
     public Result tieBankCard(Integer agentId, UserWalletAccount account, String messageCode) {
         User user = userService.findById(agentId);
-        if (user == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-        }
+
         HashMap<String,String> parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
 
@@ -653,6 +642,7 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             if ("000000".equals(rspCode)) {
                 // 绑定成功
                 account.setStatus("10");
@@ -667,11 +657,12 @@ public class WalletApi {
                 userWalletAccountService.create(account);
                 return Result.success().data(new HashMap<>());
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0051).data(new HashMap<>());
+                logger.error("绑定提现银行卡报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }finally {
             pinganApiLogService.create(PinganApiEnum.BIND_WITHDRAW_CARD, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
         }
@@ -687,9 +678,7 @@ public class WalletApi {
     @RequestMapping(value = "removebank")
     public Result removeBankCard(Integer agentId, String accId) {
         User user = userService.findById(agentId);
-        if (user == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-        }
+
         HashMap<String,String> parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
 
@@ -727,6 +716,7 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             if ("000000".equals(rspCode)) {
                 UserWalletAccount userWalletAccount = userWalletAccountService.findByACcId(accId);
                 userWalletAccount.setStatus("20");
@@ -734,11 +724,12 @@ public class WalletApi {
                 // 解除成功
                 return Result.success().data(new HashMap<>());
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0051).data(new HashMap<>());
+                logger.error("解绑提现银行卡报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }finally {
             pinganApiLogService.create(PinganApiEnum.REMOVE_WITHDRAW_CARD, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
         }
@@ -755,9 +746,7 @@ public class WalletApi {
     @RequestMapping(value = "withdrawnnote")
     public Result withdrawnNote(Integer agentId, String accId, String amount) {
         User user = userService.findById(agentId);
-        if (user == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-        }
+
         HashMap<String,String> parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
 
@@ -796,6 +785,7 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             String serialNo = (String) retKeyDict.get("SerialNo");
             if ("000000".equals(rspCode)) {
                 //返回短信指令号
@@ -803,11 +793,12 @@ public class WalletApi {
                 data.put("serialNo",serialNo);
                 return Result.success().data(data);
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0051).data(new HashMap<>());
+                logger.error("提现短信验证报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }finally {
             pinganApiLogService.create(PinganApiEnum.WITHDRAW_MONEY_SEND_MSG, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
         }
@@ -825,9 +816,7 @@ public class WalletApi {
     @RequestMapping(value = "withdrawnmoney")
     public Result withdrawnMoney(Integer agentId, String accId, String amount,String seriaNo, String code) {
         User user = userService.findById(agentId);
-        if (user == null) {
-            return Result.error().msg(Error_code.ERROR_CODE_0043).data(new HashMap<>());
-        }
+
         HashMap<String,String> parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
         HashMap retKeyDict = new HashMap();// 用于存放银行发送报文的参数
 
@@ -883,6 +872,7 @@ public class WalletApi {
              */
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
+            String rspMsg = (String) retKeyDict.get("RspMsg");
             String frontLogNo = (String) retKeyDict.get("FrontLogNo");
             if ("000000".equals(rspCode)) {
                 OutCashFlow cash = new OutCashFlow();
@@ -898,11 +888,12 @@ public class WalletApi {
                 data.put("handFee",String.format("%.1f", money * 0.006));
                 return Result.success().data(data);
             } else {
-                return Result.error().msg(Error_code.ERROR_CODE_0051).data(new HashMap<>());
+                logger.error("提现报错", rspMsg);
+                return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+            return Result.error().msg(Error_code.ERROR_CODE_0044).data(new HashMap<>());
         }finally {
             pinganApiLogService.create(PinganApiEnum.WITHDRAW, JsonUtil.obj2Json(parmaKeyDict),JsonUtil.obj2Json(retKeyDict),parmaKeyDict.get("ThirdLogNo"));
         }

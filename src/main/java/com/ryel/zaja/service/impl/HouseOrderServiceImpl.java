@@ -140,20 +140,13 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Transactional
     public HouseOrder payment(Integer userId, Integer houseOrderId) {
         HouseOrder houseOrder = check(houseOrderId);
-        List<HouseOrder> houseOrders = houseOrderDao.findAllOrderByHouseId(houseOrder.getHouse().getId());
-        for(HouseOrder houseOrder2: houseOrders){
-            if(HouseOrderStatus.getPayedList().contains(houseOrder2.getStatus())){
-                houseOrder.setStatus(HouseOrderStatus.CLOSED.getCode());
-                throw new BizException(Error_code.ERROR_CODE_0026,"房源存在已支付的订单");
-            }
-        }
-        if(!HouseOrderStatus.WAIT_PAYMENT.getCode().equals(houseOrder.getStatus())){
-            throw new BizException(Error_code.ERROR_CODE_0019);
-        }
+
+        //支付完成了进入房屋交接中
         houseOrder.setStatus(HouseOrderStatus.IN_CONNECT.getCode());//房屋交接中
+
         if(null != houseOrder.getHouse()) {
 
-            //用户支付成功,对应的房屋进入交接中的状态
+            //用户支付成功,卖家需求对应的房屋全部进入交接中的状态
             if (null != houseOrder.getHouse().getSellHouse()) {
                 List<House> houses = houseDao.listBySellHouse(houseOrder.getHouse().getSellHouse().getId());
                 for (House house : houses) {
@@ -162,13 +155,7 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
                 }
 
             }
-/*
-            //用户支付成功，对应的房屋所有其他的订单进入关闭状态
-            houseOrders.remove(houseOrder);
-            for(HouseOrder houseOrder1 : houseOrders){
-                houseOrder1.setStatus(HouseOrderStatus.CLOSED.getCode());
-                update(houseOrder);
-            }*/
+
         }
         return update(houseOrder);
     }
@@ -181,5 +168,24 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public HouseOrder findByHouseIdAndUserId(Integer houseId, Integer userId) {
         return houseOrderDao.findByHouseIdAndUserId(houseId, userId);
+    }
+
+    //检查订单所关联的房屋是不是在交易中
+    @Override
+    public Boolean checkHouseInTransaction(Integer orderId) {
+
+        HouseOrder houseOrder = check(orderId);
+        House house = houseOrder.getHouse();
+        if (house != null) {
+            //如果此订单关联的房屋已经在交易中了，那么此订单失效
+            List<HouseOrder> houseOrders = houseOrderDao.findAllOrderByHouseId(house.getId());
+            for (HouseOrder houseOrder2 : houseOrders) {
+                if (HouseOrderStatus.getPayedList().contains(houseOrder2.getStatus())) {
+                    houseOrder.setStatus(HouseOrderStatus.CLOSED.getCode());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -273,7 +273,7 @@ public class OrderApi {
             }
             House house = houseService.findById(houseId);
             if (house == null || !house.getStatus().equals(HouseStatus.PUTAWAY_YET.getCode())) {
-                throw new BizException(Error_code.ERROR_CODE_0055, "此房源不在上架状态");
+                throw new BizException(Error_code.ERROR_CODE_0040, "此房源不在上架状态");
             }
 
             HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, userId);

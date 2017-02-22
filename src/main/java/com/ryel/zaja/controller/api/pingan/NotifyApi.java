@@ -26,6 +26,46 @@ public class NotifyApi {
 
     protected final static Logger logger = LoggerFactory.getLogger(NotifyApi.class);
 
+    @RequestMapping(value = "opencard", method = RequestMethod.POST)
+    public void openCardNotify(HttpServletRequest request) {
+        try {
+
+            String orig = request.getParameter("orig");
+            String sign = request.getParameter("sign");
+
+
+            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
+            KeyedCollection output = new KeyedCollection("output");
+
+            String encoding = "GBK";
+
+
+            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
+            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
+
+
+            boolean result = util.verifyData(sign, orig);
+            logger.info("---通知验签结果---" + result);
+            if (!result) {
+                logger.info("---验签失败---" + result);
+            }
+
+            output = util.parseOrigData(orig);
+
+
+            String errorCode = (String) output.getDataValue("errorCode");
+            String errorMsg = (String) output.getDataValue("errorMsg");
+            String status = (String) output.getDataValue("status");
+
+            logger.info("---开卡回调---" + status);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+    }
+
     @RequestMapping(value = "commissionnotify", method = RequestMethod.POST)
     public void submitNotify(HttpServletRequest request) {
         try {

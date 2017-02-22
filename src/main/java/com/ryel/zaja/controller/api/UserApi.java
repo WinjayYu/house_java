@@ -137,47 +137,6 @@ public class UserApi {
             }
             userService.create(user);
 
-//            try {
-//                //创建见证宝子账户
-//                HashMap parmaKeyDict = new HashMap<>();// 用于存放生成向银行请求报文的参数
-//                HashMap retKeyDict = new HashMap<>();// 用于存放银行发送报文的参数
-//                parmaKeyDict.put("TranFunc", "6000"); // 交易码，此处以【6000】接口为例子
-//                parmaKeyDict.put("Qydm", WalletConstant.QYDM); // 企业代码
-//                parmaKeyDict.put("ThirdLogNo", PinganUtils.generateThirdLogNo()); // 请求流水号
-//                parmaKeyDict.put("SupAcctId", WalletConstant.SUP_ACCT_ID); // 资金汇总账号
-//                parmaKeyDict.put("FuncFlag", "1"); // 功能标志1：开户 3销户
-//                parmaKeyDict.put("ThirdCustId", user.getId() +""); // 交易网会员代码
-//                parmaKeyDict.put("CustProperty", "00"); // 会员属性
-//                parmaKeyDict.put("NickName", user.getUsername()); // 会员昵称
-//                parmaKeyDict.put("MobilePhone", user.getMobile()); // 手机号码
-//                parmaKeyDict.put("Email", ""); // 邮箱
-//                parmaKeyDict.put("Reserve", "会员开户"); // 保留域
-//
-//                ZJJZ_API_GW msg = new ZJJZ_API_GW();
-//                String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
-//
-//                msg.SendTranMessage(tranMessage, WalletConstant.SERVER_IP, WalletConstant.SERVER_PORT, retKeyDict);
-//                String recvMessage = (String) retKeyDict.get("RecvMessage");// 银行返回的报文
-//
-//                retKeyDict = msg.parsingTranMessageString(recvMessage);
-//                System.out.println("返回报文:=" + retKeyDict);
-//                /**
-//                 * 第三部分：解析银行返回的报文的实例
-//                 */
-//                retKeyDict = msg.parsingTranMessageString(recvMessage);
-//                String custAcctId = (String) retKeyDict.get("CustAcctId");
-//                String rspCode = (String) retKeyDict.get("RspCode");
-//                if ("000000".equals(rspCode) && StringUtils.isNotEmpty(custAcctId)) {
-//                    // 创建成功，写入数据库
-//                    user.setCustAcctId(custAcctId);
-//                    userService.update(user);
-//                } else
-//                {
-//                    logger.error("创建见证宝",retKeyDict.get("RspMsg"));
-//                }
-//            } catch (Exception e) {
-//                logger.error(e.getMessage(), e);
-//            }
         } catch (BizException be) {
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());//手机号被占用

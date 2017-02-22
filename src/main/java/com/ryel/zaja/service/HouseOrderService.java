@@ -35,4 +35,6 @@ public interface HouseOrderService extends ICommonService<HouseOrder> {
     Long count(Integer agentId);
 
     HouseOrder findByHouseIdAndUserId(Integer houseId, Integer userId);
+
+    Boolean checkHouseInTransaction(Integer orderId);
 }
