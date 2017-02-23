@@ -260,6 +260,9 @@ public class OrderApi {
     public Result publishorder(Integer userId,Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
                                String idcard, String floor, String username) {
         try {
+            if(userId == agentId){
+                throw new BizException(Error_code.ERROR_CODE_0048,"不能给自己发订单！");
+            }
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
             User agent = userService.findById(agentId);

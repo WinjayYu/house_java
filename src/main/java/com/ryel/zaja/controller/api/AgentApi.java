@@ -906,6 +906,10 @@ public class AgentApi {
             if (user == null) {
                 throw new BizException(Error_code.ERROR_CODE_0023, "根据toMobile查询user为空");
             }
+
+            if (user.getId() == agentId){
+                throw new BizException(Error_code.ERROR_CODE_0048,"不能给自己发订单！");
+            }
             // 订单类型
             String type;
             if (houseId != null) {
