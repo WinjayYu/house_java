@@ -5,6 +5,7 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.SellHouseStatus;
 import com.ryel.zaja.config.enums.UserType;
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
@@ -277,7 +278,13 @@ public class HouseApi {
         Community origComm = communityService.findByUid(community.getUid());
         if (null == origComm) {
             try {
+                if(null == community.getUid() || "".equals(community.getUid())){
+                    throw new BizException("小区信息有误！");
+                }
                 communityService.create(community);
+            } catch (BizException be){
+                logger.error(be.getMessage(), be);
+                return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());

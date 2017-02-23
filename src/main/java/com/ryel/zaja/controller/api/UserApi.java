@@ -555,47 +555,25 @@ public class UserApi {
      * 反馈
      * @param userId
      * @param content
-     * @param image1
-     * @param image2
-     * @param image3
-     * @param image4
      * @return
      */
     @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
     public Result feedback(Integer userId,
                            String content,
-                           @RequestParam(required = false) MultipartFile image1,
-                           @RequestParam(required = false) MultipartFile image2,
-                           @RequestParam(required = false) MultipartFile image3,
-                           @RequestParam(required = false) MultipartFile image4){
+                           @RequestParam(value = "imgs", required = false) MultipartFile[] imgs){
 
         try{
 
             List<String> imagePathList = new ArrayList<String>();
-            if (image1 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
+            if(null != imgs){
+                for(int i=0; i<imgs.length; i++){
+                    String path = bizUploadFile.uploadFeedbackImageToQiniu(imgs[i], userId);
+                    if (StringUtils.isNotBlank(path)) {
+                        imagePathList.add(path);
+                    }
                 }
             }
-            if (image2 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image3 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image4 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
+
 
             Feedback feedback = new Feedback();
 

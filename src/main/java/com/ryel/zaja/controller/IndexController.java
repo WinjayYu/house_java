@@ -71,7 +71,8 @@ public class IndexController extends BaseController{
     @RequestMapping(value = "/")
     public String index(){
 
-        return "redirect:/dashboard";
+//        return "redirect:/dashboard";
+        return "index";
     }
 
 
