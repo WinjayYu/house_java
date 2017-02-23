@@ -143,6 +143,7 @@ public class PinganApi {
                 data.put("list", list);
                 return Result.success().msg("").data(data);
             } else {
+                logger.error("银行查询报错", errorMsg);
                 return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
@@ -335,6 +336,7 @@ public class PinganApi {
             } else if(errorCode.equals("UKHPY37")){
                 return Result.error().msg(Error_code.ERROR_CODE_0046).data(new HashMap<>());
             }else{
+                logger.error("支付短信报错", errorMsg);
                 return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
@@ -401,7 +403,7 @@ public class PinganApi {
 
                 return UnionAPI_OrderQuery(fromUserId,toUserId,(String)output.getDataValue("accNo"),(String)output.getDataValue("telephone"),orderId,pinganOrderId);
             } else {
-
+                logger.error("支付交易报错", errorMsg);
                 return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
@@ -468,7 +470,7 @@ public class PinganApi {
 
                 return Result.success().msg("").data(new HashMap<>());
             } else {
-
+                logger.error("支付交易查询报错", errorMsg);
                 return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 
@@ -540,10 +542,12 @@ public class PinganApi {
      */
     public String pinganError(String msg)
     {
-        int left = msg.indexOf("[");
-        int right = msg.indexOf("]");
-        String replace = msg.substring(left,right);
-        return  msg.replace(replace,"");
+//        int left = msg.indexOf("[");
+//        int right = msg.indexOf("]");
+//        String replace = msg.substring(left,right);
+//        return  msg.replace(replace,"");
+
+        return msg;
 
     }
 
