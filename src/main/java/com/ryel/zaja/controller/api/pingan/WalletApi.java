@@ -169,7 +169,7 @@ public class WalletApi {
             if ("000000".equals(rspCode)) {
                 return Result.success().data(data);
             } else {
-                logger.error("查询所有的账户信息报错", rspMsg);
+                logger.error("查询所有的账户信息报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -240,7 +240,7 @@ public class WalletApi {
             if ("000000".equals(rspCode)) {
                 return Result.success().data(retKeyDict);
             } else {
-                logger.error("向子账户充钱报错", rspMsg);
+                logger.error("向子账户充钱报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -322,7 +322,7 @@ public class WalletApi {
             if ("000000".equals(rspCode)) {
                 return Result.success().data(retKeyDict);
             } else {
-                logger.error("子账户之间的交易信息", rspMsg);
+                logger.error("子账户之间的交易信息" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -371,7 +371,7 @@ public class WalletApi {
             retKeyDict = msg.parsingTranMessageString(recvMessage);
             String rspCode = (String) retKeyDict.get("RspCode");
             if (!"000000".equals(rspCode)) {
-                logger.error("见证宝错误信息", retKeyDict.get("RspMsg"));
+                logger.error("见证宝错误信息" + retKeyDict.get("RspMsg"));
                 return Result.error().msg(rspCode).data(new HashMap<>());
             }
 
@@ -468,7 +468,7 @@ public class WalletApi {
                 data.put("wallet", response);
                 return Result.success().data(data);
             } else {
-                logger.error("查询见证宝余额信息报错", rspMsg);
+                logger.error("查询见证宝余额信息报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {

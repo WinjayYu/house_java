@@ -143,7 +143,7 @@ public class PinganApi {
                 data.put("list", list);
                 return Result.success().msg("").data(data);
             } else {
-                logger.error("银行查询报错", errorMsg);
+                logger.error("银行查询报错" + errorMsg);
                 return Result.error().msg(pinganError(errorMsg)).data(new HashMap<>());
             }
 

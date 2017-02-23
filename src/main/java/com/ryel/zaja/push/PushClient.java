@@ -54,7 +54,7 @@ public class PushClient {
         while ((line = rd.readLine()) != null) {
             result.append(line);
         }
-		logger.info("推送通知失败", result.toString());
+		logger.info("推送通知"+result.toString());
         System.out.println(result.toString());
         if (status == 200) {
             System.out.println("Notification sent successfully.");
