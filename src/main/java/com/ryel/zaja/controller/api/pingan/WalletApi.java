@@ -91,7 +91,7 @@ public class WalletApi {
             } else if ("ERR114".equals(rspCode)) {
                 return Result.error().msg(Error_code.ERROR_CODE_0041).data(new HashMap<>());
             } else {
-                logger.error("创建见证宝账户报错", rspMsg);
+                logger.error("创建见证宝账户报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -582,7 +582,7 @@ public class WalletApi {
                 return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
             }else
             {
-                logger.error("开通提现银行卡报错", rspMsg);
+                logger.error("开通提现银行卡报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -657,7 +657,7 @@ public class WalletApi {
                 userWalletAccountService.create(account);
                 return Result.success().data(new HashMap<>());
             } else {
-                logger.error("绑定提现银行卡报错", rspMsg);
+                logger.error("绑定提现银行卡报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -724,7 +724,7 @@ public class WalletApi {
                 // 解除成功
                 return Result.success().data(new HashMap<>());
             } else {
-                logger.error("解绑提现银行卡报错", rspMsg);
+                logger.error("解绑提现银行卡报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -793,7 +793,7 @@ public class WalletApi {
                 data.put("serialNo",serialNo);
                 return Result.success().data(data);
             } else {
-                logger.error("提现短信验证报错", rspMsg);
+                logger.error("提现短信验证报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
@@ -888,7 +888,7 @@ public class WalletApi {
                 data.put("handFee",String.format("%.1f", money * 0.006));
                 return Result.success().data(data);
             } else {
-                logger.error("提现报错", rspMsg);
+                logger.error("提现报错" + rspMsg);
                 return Result.error().msg(rspMsg).data(new HashMap<>());
             }
         } catch (Exception e) {
