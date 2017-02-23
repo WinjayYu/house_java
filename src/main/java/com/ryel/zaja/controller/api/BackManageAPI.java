@@ -58,6 +58,8 @@ public class BackManageAPI {
     private WalletConstant wallet;
     @Autowired
     private PinganOrderService pinganOrderService;
+    @Autowired
+    private HouseOrderService houseOrderService;
 
 
     private final String remoteUrlHead = "http://img.zaja.xin/";
@@ -304,9 +306,20 @@ public class BackManageAPI {
      * @param orderId
      * @return
      */
-    @RequestMapping("refundOrder")
+    @RequestMapping("refundorderback")
     public Result refundOrder(Integer orderId)
     {
+        HouseOrder order = houseOrderService.findById(orderId);
+        if (order == null) {
+            return Result.error().msg(Error_code.ERROR_CODE_0025);
+        }
+        //对应房源的状态变成上架
+        House house = order.getHouse();
+        if(house !=null) {
+            house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
+            houseService.update(house);
+        }
+
         try {
             //见证宝交易撤销
             TradeRecord tradeRecord = tradeRecordService.findByOrderId(orderId);

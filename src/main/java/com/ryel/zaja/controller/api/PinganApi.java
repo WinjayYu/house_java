@@ -480,43 +480,6 @@ public class PinganApi {
         }
     }
 
-    /**
-     * 退款回调
-     * @param orig
-     * @param sign
-     */
-    @RequestMapping(value = "refundorder", method = RequestMethod.POST)
-    public void reFundOrder(String orig,String sign) {
-        try {
-
-
-            logger.info("---orig---" + orig);
-            logger.info("---sign---" + sign);
-
-            PayclientInterfaceUtil util = new PayclientInterfaceUtil();
-            KeyedCollection output = new KeyedCollection("output");
-
-            String encoding = "GBK";
-
-
-            orig = PayclientInterfaceUtil.Base64Decode(orig, encoding);
-            sign = PayclientInterfaceUtil.Base64Decode(sign, encoding);
-
-
-            boolean result = util.verifyData(sign, orig);
-            logger.info("---通知验签结果---" + result);
-            if (!result) {
-                logger.info("---验签失败---" + result);
-                return;
-            }
-
-            output = util.parseOrigData(orig);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 将长时间格式字符串转换为时间 yyyyMMddHHmmss

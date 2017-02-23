@@ -1039,11 +1039,6 @@ public class AgentApi {
             order.setStatus(HouseOrderStatus.AGENT_COMFIRM_REBATE.getCode());
             houseOrderService.update(order);
 
-            //对应房源的状态变成上架
-            House house = order.getHouse();
-            house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
-            houseService.update(house);
-
             return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
