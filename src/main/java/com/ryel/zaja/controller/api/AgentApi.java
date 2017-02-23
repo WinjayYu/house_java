@@ -908,7 +908,7 @@ public class AgentApi {
             }
 
             if (user.getId() == agentId){
-                throw new BizException(Error_code.ERROR_CODE_0048,"不能给自己发订单！");
+                throw new BizException(Error_code.ERROR_CODE_0019,"不能给自己发订单！");
             }
             // 订单类型
             String type;

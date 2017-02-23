@@ -18,7 +18,7 @@ public interface Error_code {
 
     String ERROR_CODE_0012 = "error_12";  //【发送订单】手机号未注册用户
 
-    String ERROR_CODE_0019 = "error_19";  //
+    String ERROR_CODE_0019 = "error_19";  // 【发布订单】不能给自己发订单
 
     String ERROR_CODE_0021 = "error_21";  //【收藏】您已收藏过
 
@@ -72,7 +72,6 @@ public interface Error_code {
 
     String ERROR_CODE_0047 = "error_47";   //  【经纪人发布订单】您已经向这用户已发起过此订单
 
-    String ERROR_CODE_0048 = "error_48";   //  【发布订单】不能给自己发订单
 
 
 }
