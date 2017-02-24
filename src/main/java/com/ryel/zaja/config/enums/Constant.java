@@ -9,8 +9,8 @@ package com.ryel.zaja.config.enums;
  */
 public enum Constant {
     AGENT_HEAD  ("https://img.zaja.xin/agent_head.png", "经纪人头像"),
-    USER_HEAD   ("https://img.zaja.xin/user_head.jpg", "用户头像"),
-            ;
+    USER_HEAD   ("https://img.zaja.xin/head.jpg", "用户头像"),
+    ;
 
     Constant(String code, String desc){
         this.code = code;
