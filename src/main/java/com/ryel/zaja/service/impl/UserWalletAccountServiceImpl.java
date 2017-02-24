@@ -42,6 +42,11 @@ public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAcc
     }
 
     @Override
+    public UserWalletAccount findByUserIdAndACctId(Integer userId, String aCctId) {
+        return userWalletAccountDao.findByUserIdAndACctId(userId,aCctId);
+    }
+
+    @Override
     public UserWalletAccount findByACcId(String aCcId) {
         return userWalletAccountDao.findByACctId(aCcId);
     }

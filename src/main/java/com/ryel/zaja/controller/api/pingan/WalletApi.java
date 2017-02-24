@@ -10,14 +10,17 @@ import com.ryel.zaja.pingan.ZJJZ_API_GW;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jasper.tagplugins.jstl.core.Out;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController()
@@ -555,8 +558,10 @@ public class WalletApi {
             if (parmaKeyDict.get("BankName").contains("平安银行")) {
                 //本行
                 parmaKeyDict.put("BankType", "1");
+                account.setBankType("10");
             } else {
                 parmaKeyDict.put("BankType", "2");
+                account.setBankType("20");
             }
             ZJJZ_API_GW msg = new ZJJZ_API_GW();
             String tranMessage = msg.getTranMessage(parmaKeyDict);// 调用函数生成报文
@@ -579,6 +584,12 @@ public class WalletApi {
                 // 发送验证码
                 return Result.success().data(new HashMap<>());
             } else if("ERR134".equals(rspCode)) {
+                UserWalletAccount wallet = userWalletAccountService.findByUserIdAndACctId(account.getUserId(),account.getaCctId());
+                if (wallet == null)
+                {
+                    account.setStatus("10");
+                    userWalletAccountService.create(account);
+                }
                 return Result.error().msg(Error_code.ERROR_CODE_0045).data(new HashMap<>());
             }else
             {
@@ -745,6 +756,26 @@ public class WalletApi {
      */
     @RequestMapping(value = "withdrawnnote")
     public Result withdrawnNote(Integer agentId, String accId, String amount) {
+
+
+        //提取金额不能大于5W
+        Integer price = Integer.valueOf(amount);
+        if (price > 50000)
+        {
+            return Result.error().msg(Error_code.ERROR_CODE_0049).data(new HashMap<>());
+        }
+
+        //判断今天是否可以提现以及金额限制
+        Page<OutCashFlow> page = outCashFlowService.pageByUserId(agentId);
+        if(page.getContent().size() != 0)
+        {
+            OutCashFlow out = page.getContent().get(0);
+            if(isToday(out.getAddTime()))
+            {
+                return Result.error().msg(Error_code.ERROR_CODE_0048).data(new HashMap<>());
+            }
+        }
+
         User user = userService.findById(agentId);
 
         HashMap<String,String> parmaKeyDict = new HashMap();// 用于存放生成向银行请求报文的参数
@@ -841,15 +872,17 @@ public class WalletApi {
             // 提现账户名称 银行卡户名，必须与子账户名称一致
             parmaKeyDict.put("OutAcctIdName", user.getUsername());
 
-            // 提现金额
-            parmaKeyDict.put("TranAmount", amount);
-
             //币种
             parmaKeyDict.put("CcyCode", "RMB");
 
             Double money = Double.valueOf(amount);
+            Double fee = (double)Math.round(money * 0.6)/100;
+
+            // 提现金额
+            parmaKeyDict.put("TranAmount", String.format("%.2f", money - fee));
+
             // 提现手续费
-            parmaKeyDict.put("HandFee", money * 0.006 + "");
+            parmaKeyDict.put("HandFee",fee + "");
 
             // 提现账号
             parmaKeyDict.put("SerialNo", seriaNo);
@@ -877,15 +910,15 @@ public class WalletApi {
             if ("000000".equals(rspCode)) {
                 OutCashFlow cash = new OutCashFlow();
                 cash.setAccId(accId);
-                cash.setUserId(user.getId()+"");
+                cash.setUserId(user.getId());
                 cash.setCustAccId(user.getCustAcctId());
                 cash.setAmount(amount);
                 cash.setUsername(user.getUsername());
-                cash.setFee(money * 0.006+"");
+                cash.setFee(String.format("%.2f", fee));
                 cash.setFrontLogNo(frontLogNo);
                 outCashFlowService.create(cash);
                 Map data = new HashMap();
-                data.put("handFee",String.format("%.1f", money * 0.006));
+                data.put("handFee",String.format("%.2f", fee));
                 return Result.success().data(data);
             } else {
                 logger.error("提现报错" + rspMsg);
@@ -899,5 +932,41 @@ public class WalletApi {
         }
 
     }
+
+    /**
+     * 判断是不是今天
+     * @param date
+     * @return
+     */
+    public boolean isToday(Date date){
+        String oldTime=DateToStr(date, "yyyy-MM-dd");
+        String newTime=DateToStr(new Date(), "yyyy-MM-dd");
+        if(oldTime.equals(newTime)){
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 日期转换成字符串
+     *
+     * @param date
+     * @param formatStr
+     *            "yyyy-MM-dd HH:mm:ss" "yyyy-MM-dd"
+     * @return str
+     */
+
+    public  String DateToStr(Date date, String formatStr) {
+        if (formatStr==null || "".equals(formatStr)) {
+            formatStr = "yyyy-MM-dd";
+        }
+        SimpleDateFormat format = new SimpleDateFormat(formatStr);
+        String str = format.format(date);
+        return str;
+
+     }
+
+
 }
 

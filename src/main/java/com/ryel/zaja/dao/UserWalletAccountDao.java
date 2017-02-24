@@ -14,5 +14,8 @@ public interface UserWalletAccountDao extends JpaRepository<UserWalletAccount, I
     @Query("select h from UserWalletAccount h where h.userId = ?1 and h.status = 10")
     List<UserWalletAccount> findByUserId(Integer userId);
 
+    @Query("select h from UserWalletAccount h where h.userId = ?1 and h.aCctId = ?2 and h.status = 10")
+    UserWalletAccount findByUserIdAndACctId(Integer userId, String aCctId);
+
     UserWalletAccount findByACctId(String aCctId);
 }

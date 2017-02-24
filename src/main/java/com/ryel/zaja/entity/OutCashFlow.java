@@ -20,7 +20,7 @@ public class OutCashFlow implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String userId;
+    private Integer userId;
 
     private String custAccId;
 
@@ -55,11 +55,11 @@ public class OutCashFlow implements Serializable {
         this.id = id;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
