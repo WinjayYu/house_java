@@ -227,7 +227,7 @@ public class UserApi {
             if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){
                 String head = user.getHead();
                 if(-1 != head.indexOf("user")) {
-                    String filename = head.substring(head.indexOf("user"));
+                    String filename = head.substring(head.indexOf("zaja.xin"));
                     qiNiuService.deleteOneFile(filename);
                 }
             }
