@@ -130,7 +130,7 @@ public class BackManageAPI {
                 agent.setSex(sex);
                 //经纪人审核成功发送消息
                 VerifyCodeUtil.sendTip(agent.getMobile(),refusemsg,"0");
-
+                userService.update(agent);
                 //为经纪人开通见证宝账户信息
                 wallet.openAccount(userId);
 
@@ -144,8 +144,8 @@ public class BackManageAPI {
                 //数据库删除信息
                 AgentMaterial material = agentService.findByAgentId(userId);
                 agentService.deleteById(material.getId());
+                userService.update(agent);
             }
-            userService.update(agent);
             return Result.success().data(new HashMap<>());
         } catch (Exception e) {
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
