@@ -56,9 +56,9 @@ class JpaConfig implements TransactionManagementConfigurer {
         dataSource.setMaxWait(50);
         dataSource.setTimeBetweenEvictionRunsMillis(60000);
         dataSource.setMinEvictableIdleTimeMillis(300000);
-        dataSource.setValidationQuery("SELECT 'x'");
+        dataSource.setValidationQuery("SELECT 1");
         dataSource.setTestWhileIdle(true);
-        dataSource.setTestOnBorrow(false);
+        dataSource.setTestOnBorrow(true);
         dataSource.setTestOnReturn(false);
         dataSource.setPoolPreparedStatements(false);
         dataSource.setMaxPoolPreparedStatementPerConnectionSize(20);

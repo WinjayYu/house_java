@@ -8,7 +8,7 @@ public interface UserWalletAccountService extends ICommonService<UserWalletAccou
     List<UserWalletAccount> findByUserId(Integer userId);
     UserWalletAccount create(UserWalletAccount userWalletAccount);
     UserWalletAccount update(UserWalletAccount userWalletAccount);
-
+    UserWalletAccount findByUserIdAndACctId(Integer userId, String aCctId);
     UserWalletAccount findByACcId(String aCcId);
 
 }

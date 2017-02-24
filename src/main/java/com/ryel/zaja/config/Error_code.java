@@ -72,6 +72,9 @@ public interface Error_code {
 
     String ERROR_CODE_0047 = "error_47";   //  【经纪人发布订单】您已经向这用户已发起过此订单
 
+    String ERROR_CODE_0048 = "error_48";   //  【提现】一天只能提取一次
+
+    String ERROR_CODE_0049 = "error_49";   //  【提现】提现额度超过5万
 
 
 }

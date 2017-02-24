@@ -7,6 +7,10 @@ import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseTagService;
 import com.ryel.zaja.service.OutCashFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +32,11 @@ public class OutCashFlowServiceImpl  extends AbsCommonService<OutCashFlow> imple
     public void create(OutCashFlow cash) {
         cash.setAddTime(new Date());
         save(cash);
+    }
+
+    @Override
+    public Page<OutCashFlow> pageByUserId(Integer userId) {
+        return outCashFlowDao.pageByUserId(userId,new PageRequest(0,1, Sort.Direction.DESC, "id"));
     }
 
     @Override
