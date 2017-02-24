@@ -595,4 +595,14 @@ public class HouseServiceImpl extends AbsCommonService<House> implements HouseSe
 
         return page;
     }
+
+    @Override
+    public List<House> listBySellHouse2(Integer sellHouseId) {
+        return houseDao.listBySellHouse2(sellHouseId);
+    }
+
+    @Override
+    public List<House> listBySellHouse3(Integer sellHouseId) {
+        return houseDao.listBySellHouse3(sellHouseId);
+    }
 }

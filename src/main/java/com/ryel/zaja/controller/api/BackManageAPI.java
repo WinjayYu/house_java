@@ -242,6 +242,15 @@ public class BackManageAPI {
     public Result reviewhouse(Integer houseId, String type,String refusemsg) {
         House house = houseService.findById(houseId);
         if ("0".equals(type)) {
+            if(null != house.getSellHouse()){
+                List<House> list = houseService.listBySellHouse3(house.getSellHouse().getId());
+                if(null != list){
+                    house.setStatus(HouseStatus.REJECT.getCode());
+                    //房屋审核失败发送消息
+                    VerifyCodeUtil.sendTip(house.getAgent().getMobile(),refusemsg,"2");
+                }
+            }
+
             // 设置为上架状态
             house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
 
@@ -310,14 +319,20 @@ public class BackManageAPI {
     public Result refundOrder(Integer orderId)
     {
         HouseOrder order = houseOrderService.findById(orderId);
-        if (order == null) {
+        if (null == order) {
             return Result.error().msg(Error_code.ERROR_CODE_0025);
         }
-        //对应房源的状态变成上架
+        //对应房源(状态：50)变成上架
         House house = order.getHouse();
-        if(house !=null) {
+        if(null != house) {
             house.setStatus(HouseStatus.PUTAWAY_YET.getCode());
             houseService.update(house);
+            if(null != house.getSellHouse()){
+                List<House> list = houseService.listBySellHouse3(house.getSellHouse().getId());
+                for(House house1 : list){
+                    house1.setStatus(HouseStatus.PUTAWAY_YET.getCode());
+                }
+            }
         }
 
         try {
