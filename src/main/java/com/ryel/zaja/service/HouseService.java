@@ -67,7 +67,11 @@ public interface HouseService extends ICommonService<House> {
 
     House findById(Integer id);
 
-    Page<House> pageBySellHouse(Integer userId, Pageable pageable);
+    Page<House> pageBySellHouse(Integer sellHouseId, Pageable pageable);
+
+    List<House> listBySellHouse2(Integer sellHouseId);
+
+    List<House> listBySellHouse3(Integer sellHouseId);
 
     //用户端查看经纪人的房源列表
     Page<House> pageByAgentId2(int agentId, Pageable pageable);

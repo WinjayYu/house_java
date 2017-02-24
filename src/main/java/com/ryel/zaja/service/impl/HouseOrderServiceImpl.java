@@ -4,15 +4,18 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.config.enums.HouseStatus;
+import com.ryel.zaja.config.enums.SellHouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.entity.Comment;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.HouseOrder;
+import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
+import com.ryel.zaja.service.SellHouseService;
 import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,6 +43,9 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
 
     @Autowired
     private HouseService houseService;
+
+    @Autowired
+    SellHouseService sellHouseService;
 
     @Override
     @Transactional
@@ -87,9 +93,12 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
                     house.setStatus(HouseStatus.CLOSED.getCode());
                     houseService.update(house);
                 }
-
+                SellHouse sellHouse = houseOrder.getHouse().getSellHouse();
+                sellHouse.setStatus(SellHouseStatus.CLOSED.getCode());
+                sellHouseService.update(sellHouse);
             }
         }
+
         return update(houseOrder);
     }
 
@@ -148,7 +157,7 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
 
             //用户支付成功,卖家需求对应的房屋全部进入交接中的状态
             if (null != houseOrder.getHouse().getSellHouse()) {
-                List<House> houses = houseDao.listBySellHouse(houseOrder.getHouse().getSellHouse().getId());
+                List<House> houses = houseDao.listBySellHouse2(houseOrder.getHouse().getSellHouse().getId());
                 for (House house : houses) {
                     house.setStatus(HouseStatus.IN_CONNECT.getCode());
                     houseService.update(house);
