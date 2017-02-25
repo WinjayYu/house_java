@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Created by burgl on 2016/8/16.
  */
-@Service
+@Service("UserServiceImpl")
 @Transactional(readOnly = true)
 public class UserServiceImpl extends AbsCommonService<User> implements UserService {
 
@@ -199,6 +199,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             user = agent;
         }else{
             //新建用户
+            user.setNickname("");
             user.setHead(AGENT_HEAD);//默认头像
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());

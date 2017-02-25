@@ -16,7 +16,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-@Service
+@Service("UserWalletAccountServiceImpl")
 @Transactional(readOnly = true)
 public class UserWalletAccountServiceImpl extends AbsCommonService<UserWalletAccount> implements UserWalletAccountService {
     protected final static Logger logger = LoggerFactory.getLogger(UserWalletAccountServiceImpl.class);

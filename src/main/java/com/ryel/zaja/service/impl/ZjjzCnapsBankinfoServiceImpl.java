@@ -21,7 +21,7 @@ public class ZjjzCnapsBankinfoServiceImpl extends AbsCommonService<ZjjzCnapsBank
 
     @Override
     public List<ZjjzCnapsBankinfo> findByBankclscodeAndCitycode(String bankclscode, String citycode) {
-        return zjjzCnapsBankinfoDao.findByBankclscodeAndCitycode(bankclscode, citycode);
+        return null;
     }
 
     @Override

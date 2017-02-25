@@ -308,7 +308,6 @@ public class AgentApi {
             Page<HouseOrder> page = houseOrderService.pageByAgentId(agentId,
                     new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC, "id"));
 
-
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
             for (HouseOrder order : page.getContent()) {
@@ -406,6 +405,7 @@ public class AgentApi {
             }
             Page<BuyHouse> page = null;
 
+            //List的作用：去掉经纪人自己发的需求和已经接单过的需求
             List<Integer> list = agentBuyHouseService.findBuyHouseByAgentId(agentId);
             list.addAll(buyHouseService.findByUserIdAsId(agentId));
             //给一个默认值，防止list为null的时候sql报错
@@ -598,7 +598,9 @@ public class AgentApi {
     @RequestMapping(value = "updatehouse", method = RequestMethod.POST)
     public String updatehouse(@RequestParam(required = false) MultipartFile image1, @RequestParam(required = false) MultipartFile image2,
                                @RequestParam(required = false) MultipartFile image3, @RequestParam(required = false) MultipartFile image4,
-                               @RequestParam(required = false) MultipartFile image5,
+                               @RequestParam(required = false) MultipartFile image5, @RequestParam(required = false) MultipartFile image6,
+                              @RequestParam(required = false) MultipartFile image7, @RequestParam(required = false) MultipartFile image8,
+                              @RequestParam(required = false) MultipartFile image9,
                                Integer agentId, Integer houseId, String title, BigDecimal price, String tags, Community community,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
                                String features) {
@@ -671,6 +673,30 @@ public class AgentApi {
                     imagePathList.add(path);
                 }
             }
+            if (image6 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image6, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image7 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image7, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image8 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image8, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image9 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image9, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
             house.setImgs(JsonUtil.obj2Json(imagePathList));
             houseService.update(house);
             return JsonUtil.obj2ApiJson(Result.success());
@@ -690,7 +716,9 @@ public class AgentApi {
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
     public String publishhouse(@RequestParam(required = false) MultipartFile image1, @RequestParam(required = false) MultipartFile image2,
                                @RequestParam(required = false) MultipartFile image3, @RequestParam(required = false) MultipartFile image4,
-                               @RequestParam(required = false) MultipartFile image5,
+                               @RequestParam(required = false) MultipartFile image5, @RequestParam(required = false) MultipartFile image6,
+                               @RequestParam(required = false) MultipartFile image7, @RequestParam(required = false) MultipartFile image8,
+                               @RequestParam(required = false) MultipartFile image9,
                                Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
                                String features) {
@@ -786,6 +814,30 @@ public class AgentApi {
             }
             if (image5 != null) {
                 String path = bizUploadFile.uploadHouseImageToLocal(image5, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image6 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image6, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image7 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image7, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image8 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image8, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image9 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(image9, houseId);
                 if (StringUtils.isNotBlank(path)) {
                     imagePathList.add(path);
                 }
@@ -937,6 +989,7 @@ public class AgentApi {
             String code = BizUtil.getOrderCode();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
+            houseOrder.setAuthor(agent);
             houseOrder.setBuyerMobile(toMobile);
             houseOrder.setStatus(HouseOrderStatus.NO_ORDER.getCode());
             houseOrder.setType(type);
@@ -1091,6 +1144,7 @@ public class AgentApi {
                 listByDisOrCity = agentLocationService.findByCity(city);
             }
 
+            //筛选5公里之内的经纪人
             List<AgentLocation> listByLoc = agentLocationService.findByLoc(longitude, latitude, listByDisOrCity);
             if(listByLoc.isEmpty()){
                 return Result.success().msg("").data(new HashMap<>());
@@ -1191,6 +1245,29 @@ public class AgentApi {
 
 
             return Result.success().msg("").data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 经纪人确认接单,状态值从"10"变成"20"
+     * @param userId
+     * @param houseOrderId
+     * @return
+     */
+    @RequestMapping(value = "agentreceiveorder", method = RequestMethod.POST)
+    public Result agentReceiveOrder(Integer userId, Integer houseOrderId){
+        try{
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
+
+            houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
+            houseOrderService.update(houseOrder);
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());

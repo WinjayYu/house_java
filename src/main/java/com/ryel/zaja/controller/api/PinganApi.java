@@ -67,7 +67,7 @@ public class PinganApi {
             com.ecc.emp.data.KeyedCollection signDataput = new com.ecc.emp.data.KeyedCollection("signDataput");
 
             input.put("masterId", masterId);//商户号，注意生产环境上要替换成商户自己的生产商户号
-            input.put("orderId",getOderId(masterId, datetamp));//订单号，严格遵守格式：商户号+8位日期YYYYMMDD+8位流水
+            input.put("orderId", getOderId(masterId, datetamp));//订单号，严格遵守格式：商户号+8位日期YYYYMMDD+8位流水
             input.put("customerId", userId);//会员号
             input.put("dateTime", timestamp);//下单时间，YYYYMMDDHHMMSS
 
@@ -135,7 +135,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
                 // 开卡成功
                 logger.info("开卡成功（快捷支付）====================");
             } else {
@@ -166,7 +166,7 @@ public class PinganApi {
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
                 IndexedCollection icoll = (IndexedCollection) output.getDataElement("unionInfo");
 
                 List<Map> list = new ArrayList<>();
@@ -184,8 +184,7 @@ public class PinganApi {
                 Map data = new HashMap<String, String>();
                 data.put("list", list);
                 return Result.success().msg("").data(data);
-            }else
-            {
+            } else {
                 return Result.error().msg(errorMsg).data(new HashMap<>());
             }
 
@@ -228,11 +227,10 @@ public class PinganApi {
             System.out.println("---output---" + output);
 
 
-
             String errorCode = (String) output.getDataValue("errorCode");
             String errorMsg = (String) output.getDataValue("errorMsg");
 
-            if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
                 // 短信发送成功
 
                 Map pay = new HashMap<>();
@@ -318,13 +316,13 @@ public class PinganApi {
             String errorMsg = (String) output.getDataValue("errorMsg");
 
 
-             if((errorCode == null || errorCode.replaceAll(" ","").equals(""))&& (errorMsg == null || errorCode.replaceAll(" ","").equals(""))){
+            if ((errorCode == null || errorCode.replaceAll(" ", "").equals("")) && (errorMsg == null || errorCode.replaceAll(" ", "").equals(""))) {
 
                 PinanOrder order = new PinanOrder();
                 order.setMasterId((String) output.getDataValue("masterId"));
                 order.setOrderId((String) output.getDataValue("orderId"));
-                order.setAmount((String)output.getDataValue("amount"));
-                order.setCharge((String)output.getDataValue("charge"));
+                order.setAmount((String) output.getDataValue("amount"));
+                order.setCharge((String) output.getDataValue("charge"));
                 order.setValidtime((String) output.getDataValue("validtime"));
                 order.setCustomerId((String) output.getDataValue("customerId"));
                 order.setAccNo((String) output.getDataValue("accNo"));
@@ -337,7 +335,7 @@ public class PinganApi {
 
 //                OrderApi api = new OrderApi();
 //                api.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
-                houseOrderService.payment(Integer.parseInt(order.getCustomerId()),Integer.parseInt(order.getRemark()));
+                houseOrderService.payment(Integer.parseInt(order.getCustomerId()), Integer.parseInt(order.getRemark()));
                 pinanOrderService.create(order);
 
                 return Result.success().msg("").data(new HashMap<>());
@@ -439,7 +437,7 @@ public class PinganApi {
      * @param pinantime
      * @return
      */
-    public  Date pinganTimeToDate(String pinantime)  {
+    public Date pinganTimeToDate(String pinantime) {
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             Date date = formatter.parse(pinantime);

@@ -28,7 +28,7 @@ public class MyInterceptor implements HandlerInterceptor {
         String timestamp = new StringBuffer(subTime.toString()).reverse().toString();
         Long currentTime = new Timestamp(System.currentTimeMillis()).getTime();
         long distance = (new Timestamp(System.currentTimeMillis())).getTime() - Long.parseLong(timestamp);
-        if(distance > 600000){
+        if(distance > 30000){//30秒
             return false;
         }
         String result = timestamp + "ZAJA";

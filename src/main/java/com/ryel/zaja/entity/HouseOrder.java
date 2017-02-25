@@ -3,6 +3,7 @@ package com.ryel.zaja.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryel.zaja.annotations.Exclude;
+import com.ryel.zaja.service.ICommonService;
 import com.ryel.zaja.utils.CustomJsonDateSerializer;
 
 import javax.persistence.*;
@@ -63,6 +64,16 @@ public class HouseOrder implements Serializable {
     private BigDecimal price;
 
     private BigDecimal commission;
+
+    private String idcard;
+
+    private String floor;
+
+    private String username;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
 
     public HouseOrder(){}
 
@@ -176,5 +187,37 @@ public class HouseOrder implements Serializable {
 
     public void setCommunity(Community community) {
         this.community = community;
+    }
+
+    public String getIdcard() {
+        return idcard;
+    }
+
+    public void setIdcard(String idcard) {
+        this.idcard = idcard;
+    }
+
+    public String getFloor() {
+        return floor;
+    }
+
+    public void setFloor(String floor) {
+        this.floor = floor;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 }

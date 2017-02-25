@@ -45,6 +45,16 @@ public class User implements Serializable {
     @Column(name = "add_time")
     private Date addTime;
 
+    private String custAcctId;
+
+    public String getCustAcctId() {
+        return custAcctId;
+    }
+
+    public void setCustAcctId(String custAcctId) {
+        custAcctId = custAcctId;
+    }
+
     public User(){}
 
     public User(int id){
