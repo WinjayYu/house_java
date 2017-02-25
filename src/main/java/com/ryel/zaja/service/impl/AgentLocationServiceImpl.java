@@ -48,6 +48,7 @@ public class AgentLocationServiceImpl extends AbsCommonService<AgentLocation> im
             if (distance <= 5000) {//5公里之内的
                 list.add(agentLocation);
             }
+            if(list.size() > 60) break;//最多60个
         }
 
         Double longitude1;

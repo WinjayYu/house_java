@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -75,6 +76,14 @@ public class AgentApi {
     private AgentLocationService agentLocationService;
     @Autowired
     private FeedbackService feedbackService;
+    @Autowired
+    private TradeRecordService tradeRecordService;
+    @Autowired
+    private ImgWallService imgWallService;
+    @Autowired
+    private QiNiuService qiNiuService;
+    @Autowired
+    private ComplainService complainService;
 
     /**
      * 登录
@@ -82,7 +91,7 @@ public class AgentApi {
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public Result login(String mobile, String password) {
-        try {
+            try {
             if (StringUtils.isBlank(mobile) || StringUtils.isBlank(password)) {
                 return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
             }
@@ -143,7 +152,7 @@ public class AgentApi {
         }
     }
 
-    @RequestMapping(value = "/changeaccount", method = RequestMethod.POST)
+    @RequestMapping(value = "changeaccount", method = RequestMethod.POST)
     public Result changeAccount(Integer agentId, String mobile, String password, String verCode) {
         try {
             User user = userService.findById(agentId);
@@ -315,18 +324,24 @@ public class AgentApi {
                 //说明是二次编辑的房源信息
                 if (HouseType.FIRST.getCode().equals(order.getType())) {
                     neworder.put("house", order.getHouse());
-                } else {
-                    neworder.put("community", order.getCommunity());
-                    neworder.put("area", order.getArea());
-                    neworder.put("price", order.getPrice());
-                    neworder.put("commission", order.getCommission());
                 }
+
+                neworder.put("community", order.getCommunity());
+                neworder.put("area", order.getArea());
+                neworder.put("price", order.getPrice());
+                neworder.put("commission", order.getCommission());
+                neworder.put("discount",order.getDiscount());
 
                 neworder.put("id", order.getId());
                 neworder.put("code", order.getCode());
                 neworder.put("buyer", order.getBuyer());
                 neworder.put("status", order.getStatus());
                 neworder.put("type", order.getType());
+                neworder.put("username", order.getUsername());
+                neworder.put("idcard", order.getIdcard());
+                neworder.put("authorId", order.getAuthorId());
+                neworder.put("floor", order.getFloor());
+                neworder.put("addTime", new SimpleDateFormat("yyyy-MM-dd HH:mm").format(order.getAddTime()));
 
                 list.add(neworder);
             }
@@ -500,7 +515,7 @@ public class AgentApi {
     /**
      * 接单
      */
-    @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
+    @RequestMapping(value = "receivedemand", method = RequestMethod.POST)
     public Result receiveorder(Integer demandId, Integer agentId, String type) {
         try {
             if (demandId == null) {
@@ -576,21 +591,6 @@ public class AgentApi {
         }
     }
 
-    /**
-     * 我的佣金 前20条
-     */
-    @RequestMapping(value = "mycommission", method = RequestMethod.POST)
-    public Result mycommission(Integer agentId) {
-        try {
-            List<HouseOrder> list = houseOrderService.findPayedOrderByAgentId(agentId);
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("list", list);
-            return Result.success().data(dataMap);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
 
     /**
      * 更新房源
@@ -714,11 +714,7 @@ public class AgentApi {
      * 发布房源
      */
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
-    public String publishhouse(@RequestParam(required = false) MultipartFile image1, @RequestParam(required = false) MultipartFile image2,
-                               @RequestParam(required = false) MultipartFile image3, @RequestParam(required = false) MultipartFile image4,
-                               @RequestParam(required = false) MultipartFile image5, @RequestParam(required = false) MultipartFile image6,
-                               @RequestParam(required = false) MultipartFile image7, @RequestParam(required = false) MultipartFile image8,
-                               @RequestParam(required = false) MultipartFile image9,
+    public String publishhouse(@RequestParam(value = "imgs", required = false) MultipartFile[] imgs,
                                Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
                                String features) {
@@ -787,59 +783,15 @@ public class AgentApi {
             // 把图片更新进去
             Integer houseId = house.getId();
             List<String> imagePathList = new ArrayList<String>();
-            if (image1 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image1, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-                house.setCover(path);
-            }
-            if (image2 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image2, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image3 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image3, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image4 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image4, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image5 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image5, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image6 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image6, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image7 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image7, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image8 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image8, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image9 != null) {
-                String path = bizUploadFile.uploadHouseImageToLocal(image9, houseId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
+            if(null != imgs){
+                for(int i=0; i<imgs.length; i++){
+                    String path = bizUploadFile.uploadHouseImageToLocal(imgs[i], houseId);
+                    if (StringUtils.isNotBlank(path)) {
+                        imagePathList.add(path);
+                    }
+                    if (0 == i) {
+                        house.setCover(path);
+                    }
                 }
             }
             house.setImgs(JsonUtil.obj2Json(imagePathList));
@@ -875,7 +827,7 @@ public class AgentApi {
                           String renovation,
                           String floor) {
 
-        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, UserType.AGENT.getCode());
+        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, null, UserType.AGENT.getCode());
         Map<String, Object> dataMap = APIFactory.fitting(houses);
         return Result.success().msg("").data(dataMap);
     }
@@ -917,9 +869,9 @@ public class AgentApi {
      * 修改头像
      */
     @RequestMapping(value = "modifyhead")
-    public Result modifyhead(Integer agentId, @RequestParam(required = true) MultipartFile image) {
+    public Result modifyhead(Integer agentId, @RequestParam(required = true) MultipartFile imgs) {
         try {
-            String path = bizUploadFile.uploadUserImageToQiniu(image, agentId);
+            String path = bizUploadFile.uploadUserImageToQiniu(imgs, agentId);
             if (StringUtils.isNotBlank(path)) {
                 Map<String, String> dataMap = new HashMap<>();
                 dataMap.put("remotePath", path);
@@ -941,7 +893,7 @@ public class AgentApi {
      */
     @RequestMapping(value = "publishorder")
     public Result publishorder(Integer agentId, Integer houseId, Community community, BigDecimal area, BigDecimal price,
-                                    String toMobile) {
+                                    String toMobile, BigDecimal discount, String username, String idcard, String floor) {
         try {
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
@@ -954,14 +906,24 @@ public class AgentApi {
             if (user == null) {
                 throw new BizException(Error_code.ERROR_CODE_0023, "根据toMobile查询user为空");
             }
+
+            if (user.getId() == agentId){
+                throw new BizException(Error_code.ERROR_CODE_0019,"不能给自己发订单！");
+            }
             // 订单类型
             String type;
             if (houseId != null) {
                 type = HouseOrderType.FROM_HOUSE.getCode();
                 House house = houseService.findById(houseId);
-                if (house == null) {
-                    throw new BizException(Error_code.ERROR_CODE_0025, "查询到house is null");
+                if (house == null || !HouseStatus.getAgentCanSeeStatus().contains(house.getStatus())) {
+                    throw new BizException(Error_code.ERROR_CODE_0040, "此房源不在上架状态");
                 }
+
+                HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, user.getId());
+                if(null != houseOrder1){
+                    throw new BizException(Error_code.ERROR_CODE_0047, "您已经向这用户已发起过此订单");
+                }
+
                 List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);
                 if (!CollectionUtils.isEmpty(list)) {
                     throw new BizException(Error_code.ERROR_CODE_0026, "房源已经存在已支付的订单");
@@ -989,7 +951,7 @@ public class AgentApi {
             String code = BizUtil.getOrderCode();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setAuthor(agent);
+            houseOrder.setAuthorId(agent.getId());
             houseOrder.setBuyerMobile(toMobile);
             houseOrder.setStatus(HouseOrderStatus.NO_ORDER.getCode());
             houseOrder.setType(type);
@@ -997,7 +959,15 @@ public class AgentApi {
             houseOrder.setCode(code);
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
-            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
+            //实际佣金等于price*250-discount 单位：元
+            discount = discount == null ? BigDecimal.ZERO : discount;
+            houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)).subtract(discount));
+
+            houseOrder.setIdcard(idcard);
+            houseOrder.setUsername(username);
+            houseOrder.setFloor(floor);
+
+            houseOrder.setDiscount(discount);
 
             houseOrderService.save(houseOrder);
 
@@ -1068,7 +1038,8 @@ public class AgentApi {
             }
             order.setStatus(HouseOrderStatus.AGENT_COMFIRM_REBATE.getCode());
             houseOrderService.update(order);
-            return Result.success();
+
+            return Result.success().msg("").data(new HashMap<>());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
@@ -1093,6 +1064,11 @@ public class AgentApi {
     }
 
 
+    /**
+     * 获取经纪人的接单数 房源总数 评分
+     * @param agentId
+     * @return
+     */
     @RequestMapping(value = "count", method = RequestMethod.POST)
     public Result count(Integer agentId){
         try{
@@ -1114,7 +1090,12 @@ public class AgentApi {
             dataMap.put("orderSum", orderSum);
             dataMap.put("houseSum", houseSum);
 
-            return Result.success().msg("").data(dataMap);
+            Map<String, Object> result = new HashMap<>();
+            List<Object> list = imgWallService.findByAgentId(agentId);
+            result.put("list", list);
+            result.put("analysis", dataMap);
+
+            return Result.success().msg("").data(result);
 
         }catch (Exception e){
             logger.error(e.getMessage(), e);
@@ -1194,44 +1175,21 @@ public class AgentApi {
      * 反馈
      * @param agentId
      * @param content
-     * @param image1
-     * @param image2
-     * @param image3
-     * @param image4
      * @return
      */
     @RequestMapping(value = "feedback", method = RequestMethod.POST)
     public Result feedback(Integer agentId,
                            String content,
-                           @RequestParam(required = false) MultipartFile image1,
-                           @RequestParam(required = false) MultipartFile image2,
-                           @RequestParam(required = false) MultipartFile image3,
-                           @RequestParam(required = false) MultipartFile image4){
+                           @RequestParam(value = "imgs", required = false) MultipartFile[] imgs){
 
         try{
             List<String> imagePathList = new ArrayList<String>();
-            if (image1 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, agentId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image2 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, agentId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image3 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, agentId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image4 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, agentId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
+            if (null != imgs){
+                for(MultipartFile img: imgs){
+                    String path = bizUploadFile.uploadFeedbackImageToQiniu(img, agentId);
+                    if (StringUtils.isNotBlank(path)) {
+                        imagePathList.add(path);
+                    }
                 }
             }
 
@@ -1253,21 +1211,173 @@ public class AgentApi {
 
     /**
      * 经纪人确认接单,状态值从"10"变成"20"
-     * @param userId
-     * @param houseOrderId
+     * @param agentId
+     * @param orderId
      * @return
      */
-    @RequestMapping(value = "agentreceiveorder", method = RequestMethod.POST)
-    public Result agentReceiveOrder(Integer userId, Integer houseOrderId){
+    @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
+    public Result agentReceiveOrder(Integer agentId, Integer orderId, BigDecimal discount){
         try{
-            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
+            HouseOrder houseOrder = houseOrderService.findByAgentIdAndOrderId(agentId, orderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
+
+            discount = discount == null ? BigDecimal.ZERO : discount;
+            houseOrder.setDiscount(discount);
+            houseOrder.setCommission(houseOrder.getCommission().subtract(discount));
+            houseOrderService.update(houseOrder);
+
+            //更新用户信息
+            User user = houseOrder.getBuyer();
+            user.setUsername(houseOrder.getUsername());
+            user.setIdcard(houseOrder.getIdcard());
+            userService.update(user);
+
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 经纪人拒绝接单
+     * @param agentId
+     * @param orderId
+     * @return
+     */
+    @RequestMapping(value = "rejectorder", method = RequestMethod.POST)
+    public Result agentRejectOrder(Integer agentId, Integer orderId){
+        try{
+            HouseOrder houseOrder = houseOrderService.findByAgentIdAndOrderId(agentId, orderId);
+
+            houseOrder.setStatus(HouseOrderStatus.REJECT.getCode());
             houseOrderService.update(houseOrder);
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 经纪人投诉，订单状态值从"10"变成"12"，投诉内容写进数据库
+     * @param agentId
+     * @param orderId
+     * @param content
+     * @return
+     */
+    @RequestMapping(value = "complain", method = RequestMethod.POST)
+    public Result agentComplain(Integer agentId, Integer orderId, String content){
+        try{
+            complainService.create(agentId, orderId, content);
+
+            HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(agentId, orderId);
+            houseOrder.setStatus(HouseOrderStatus.COMPLAIN.getCode());
+            houseOrderService.update(houseOrder);
+            return Result.success().msg("").data(new HashMap<>());
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 我的佣金历史记录
+     * @param agentId
+     * @return
+     */
+    @RequestMapping(value = "intomoneyhistory", method = RequestMethod.POST)
+    public Result intoMoneyHistory(Integer agentId){
+        try{
+            Page<TradeRecord> page = tradeRecordService.findByInThirdCustId(agentId);
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            return Result.success().msg("").data(dataMap);
+        }catch (BizException be){
+            logger.error(be.getMessage(), be);
+            return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+    }
+
+    /**
+     * 经纪人上传照片墙
+     * @param agentId
+     * @param imgs
+     * @return
+     */
+    @RequestMapping(value = "imgwall", method = RequestMethod.POST)
+    public Result imgWall(Integer agentId, @RequestParam(value="imgs", required = false) MultipartFile[] imgs){
+        try{
+
+            Long imgWalls = imgWallService.countImg(agentId);
+            if(imgWalls > 8){
+                throw new Exception();
+            }
+            for(MultipartFile img: imgs){
+                ImgWall imgWall = new ImgWall();
+                String path = bizUploadFile.uploadUserImageToQiniu(img, agentId);
+                imgWall.setUserId(agentId);
+                imgWall.setImg(path);
+                imgWall.setAddTime(new Date());
+                imgWallService.save(imgWall);
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+        return viewImgWall(agentId);
+    }
+
+    /**
+     * 经纪人删除照片墙中的图片
+     * @param agentId
+     * @param urls
+     * @return
+     */
+    @RequestMapping(value = "deleteimgwall", method = RequestMethod.POST)
+    public Result deleteImgwall(Integer agentId, String urls){
+        try{
+
+            String[] path = JsonUtil.json2Obj(urls,String[].class);
+            for(String url : path){
+                ImgWall wall =  imgWallService.findByAgentIdAndUrl(agentId, url);
+                if(wall !=null) {
+                    String filename = url.substring(url.indexOf("user"));
+                    qiNiuService.deleteOneFile(filename);
+                    imgWallService.delete(wall);
+                }
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+        }
+        return Result.success().msg("").data(new HashMap<>());
+    }
+
+    /**
+     * 查看照片墙
+     * @return
+     */
+    @RequestMapping(value = "viewimgwall", method = RequestMethod.POST)
+    public Result viewImgWall(Integer agentId){
+
+        try{
+            Map<String, Object> data = new HashMap();
+            List<Object> list = imgWallService.findByAgentId(agentId);
+            data.put("list", list);
+            return Result.success().msg("").data(data);
         }catch (Exception e){
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());

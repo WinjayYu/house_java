@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<configuration scan="true" scanPeriod="3 seconds">
+<configuration scan="true" scanPeriod="60 seconds">
 	<contextName>SpringBlog</contextName>
 
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 /app/sv/logs -->

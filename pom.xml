@@ -56,6 +56,19 @@
                 <pro.upload.url>https://ylili.cn/files/upload/</pro.upload.url>
             </properties>
         </profile>
+
+
+        <profile>
+            <id>online</id>
+            <properties>
+                <spring.dataSource.url>jdbc:mysql://10.9.152.121:3306/ZAJA?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.username>root</spring.dataSource.username>
+                <spring.dataSource.password>ZAJA_ziyouzhijia123</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
+                <pro.upload.path>/usr/local/tomcat8.5/webapps/files/upload/</pro.upload.path>
+                <pro.upload.url>https://zaja.xin/files/upload/</pro.upload.url>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -209,6 +222,12 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
         </dependency>
 
         <!--Push-->

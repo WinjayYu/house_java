@@ -3,6 +3,7 @@ package com.ryel.zaja.service.impl;
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.AgentRegisterStatus;
+import com.ryel.zaja.config.enums.Constant;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.AgentMaterialDao;
@@ -18,6 +19,7 @@ import com.ryel.zaja.utils.ClassUtil;
 import com.ryel.zaja.utils.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -40,7 +42,7 @@ import java.util.List;
 /**
  * Created by burgl on 2016/8/16.
  */
-@Service("UserServiceImpl")
+@Service
 @Transactional(readOnly = true)
 public class UserServiceImpl extends AbsCommonService<User> implements UserService {
 
@@ -53,11 +55,8 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
     @Autowired
     private BizUploadFile bizUploadFile;
 
-
     @Autowired
     EntityManagerFactory emf;
-
-    public static final String AGENT_HEAD = "https://img.zaja.xin/agent_head.png";
 
     @Transactional
     @Override
@@ -194,15 +193,17 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             //更新用户
             agent.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             agent.setType(UserType.AGENT.getCode());
+            agent.setIdcard(agentMaterial.getIdcard());
             update(agent);
 
             user = agent;
         }else{
             //新建用户
             user.setNickname("");
-            user.setHead(AGENT_HEAD);//默认头像
+            user.setHead(Constant.AGENT_HEAD.getCode());//默认头像
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
+            user.setIdcard(agentMaterial.getIdcard());
             create(user);
         }
         // 上传图片

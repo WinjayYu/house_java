@@ -4,15 +4,18 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.config.enums.HouseStatus;
+import com.ryel.zaja.config.enums.SellHouseStatus;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.HouseDao;
 import com.ryel.zaja.dao.HouseOrderDao;
 import com.ryel.zaja.entity.Comment;
 import com.ryel.zaja.entity.House;
 import com.ryel.zaja.entity.HouseOrder;
+import com.ryel.zaja.entity.SellHouse;
 import com.ryel.zaja.service.AbsCommonService;
 import com.ryel.zaja.service.HouseOrderService;
 import com.ryel.zaja.service.HouseService;
+import com.ryel.zaja.service.SellHouseService;
 import com.ryel.zaja.utils.ClassUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,6 +43,9 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
 
     @Autowired
     private HouseService houseService;
+
+    @Autowired
+    SellHouseService sellHouseService;
 
     @Override
     @Transactional
@@ -87,9 +93,12 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
                     house.setStatus(HouseStatus.CLOSED.getCode());
                     houseService.update(house);
                 }
-
+                SellHouse sellHouse = houseOrder.getHouse().getSellHouse();
+                sellHouse.setStatus(SellHouseStatus.CLOSED.getCode());
+                sellHouseService.update(sellHouse);
             }
         }
+
         return update(houseOrder);
     }
 
@@ -132,18 +141,23 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     }
 
     @Override
+    public HouseOrder findByAgentIdAndOrderId(Integer agentId, Integer houseOrderId) {
+        return houseOrderDao.findByAgentIdAndOrderId(agentId, houseOrderId);
+    }
+
+    @Override
     @Transactional
     public HouseOrder payment(Integer userId, Integer houseOrderId) {
         HouseOrder houseOrder = check(houseOrderId);
-        if(!HouseOrderStatus.WAIT_PAYMENT.getCode().equals(houseOrder.getStatus())){
-            throw new BizException(Error_code.ERROR_CODE_0019);
-        }
+
+        //支付完成了进入房屋交接中
         houseOrder.setStatus(HouseOrderStatus.IN_CONNECT.getCode());//房屋交接中
+
         if(null != houseOrder.getHouse()) {
 
-            //用户支付成功,对应的房屋进入交接中的状态
+            //用户支付成功,卖家需求对应的房屋全部进入交接中的状态
             if (null != houseOrder.getHouse().getSellHouse()) {
-                List<House> houses = houseDao.listBySellHouse(houseOrder.getHouse().getSellHouse().getId());
+                List<House> houses = houseDao.listBySellHouse2(houseOrder.getHouse().getSellHouse().getId());
                 for (House house : houses) {
                     house.setStatus(HouseStatus.IN_CONNECT.getCode());
                     houseService.update(house);
@@ -151,12 +165,6 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
 
             }
 
-            //用户支付成功，对应的房屋所有其他的订单进入关闭状态
-            List<HouseOrder> houseOrders = houseOrderDao.findAllOrderByHouseId(houseOrder.getHouse().getId());
-            for(HouseOrder houseOrder1 : houseOrders){
-                houseOrder1.setStatus(HouseOrderStatus.CLOSED.getCode());
-                update(houseOrder);
-            }
         }
         return update(houseOrder);
     }
@@ -164,5 +172,29 @@ public class HouseOrderServiceImpl extends AbsCommonService<HouseOrder> implemen
     @Override
     public Long count(Integer agentId) {
         return houseOrderDao.countByAgentId(agentId);
+    }
+
+    @Override
+    public HouseOrder findByHouseIdAndUserId(Integer houseId, Integer userId) {
+        return houseOrderDao.findByHouseIdAndUserId(houseId, userId);
+    }
+
+    //检查订单所关联的房屋是不是在交易中
+    @Override
+    public Boolean checkHouseInTransaction(Integer orderId) {
+
+        HouseOrder houseOrder = check(orderId);
+        House house = houseOrder.getHouse();
+        if (house != null) {
+            //如果此订单关联的房屋已经在交易中了，那么此订单失效
+            List<HouseOrder> houseOrders = houseOrderDao.findAllOrderByHouseId(house.getId());
+            for (HouseOrder houseOrder2 : houseOrders) {
+                if (HouseOrderStatus.getPayedList().contains(houseOrder2.getStatus())) {
+                    houseOrder.setStatus(HouseOrderStatus.CLOSED.getCode());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

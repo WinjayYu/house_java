@@ -9,6 +9,9 @@ import java.io.Serializable;
 @Entity
 @Table(name = "house_tag")
 public class HouseTag implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;

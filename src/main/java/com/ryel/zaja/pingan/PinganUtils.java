@@ -22,7 +22,26 @@ public class PinganUtils {
 		return "TH" + generateThirdLogNo();
 	}
 
-	public static void main(String[] args){
-		System.err.print(generateThirdHtId());
+	public static String getOderId(String masterId, String datetamp) {
+		int orderid;
+		String orderids;
+		java.util.Random r = new java.util.Random();
+		while (true) {
+			orderid = r.nextInt(99999999);
+			if (orderid < 0)
+				orderid = -orderid;
+			orderids = String.valueOf(orderid);
+			System.out.println("--orderids----" + orderids);
+			if (orderids.length() < 8) {
+				System.out.println("--order22222ids----" + orderids);
+				continue;
+			}
+			if (orderids.length() >= 8) {
+				orderids = orderids.substring(0, 8);
+				System.out.println("--orderids222----" + orderids);
+				break;
+			}
+		}
+		return masterId + datetamp + orderids;
 	}
 }

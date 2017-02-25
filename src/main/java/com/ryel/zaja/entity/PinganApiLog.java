@@ -30,8 +30,8 @@ public class PinganApiLog implements Serializable {
 
     private String response;
 
-    @Column(name = "add_by")
-    private Integer addBy;
+    @Column(name = "third_logno")
+    private String thirdLogNo;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -90,12 +90,12 @@ public class PinganApiLog implements Serializable {
         this.response = response;
     }
 
-    public Integer getAddBy() {
-        return addBy;
+    public String getThirdLogNo() {
+        return thirdLogNo;
     }
 
-    public void setAddBy(Integer addBy) {
-        this.addBy = addBy;
+    public void setThirdLogNo(String thirdLogNo) {
+        this.thirdLogNo = thirdLogNo;
     }
 
     public Date getAddTime() {

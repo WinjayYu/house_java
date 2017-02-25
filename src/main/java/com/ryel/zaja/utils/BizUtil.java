@@ -27,7 +27,7 @@ public class BizUtil {
             double lat2 = community.getLatitude().doubleValue();
             //计算两个点之间的距离
             double distance = GetDistanceUtil.GetDistance(lon1, lat1, lon2, lat2);
-            if (distance <= 5000) {
+            if (distance <= 7000) {
                 communities.add(community);
             }
         }

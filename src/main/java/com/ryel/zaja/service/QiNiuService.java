@@ -124,8 +124,9 @@ public class QiNiuService {
             }
             return imgs;
         }catch (QiniuException e){
-            Response r = e.response;
-            throw new BizException(r.toString());
+            return null;
+//            Response r = e.response;
+//            throw new BizException(r.toString());
         }
     }
 

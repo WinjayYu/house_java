@@ -4,7 +4,7 @@ package com.ryel.zaja.config;
  * Created by billyu on 2016/12/3.
  */
 public interface Error_code {
-    String ERROR_CODE_0001 = "error_01";  //【通用】服务器异常
+    String ERROR_CODE_0001 = "error_01";  //【通用】服务器异常，CEO正在狂打程序员
 
     String ERROR_CODE_0004 = "error_04";  //【登录】用户名或密码错误
 
@@ -18,7 +18,7 @@ public interface Error_code {
 
     String ERROR_CODE_0012 = "error_12";  //【发送订单】手机号未注册用户
 
-    String ERROR_CODE_0019 = "error_19";  //【通用】操作失败
+    String ERROR_CODE_0019 = "error_19";  // 【发布订单】不能给自己发订单
 
     String ERROR_CODE_0021 = "error_21";  //【收藏】您已收藏过
 
@@ -56,29 +56,25 @@ public interface Error_code {
 
     String ERROR_CODE_0039 = "error_39";   //  【申请经纪人】您已申请过
 
-    String ERROR_CODE_0040 = "error_40";   //  【平安】会员创建子账户失败
+    String ERROR_CODE_0040 = "error_40";   //  【用户发布订单】此房源不在上架状态
 
-    String ERROR_CODE_0041 = "error_41";   //  【平安】会员子账户已经存在
+    String ERROR_CODE_0041 = "error_41";   //  【平安快捷支付】会员子账户已经存在
 
-    String ERROR_CODE_0042 = "error_42";   //  【平安】找不到用户信息
+    String ERROR_CODE_0042 = "error_42";   //  【平安快捷支付】此房屋已经在交易中，购买失败
 
-    String ERROR_CODE_0043 = "error_43";   //  【平安】该用户没有见证宝账户
+    String ERROR_CODE_0043 = "error_43";   //  【平安快捷支付】快捷支付信息异常 - APP显示：银行系统故障，CEO正在找他们麻烦
 
-    String ERROR_CODE_0044 = "error_44";   //  【平安】查询见证宝账户信息异常
+    String ERROR_CODE_0044 = "error_44";   //  【平安见证宝】查询见证宝账户信息异常 -APP显示：银行系统故障，CEO正在找他们麻烦
 
-    String ERROR_CODE_0045 = "error_45";   //  【平安】接口必填参数为空
+    String ERROR_CODE_0045 = "error_45";   //  【平安见证宝】此卡号已被绑定
 
-    String ERROR_CODE_0046 = "error_46";   //  【平安】bankType错误
+    String ERROR_CODE_0046 = "error_46";   //  【平安见证宝】支付短信发送过于频繁，休息一下
 
-    String ERROR_CODE_0047 = "error_47";   //  【平安】绑定提现账户异常
+    String ERROR_CODE_0047 = "error_47";   //  【经纪人发布订单】您已经向这用户已发起过此订单
 
-    String ERROR_CODE_0048 = "error_48";   //  【平安】绑定提现账户发送验证码失败
+    String ERROR_CODE_0048 = "error_48";   //  【提现】一天只能提取一次
 
-    String ERROR_CODE_0049 = "error_49";   //  【平安】转账时交易记录不存在
-
-    String ERROR_CODE_0050 = "error_50";   //  【平安】交易发生异常
-
-    String ERROR_CODE_0051 = "error_51";   //  【平安】提现异常
+    String ERROR_CODE_0049 = "error_49";   //  【提现】提现额度超过5万
 
 
 }

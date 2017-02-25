@@ -5,6 +5,7 @@ import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.SellHouseStatus;
 import com.ryel.zaja.config.enums.UserType;
+import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
@@ -24,10 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -280,7 +278,13 @@ public class HouseApi {
         Community origComm = communityService.findByUid(community.getUid());
         if (null == origComm) {
             try {
+                if(null == community.getUid() || "".equals(community.getUid())){
+                    throw new BizException("小区信息有误！");
+                }
                 communityService.create(community);
+            } catch (BizException be){
+                logger.error(be.getMessage(), be);
+                return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 return Result.error().msg(Error_code.ERROR_CODE_0025).data(new HashMap<>());
@@ -377,19 +381,55 @@ public class HouseApi {
      * @param floor
      * @return
      */
-    @RequestMapping(value = "/discovery/filter", method = RequestMethod.POST)
+    @RequestMapping(value = {"/discovery/filter", "/discovery/filterbycity"}, method = RequestMethod.POST)
     public Result filters(Integer pageNum,
                           Integer pageSize,
                           String price,
                           String area,
                           String layout,
                           String renovation,
-                          String floor) {
+                          String floor,
+                          String city,
+                          String district,
+                          @RequestParam(value = "longitude", required = false) Double lon1,
+                          @RequestParam(value = "latitude", required = false) Double lat1) {
 
-        Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, UserType.USER.getCode());
-        Map<String, Object> dataMap = APIFactory.fitting(houses);
-        return Result.success().msg("").data(dataMap);
+        if (null == pageNum) {
+            pageNum = 1;
+        }
+        if (null == pageSize) {
+            pageSize = 1;
+        }
+        //如果经纬度不为空，则为筛选附近接口，否则筛选城市接口
+        if(null != lon1 && null != lat1){
+
+            List<String> uids = nearbyCommunity(lon1, lat1, city);
+            if(null != uids && !uids.isEmpty()) {
+                Iterator<String> it = uids.iterator();
+                while (it.hasNext()) {
+                    String uid = it.next();
+                    Community community = communityService.findByUid(uid);
+                    if (!community.getDistrict().equals(district)) {
+                        it.remove();
+                    }
+                }
+
+                Page<House> page = houseService.pageByNearbyHouse(pageNum, pageSize, uids, price, area, layout, renovation, floor);
+                Map<String, Object> dataMap = APIFactory.fitting(page);
+                return Result.success().msg("").data(dataMap);
+            }
+
+            Page<House> page = houseService.findByAddTime(UserType.USER.getCode(), new PageRequest(pageNum - 1, pageSize, Sort.Direction.DESC));
+            Map<String, Object> dataMap = APIFactory.fitting(page);
+            return Result.success().msg("").data(dataMap);
+
+        }else {
+            Page<House> houses = houseService.filter(pageNum, pageSize, price, area, layout, renovation, floor, city, UserType.USER.getCode());
+            Map<String, Object> dataMap = APIFactory.fitting(houses);
+            return Result.success().msg("").data(dataMap);
+        }
     }
+
 
 
     /**

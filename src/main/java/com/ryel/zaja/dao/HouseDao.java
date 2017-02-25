@@ -66,10 +66,22 @@ public interface HouseDao extends JpaRepository<House, Integer> ,JpaSpecificatio
     @Query("select h from House h where h.sellHouse.id = ?1")
     List<House> listBySellHouse(Integer sellHouseId);
 
+    //用sellHouseId查出的通过此sellHouse编辑而成的House，house状态在(30,40)
+    @Query("select h from House h where h.sellHouse.id = ?1 and h.status in ('30', '40')")
+    List<House> listBySellHouse2(Integer sellHouseId);
+
+    //用sellHouseId查出的通过此sellHouse编辑而成的House，house状态在(50)
+    @Query("select h from House h where h.sellHouse.id = ?1 and h.status = '50'")
+    List<House> listBySellHouse3(Integer sellHouseId);
+
     @Query("select count(h) from House h where h.agent.id = ?1")
     Long countByAgentId(Integer agentId);
 
     //用sellHouseId查出所有的通过此sellHouse编辑而成的House
     @Query("select h from House h where h.sellHouse.id = ?1 and h.status = '30'")
     Page<House> PageBySellHouse(Integer sellHouseId, Pageable pageable);
+
+    @Query("select h from House h where h.community.uid in ?1 and h.status in ?2")
+    List<House> listByUids(List<String> uid, List<String> status);
+
 }

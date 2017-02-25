@@ -5,6 +5,7 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.config.enums.HouseOrderType;
 import com.ryel.zaja.config.enums.HouseStatus;
+import com.ryel.zaja.controller.api.pingan.WalletConstant;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
@@ -51,6 +52,12 @@ public class OrderApi {
 
     @Autowired
     private PushDeviceService pushService;
+
+    @Autowired
+    private WalletConstant wallet;
+
+    @Autowired
+    private TradeRecordService tradeRecordService;
 
     //创建订单
     @RequestMapping(value = "createorder")
@@ -115,6 +122,9 @@ public class OrderApi {
     public Result confirm(Integer userId, Integer houseOrderId){
         try{
             houseOrderService.confirm(userId, houseOrderId);
+            //解冻资金
+            TradeRecord tradeRecord = tradeRecordService.findByOrderId(houseOrderId);
+            wallet.unFrozennMoney(tradeRecord.getInThirdCustId().getId(),tradeRecord.getThirdHtId());
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);
@@ -144,20 +154,12 @@ public class OrderApi {
      * @return
      */
     @RequestMapping(value = "receiveorder", method = RequestMethod.POST)
-    public Result receiveOrder(Integer userId, Integer houseOrderId, String idcard, String floor, String username){
+    public Result receiveOrder(Integer userId, Integer houseOrderId){
         try{
             HouseOrder houseOrder = houseOrderService.findByBuyerIdAndOrderId(userId, houseOrderId);
 
             houseOrder.setStatus(HouseOrderStatus.WAIT_PAYMENT.getCode());
-            houseOrder.setIdcard(idcard);
-            houseOrder.setFloor(floor);
-            houseOrder.setUsername(username);
             houseOrderService.update(houseOrder);
-            //更新用户信息
-            User user = new User();
-            user.setId(userId);
-            user.setUsername(username);
-            userService.update(user);
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);
@@ -255,9 +257,12 @@ public class OrderApi {
      * 用户发起订单
      */
     @RequestMapping(value = "userpublishorder")
-    public Result publishorder(Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
-                               String toMobile, String idcard, String floor, String username) {
+    public Result publishorder(Integer userId,Integer agentId, Integer houseId, BigDecimal area, BigDecimal price,
+                               String idcard, String floor, String username) {
         try {
+            if(userId == agentId){
+                throw new BizException(Error_code.ERROR_CODE_0019,"不能给自己发订单！");
+            }
             HouseOrder houseOrder = new HouseOrder();
             // 查经济人
             User agent = userService.findById(agentId);
@@ -265,14 +270,20 @@ public class OrderApi {
                 throw new BizException(Error_code.ERROR_CODE_0023, "查询用户信息为空");
             }
             // 查买房人
-            User user = userService.findByMobile(toMobile);
+            User user = userService.findById(userId);
             if (user == null) {
-                throw new BizException(Error_code.ERROR_CODE_0023, "根据toMobile查询user为空");
+                throw new BizException(Error_code.ERROR_CODE_0023, "user为空");
             }
             House house = houseService.findById(houseId);
-            if (house == null) {
-                throw new BizException(Error_code.ERROR_CODE_0025, "查询到house is null");
+            if (house == null || !house.getStatus().equals(HouseStatus.PUTAWAY_YET.getCode())) {
+                throw new BizException(Error_code.ERROR_CODE_0040, "此房源不在上架状态");
             }
+
+            HouseOrder houseOrder1 = houseOrderService.findByHouseIdAndUserId(houseId, userId);
+            if(null != houseOrder1){
+                throw new BizException(Error_code.ERROR_CODE_0026, "此房源您已发起过订单");
+            }
+
             List<HouseOrder> list = houseOrderService.findPayedOrderByHouseId(houseId);
             if (!CollectionUtils.isEmpty(list)) {
                 throw new BizException(Error_code.ERROR_CODE_0026, "房源已经存在已支付的订单");
@@ -282,14 +293,14 @@ public class OrderApi {
             if (null != house.getSellHouse()) {
                 houseOrder.setSeller(house.getSellHouse().getUser());
             } else {
-                houseOrder.setSeller(userService.findById(agentId));
+                houseOrder.setSeller(userService.findById(userId));
             }
 
             // 生产订单号
             String code = BizUtil.getOrderCode();
             houseOrder.setAgent(agent);
             houseOrder.setBuyer(user);
-            houseOrder.setBuyerMobile(toMobile);
+            houseOrder.setBuyerMobile(user.getMobile());
             houseOrder.setStatus(HouseOrderStatus.NO_ORDER.getCode());
             houseOrder.setType(HouseOrderType.FROM_HOUSE.getCode());
             houseOrder.setAddTime(new Date());
@@ -297,10 +308,11 @@ public class OrderApi {
             houseOrder.setArea(area);
             houseOrder.setPrice(price);
             houseOrder.setCommission(price.multiply(BigDecimal.valueOf(250)));
-            houseOrder.setAuthor(user);
-            houseOrder.setUsername(username);
+            houseOrder.setAuthorId(user.getId());
             houseOrder.setFloor(floor);
             houseOrder.setIdcard(idcard);
+            houseOrder.setUsername(username);
+            houseOrder.setDiscount(BigDecimal.ZERO);
 
             houseOrderService.save(houseOrder);
 

@@ -39,7 +39,9 @@ public interface HouseService extends ICommonService<House> {
                        final String layout,
                        final String renovation,
                        final String floor,
+                       final String city,
                        final String userType);
+
 
     Page<House> mgtPageHouse(int pageNum, int pageSize,String title,String status);
 
@@ -65,7 +67,11 @@ public interface HouseService extends ICommonService<House> {
 
     House findById(Integer id);
 
-    Page<House> pageBySellHouse(Integer userId, Pageable pageable);
+    Page<House> pageBySellHouse(Integer sellHouseId, Pageable pageable);
+
+    List<House> listBySellHouse2(Integer sellHouseId);
+
+    List<House> listBySellHouse3(Integer sellHouseId);
 
     //用户端查看经纪人的房源列表
     Page<House> pageByAgentId2(int agentId, Pageable pageable);
@@ -77,4 +83,8 @@ public interface HouseService extends ICommonService<House> {
     List<House> hotHouse(double lon1, double lat1, String city, String type);
     //获取所有的房屋信息
     Page<House> backPageHouse(int pageNum, int pageSize,String status);
+
+    List<House> listByUids(List<String> uids);
+
+    Page<House> pageByNearbyHouse(int pageNum, int pageSize,List<String> list, String price, String area, String layout, String renovation, String floor);
 }

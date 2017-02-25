@@ -10,9 +10,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PushClient {
-	
+
+	protected final static Logger logger = LoggerFactory.getLogger(PushClient.class);
+
+
 	// The user agent
 	protected final String USER_AGENT = "Mozilla/5.0";
 
@@ -49,6 +54,7 @@ public class PushClient {
         while ((line = rd.readLine()) != null) {
             result.append(line);
         }
+		logger.info("推送通知"+result.toString());
         System.out.println(result.toString());
         if (status == 200) {
             System.out.println("Notification sent successfully.");

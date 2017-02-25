@@ -8,35 +8,28 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-/**投诉表
- * Created by billyu on 2017/1/9.
+/**
+ * Created by billyu on 2017/2/15.
  */
 @Entity
-@Table(name = "complain")
-public class Complain implements Serializable {
-
+@Table(name = "img_wall")
+public class ImgWall implements Serializable {
     private static final long serialVersionUID = 1L;
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "house_order_id")
-    private HouseOrder houseOrder;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Integer userId;
 
-    private String content;
+    private String img;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = CustomJsonDateSerializer.class)
     @Column(name = "add_time")
     private Date addTime;
-
-    public Complain(){}
 
     public Integer getId() {
         return id;
@@ -46,28 +39,20 @@ public class Complain implements Serializable {
         this.id = id;
     }
 
-    public HouseOrder getHouseOrder() {
-        return houseOrder;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setHouseOrder(HouseOrder houseOrder) {
-        this.houseOrder = houseOrder;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public User getUser() {
-        return user;
+    public String getImg() {
+        return img;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setImg(String img) {
+        this.img = img;
     }
 
     public Date getAddTime() {
