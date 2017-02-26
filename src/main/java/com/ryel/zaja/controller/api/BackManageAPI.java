@@ -357,7 +357,7 @@ public class BackManageAPI {
      * @apiSuccess {Result} Result 返回结果
      * @apiUse UserInfo
      */
-    @RequestMapping("/user/login")
+    @RequestMapping("user/login")
     public String login(String mobile, String password) {
         User origUser = userService.login(mobile, password);
         if(null == origUser) {

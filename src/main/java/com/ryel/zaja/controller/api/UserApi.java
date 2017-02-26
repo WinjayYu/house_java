@@ -2,22 +2,18 @@ package com.ryel.zaja.controller.api;
 
 import com.ryel.zaja.config.Error_code;
 import com.ryel.zaja.config.bean.Result;
-import com.ryel.zaja.config.enums.Constant;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
 import com.ryel.zaja.pingan.PinganUtils;
-import com.ryel.zaja.controller.api.pingan.WalletConstant;
 import com.ryel.zaja.pingan.ZJJZ_API_GW;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;
 import com.ryel.zaja.utils.VerifyCodeUtil;
-;
+import com.ryel.zaja.utils.bean.FileBo;;
+import com.sun.org.apache.xml.internal.utils.SerializableLocatorImpl;
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -27,13 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,12 +92,15 @@ public class UserApi {
     @Autowired
     private ApkService apkService;
 
+    private static final String USERHEADURL = "http://www.qqtouxiang.com/d/file/qinglv/20170212/3e7bfa0abf0f15e2ecc5e8d33d45d5ed.jpg";
+
     @Autowired
     private UserWalletAccountService userWalletAccountService;
 
-    @Autowired
-    private ImgWallService imgWallService;
 
+//    private static int EXPIRES = 10 * 60; //超时时间10min
+//    private static int captchaW = 200;
+//    private static int captchaH = 60;
 
     /**
      * @api {post} /api/user/register 1.APP用户注册
@@ -113,22 +113,21 @@ public class UserApi {
      * @apiSuccess {Result} Result 返回结果
      */
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
-    public Result register(User user, @RequestParam("verCode") String verCode) {
-        ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
-        String origVerCode = valueops.get(user.getMobile());
+    public Result register(User user) {
+//        ValueOperations<String, String> valueops = stringRedisTemplate.opsForValue();
+//        String origVerCode = valueops.get(user.getMobile());
 //        Object origVerCode = redisTemplate.opsForValue().get(user.getMobile());
-        if (null == origVerCode) {
-            return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
-        }
-        if (!origVerCode.equals(verCode)) {
-            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
-        }
+//        if (null == origVerCode) {
+//            return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
+//        }
+//        if (!origVerCode.equals(verCode)) {
+//            return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
+//        }
         try {
-            user.setHead(Constant.USER_HEAD.getCode());
+            user.setHead(USERHEADURL);
             user.setNickname("");
-            user.setUsername("");
+            user.setUsername("啦啦");
             user.setAgentStatus("");
-            user.setIdcard("");
             if (null == user.getSex()) {
                 user.setSex("30");//未设置
             }
@@ -161,19 +160,19 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    public Result login(String mobile, String password) {
+    public String login(String mobile, String password) {
         User origUser = userService.login(mobile, password);
         if(null == origUser) {
-            return Result.error().msg(Error_code.ERROR_CODE_0004).data(new HashMap<>());//用户名或密码错误
-
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0004);//用户名或密码错误
+            return JsonUtil.obj2ApiJson(result);
         }
         if("".equals(origUser.getPassword())){
-            return Result.error().msg(Error_code.ERROR_CODE_0030).data(new HashMap<>());//未设置密码
+            Result result = Result.error().msg(Error_code.ERROR_CODE_0030);//未设置密码
+            return JsonUtil.obj2ApiJson(result);
         }
-            Map<String,Object> user = APIFactory.filterUser(origUser);
-            Map<String, Object> data = new HashMap<>();
-            data.put("user", user);
-            return Result.success().msg("").data(data);
+            origUser.setPassword("");
+            Result result = Result.success().msg("").data(user2map(origUser));
+            return JsonUtil.obj2ApiJson(result);
     }
 
     /**
@@ -219,6 +218,7 @@ public class UserApi {
      * "data": "http://localhost:8080/files/upload/img/2016/8/558537507501307.jpg"
      * }
      */
+    //@RequestParam(value = "head", required = true) MultipartFile file
     @RequestMapping(value = "/user/head")
     public Result headUpload(Integer userId,
                              @RequestParam(required = true) MultipartFile image) throws BizException,Exception{
@@ -227,7 +227,7 @@ public class UserApi {
             if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){
                 String head = user.getHead();
                 if(-1 != head.indexOf("user")) {
-                    String filename = head.substring(head.indexOf("zaja.xin"));
+                    String filename = head.substring(head.indexOf("user"));
                     qiNiuService.deleteOneFile(filename);
                 }
             }
@@ -331,26 +331,14 @@ public class UserApi {
 
         String textEntity = VerifyCodeUtil.send(mobile, verCode, type);
 
-            System.out.print(textEntity);
-            SAXReader saxReader = new SAXReader();
 
-            Document document = saxReader.read(new ByteArrayInputStream(textEntity.getBytes("UTF-8")));
-            Element rootElement = document.getRootElement();
-            String s =  rootElement.getStringValue();
-            if(!s.contains("Success")){
-                throw new BizException(Error_code.ERROR_CODE_0008, s);
-
+            JSONObject jsonObj = new JSONObject(textEntity);
+            int error_code = jsonObj.getInt("error");
+            String error_msg = jsonObj.getString("msg");
+            if(0 != error_code){
+                return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
             }
-//            JSONObject jsonObj = new JSONObject(textEntity);
-//            int error_code = jsonObj.getInt("error");
-//            String error_msg = jsonObj.getString("msg");
-//            if(0 != error_code){
-//                return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
-//            }
-        } catch(BizException be){
-            logger.error(be.getMessage(), be);
-            return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
-        } catch(Exception e) {
+        } catch (JSONException e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(Error_code.ERROR_CODE_0008).data(new HashMap<>());
         }
@@ -367,10 +355,7 @@ public class UserApi {
                 if (null != thirdUser.getUser()) {
                     int id = thirdUser.getUser();
                     User user = userService.findById(id);
-                    Map<String,Object> user1 = APIFactory.filterUser(user);
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("user", user1);
-                    return Result.success().msg("").data(data);
+                    return Result.success().msg("").data(user2map(user));
                 } else {
                     Map<String, String> map = new HashMap<>();
                     map.put("status", "0");//"0"代表没有绑定手机号
@@ -418,19 +403,19 @@ public class UserApi {
             }
 
 
-            User user1;
-            if(null != (user1 = userService.findByMobile(mobile))){
+            if(null != userService.findByMobile(mobile)){
 
-//              User user = userService.findByMobile(mobile);
+                User user = userService.findByMobile(mobile);
+
 
                 //一个账户只能绑定一个微信或者QQ
-                ThirdUser thirdUser1 = thirdUserService.check(user1.getId(),thirdUser.getType());
+                ThirdUser thirdUser1 = thirdUserService.check(user.getId(),thirdUser.getType());
                 if(null != thirdUser1){
                     if(null != thirdUser1.getUser()) {
                         return Result.error().msg(Error_code.ERROR_CODE_0038).data(new HashMap<>());
                     }
                 }
-                thirdUser.setUser(user1.getId());
+                thirdUser.setUser(user.getId());
                 thirdUserService.update(thirdUser);
 
                /* String str = JsonUtil.obj2Json(thirdUser1);
@@ -440,7 +425,7 @@ public class UserApi {
 
                 Map<String, Object> dataMap = new HashMap<>();
                 dataMap.put("user",obj.toString());*/
-                return Result.success().msg("").data(user2map(user1));
+                return Result.success().msg("").data(user2map(user));
             }
 
             User user = new User();
@@ -460,10 +445,7 @@ public class UserApi {
             thirdUser.setUser(origUser.getId());
             ThirdUser thirdUser2 = thirdUserService.update(thirdUser);
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("user",APIFactory.filterUser(origUser));
-
-          return Result.success().msg("").data(data);
+          return Result.success().msg("").data(user2map(origUser));
         } catch (BizException be){
             logger.error(be.getMessage(), be);
             return Result.error().msg(Error_code.ERROR_CODE_0006).data(new HashMap<>());
@@ -555,25 +537,47 @@ public class UserApi {
      * 反馈
      * @param userId
      * @param content
+     * @param image1
+     * @param image2
+     * @param image3
+     * @param image4
      * @return
      */
     @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
     public Result feedback(Integer userId,
                            String content,
-                           @RequestParam(value = "imgs", required = false) MultipartFile[] imgs){
+                           @RequestParam(required = false) MultipartFile image1,
+                           @RequestParam(required = false) MultipartFile image2,
+                           @RequestParam(required = false) MultipartFile image3,
+                           @RequestParam(required = false) MultipartFile image4){
 
         try{
 
             List<String> imagePathList = new ArrayList<String>();
-            if(null != imgs){
-                for(int i=0; i<imgs.length; i++){
-                    String path = bizUploadFile.uploadFeedbackImageToQiniu(imgs[i], userId);
-                    if (StringUtils.isNotBlank(path)) {
-                        imagePathList.add(path);
-                    }
+            if (image1 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
                 }
             }
-
+            if (image2 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image3 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (image4 != null) {
+                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
 
             Feedback feedback = new Feedback();
 
@@ -610,6 +614,7 @@ public class UserApi {
         try{
 
             Comment comment = commentService.create(userId, agentId, houseOrderId, star, content);
+//            Comment comment = commentService.findByHouseOrderId(houseOrderId);
 
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException e){
@@ -715,13 +720,7 @@ public class UserApi {
             houseCount = houseCount == null ? 0 : houseCount;
             dataMap.put("houseCount", houseCount);
 
-            List<Object> imgList = imgWallService.findByAgentId(userId);
-            dataMap.put("imgList", imgList);
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("analysis",dataMap);
-
-            return Result.success().msg("").data(result);
+            return Result.success().msg("").data(dataMap);
 
         }catch (Exception e){
             logger.error(e.getMessage(), e);
