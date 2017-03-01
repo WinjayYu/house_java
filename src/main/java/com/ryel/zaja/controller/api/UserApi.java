@@ -188,14 +188,19 @@ public class UserApi {
      * @apiUse UserInfo
      */
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)
-    public Result update(Integer userId, String nickname, String sex) {
-        User user = new User();
-        user.setId(userId);
-        if (null != nickname) {
-            user.setNickname(nickname);
-        } else {
-            user.setSex(sex);
+    public Result update(User user) {
+//        User user = new User();
+//        user.setId(userId);
+//        if (null != nickname) {
+//            user.setNickname(nickname);
+//        } else {
+//            user.setSex(sex);
+//        }
+
+        if(null == user.getId()){
+            return Result.error().msg(Error_code.ERROR_CODE_0023).data(new HashMap<>());
         }
+
         userService.update(user);
         User origUser = userService.findById(user.getId());
         return Result.success().msg("").data(user2map(origUser));

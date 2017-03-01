@@ -714,42 +714,41 @@ public class AgentApi {
      * 发布房源
      */
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
-    public String publishhouse(@RequestParam(value = "imgs", required = false) MultipartFile[] imgs,
-                               Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
+    public String publishhouse(String imgs, Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
                                String features) {
         try {
             // 参数校验
-            if (agentId == null || community == null) {
-                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("agentId或sellhouseId或community为空"));
-            }
-            // 小区校验
-            Community origComm = communityService.createOrUpdateByUid(community);
-            // 用户校验
-            User agent = userService.findById(agentId);
-            if (agent == null) {
-                throw new BizException("查询到用户为空userId:" + agentId);
-            }
+//            if (agentId == null || community == null) {
+//                return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0023).data("agentId或sellhouseId或community为空"));
+//            }
+//            // 小区校验
+//            Community origComm = communityService.createOrUpdateByUid(community);
+//            // 用户校验
+//            User agent = userService.findById(agentId);
+//            if (agent == null) {
+//                throw new BizException("查询到用户为空userId:" + agentId);
+//            }
             House house = new House();
-            // 判断sellhouseId是否存在
-            if (sellhouseId != null) {
-                SellHouse sellHouse = sellHouseService.findById(sellhouseId);
-                if (sellHouse == null) {
-                    throw new BizException("查询到sellHouse为空sellhouseId:" + sellhouseId);
-                }
-                // 判断经济人是否发布过房源
-                List<House> list = houseService.findByAgentIdAndSellHouseId(agent.getId(), sellhouseId);
-                if (!CollectionUtils.isEmpty(list)) {
-                    return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0028));
-                }
-                house.setSellHouse(sellHouse);
-            }
+//            // 判断sellhouseId是否存在
+//            if (sellhouseId != null) {
+//                SellHouse sellHouse = sellHouseService.findById(sellhouseId);
+//                if (sellHouse == null) {
+//                    throw new BizException("查询到sellHouse为空sellhouseId:" + sellhouseId);
+//                }
+//                // 判断经济人是否发布过房源
+//                List<House> list = houseService.findByAgentIdAndSellHouseId(agent.getId(), sellhouseId);
+//                if (!CollectionUtils.isEmpty(list)) {
+//                    return JsonUtil.obj2ApiJson(Result.error().msg(Error_code.ERROR_CODE_0028));
+//                }
+//                house.setSellHouse(sellHouse);
+//            }
 
             house.setCity(community.getCity());
             house.setViewNum(0);
             house.setPrice(price);
             house.setCommission(price.multiply(BigDecimal.valueOf(250)));
-            house.setAgent(agent);
+//            house.setAgent(agent);
             house.setCommunity(community);
             house.setStatus(HouseStatus.SAVED.getCode());
             house.setAddTime(new Date());
@@ -765,6 +764,7 @@ public class AgentApi {
             house.setPublishTime(new Date());
             house.setLastModifiedTime(new Date());
             house.setYear(new SimpleDateFormat("yyyy").format(new Date()));
+            house.setImgs(imgs);
             if (sellhouseId != null) {
                 house.setType("10");
             } else {
@@ -773,29 +773,13 @@ public class AgentApi {
 
             //保存房屋标签数据
             String[] tagList= tags.split("\\|");
-            for (String tag : tagList)
-            {
-                tagService.upDateTagNum(tag);
+            if (tagList.length != 1){
+                house.setTags(tags);
             }
+
 
             houseService.create(house);
 
-            // 把图片更新进去
-            Integer houseId = house.getId();
-            List<String> imagePathList = new ArrayList<String>();
-            if(null != imgs){
-                for(int i=0; i<imgs.length; i++){
-                    String path = bizUploadFile.uploadHouseImageToLocal(imgs[i], houseId);
-                    if (StringUtils.isNotBlank(path)) {
-                        imagePathList.add(path);
-                    }
-                    if (0 == i) {
-                        house.setCover(path);
-                    }
-                }
-            }
-            house.setImgs(JsonUtil.obj2Json(imagePathList));
-            houseService.update(house);
             return JsonUtil.obj2ApiJson(Result.success().msg("").data(new HashMap<>()));
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
