@@ -38,7 +38,7 @@ public interface UserService extends ICommonService<User>{
 
     Page<User> mgtPageAgent(int pageNum, int pageSize,String name);
 
-    void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
+    User agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
                        MultipartFile positive, MultipartFile negative, MultipartFile companyPic);
 
     void applyAgent(Integer userId, AgentMaterial agentMaterial,

@@ -5,7 +5,6 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.HouseOrderStatus;
 import com.ryel.zaja.config.enums.HouseOrderType;
 import com.ryel.zaja.config.enums.HouseStatus;
-import com.ryel.zaja.controller.api.pingan.WalletConstant;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.dao.CommunityDao;
 import com.ryel.zaja.dao.HouseDao;
@@ -52,9 +51,6 @@ public class OrderApi {
 
     @Autowired
     private PushDeviceService pushService;
-
-    @Autowired
-    private WalletConstant wallet;
 
     @Autowired
     private TradeRecordService tradeRecordService;
@@ -122,9 +118,6 @@ public class OrderApi {
     public Result confirm(Integer userId, Integer houseOrderId){
         try{
             houseOrderService.confirm(userId, houseOrderId);
-            //解冻资金
-            TradeRecord tradeRecord = tradeRecordService.findByOrderId(houseOrderId);
-            wallet.unFrozennMoney(tradeRecord.getInThirdCustId().getId(),tradeRecord.getThirdHtId());
             return Result.success().msg("").data(new HashMap<>());
         }catch (BizException be){
             logger.error(be.getMessage(), be);

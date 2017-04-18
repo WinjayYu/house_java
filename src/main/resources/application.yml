@@ -43,3 +43,5 @@ server:
       protocol-header: x-forwarded-proto
       port-header: X-Forwarded-Port
     use-forward-headers: true
+multipart:
+  max-file-size: 10Mb

@@ -224,9 +224,10 @@ public class UserApi {
      * }
      */
     //@RequestParam(value = "head", required = true) MultipartFile file
-    @RequestMapping(value = "/user/head")
+    @RequestMapping(value = "/user/head", method = RequestMethod.POST)
     public Result headUpload(Integer userId,
                              @RequestParam(required = true) MultipartFile image) throws BizException,Exception{
+
 
             User user = userService.findById(userId);
             if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){

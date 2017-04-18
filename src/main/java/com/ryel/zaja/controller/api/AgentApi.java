@@ -132,17 +132,10 @@ public class AgentApi {
                            @RequestParam(required = false) MultipartFile negativeFile,
                            @RequestParam(required = false) MultipartFile companyPicFile) {
         try {
-            // 校验验证码
-            Object origVerCode = stringRedisTemplate.opsForValue().get(user.getMobile());
-            if (null == origVerCode) {
-                return Result.error().msg(Error_code.ERROR_CODE_0010).data(new HashMap<>());
-            }
-            if (!origVerCode.equals(verifycode)) {
-                return Result.error().msg(Error_code.ERROR_CODE_0009).data(new HashMap<>());
-            }
-
-            userService.agentRegister(user, agentMaterial, verifycode, positiveFile, negativeFile, companyPicFile);
-            return Result.success().msg("").data(new HashMap<>());
+            User user1 = userService.agentRegister(user, agentMaterial, verifycode, positiveFile, negativeFile, companyPicFile);
+            Map<String, Object> data = new HashMap<>();
+            data.put("user",user1);
+            return Result.success().msg("").data(data);
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
             return Result.error().msg(e.getCode()).data(new HashMap<>());

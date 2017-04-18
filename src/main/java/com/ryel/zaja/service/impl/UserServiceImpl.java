@@ -155,7 +155,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
     @Override
     @Transactional
-    public void agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
+    public User agentRegister(User user, AgentMaterial agentMaterial, String verifyCode,
                               MultipartFile positive, MultipartFile negative, MultipartFile companyPic) {
         // 校验参数
         if(user == null
@@ -187,6 +187,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             throw new BizException(Error_code.ERROR_CODE_0027,"身份证已经存在");
         }
 
+        User user1 = new User();
         //审核被拒绝用户
         if(agent != null && AgentRegisterStatus.APPROVE_REJECT.getCode().equals(agent.getAgentStatus()))
         {
@@ -204,7 +205,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
             user.setAgentStatus(AgentRegisterStatus.APPROVE_APPLY.getCode());
             user.setType(UserType.AGENT.getCode());
             user.setIdcard(agentMaterial.getIdcard());
-            create(user);
+            user1 = create(user);
         }
         // 上传图片
         String positivePath = bizUploadFile.uploadAgentImageToLocal(positive,user.getId());
@@ -225,6 +226,8 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
         agentMaterial.setNegative(negativePath);
         agentMaterial.setCompanyPic(companyPicPath);
         agentMaterialService.save(agentMaterial);
+
+        return user1;
     }
 
 
