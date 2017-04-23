@@ -101,7 +101,7 @@ public class UserServiceImpl extends AbsCommonService<User> implements UserServi
 
 
     @Override
-    public Page<User> findByPage(final String name, int pageNum, int pageSize) {
+    public Page<User> findByPage(int pageNum, int pageSize,final String name) {
         Page<User> page = userDao.findAll(new Specification<User>() {
             @Override
             public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {

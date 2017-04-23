@@ -48,7 +48,7 @@ public class HouseController extends BaseController {
 
     @RequestMapping("/index")
     public ModelAndView index(){
-        ModelAndView modelAndView = new ModelAndView("房源列表");
+        ModelAndView modelAndView = new ModelAndView("houseList");
         modelAndView.addObject("statusList",HouseStatus.getAllStatusOptionHtml(true));
         return modelAndView;
     }
@@ -64,7 +64,7 @@ public class HouseController extends BaseController {
 
     @RequestMapping("/detail")
     public ModelAndView detail(Integer id) {
-        ModelAndView modelAndView = new ModelAndView("房源详情");
+        ModelAndView modelAndView = new ModelAndView("houseDetail");
         House house = houseService.findById(id);
         if (StringUtils.isNotBlank(house.getFeature())) {
             Feature feature = JsonUtil.json2Obj(house.getFeature(), Feature.class);

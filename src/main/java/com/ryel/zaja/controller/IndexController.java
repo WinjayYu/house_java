@@ -79,7 +79,7 @@ public class IndexController extends BaseController{
     public String home(HttpServletRequest request,
                             HttpServletResponse response,
                             ModelMap model) {
-        return "首页";
+        return "houseList";
     }
 
 

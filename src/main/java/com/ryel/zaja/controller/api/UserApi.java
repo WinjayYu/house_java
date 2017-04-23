@@ -5,8 +5,6 @@ import com.ryel.zaja.config.bean.Result;
 import com.ryel.zaja.config.enums.UserType;
 import com.ryel.zaja.core.exception.BizException;
 import com.ryel.zaja.entity.*;
-import com.ryel.zaja.pingan.PinganUtils;
-import com.ryel.zaja.pingan.ZJJZ_API_GW;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.JsonUtil;

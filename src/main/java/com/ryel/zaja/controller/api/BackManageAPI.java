@@ -6,8 +6,6 @@ import com.ryel.zaja.config.enums.AgentRegisterStatus;
 import com.ryel.zaja.config.enums.HouseStatus;
 import com.ryel.zaja.controller.HouseController;
 import com.ryel.zaja.entity.*;
-import com.ryel.zaja.pingan.PinganUtils;
-import com.ryel.zaja.pingan.ZJJZ_API_GW;
 import com.ryel.zaja.service.*;
 import com.ryel.zaja.utils.APIFactory;
 import com.ryel.zaja.utils.DataTableFactory;

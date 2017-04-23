@@ -29,15 +29,14 @@ public class UserController  extends BaseController{
     private AgentMaterialService agentMaterialService;
 
 
-    @RequestMapping("/index")
-    public String index(HttpServletRequest request,
-                        HttpServletResponse response){
-        return "用户列表";
+    @RequestMapping("/userIndex")
+    public String index(){
+        return "userList";
     }
 
     @RequestMapping("/agentIndex")
     public String agentIndex(){
-        return "经济人列表";
+        return "agentList";
     }
 
     @RequestMapping("/agentList")
@@ -51,9 +50,28 @@ public class UserController  extends BaseController{
 
     @RequestMapping("/agentDetail")
     public ModelAndView agentDetail(Integer agentId) {
-        ModelAndView modelAndView = new ModelAndView("经济人详情");
+        ModelAndView modelAndView = new ModelAndView("agentDetail");
         User user = userService.findById(agentId);
         AgentMaterial agentMaterial = agentMaterialService.findByAgentId(agentId);
+        modelAndView.addObject("user",user);
+        modelAndView.addObject("agentMaterial",agentMaterial);
+        return modelAndView;
+    }
+
+    @RequestMapping("/userList")
+    @ResponseBody
+    public Map userList(Integer draw, Integer start, Integer length, String name) {
+        int pageNum = getPageNum(start, length);
+        Page<User> page = userService.findByPage(pageNum, length, name);
+        Map<String, Object> result = DataTableFactory.fitting(draw, page);
+        return result;
+    }
+
+    @RequestMapping("/userDetail")
+    public ModelAndView userDetail(Integer userId) {
+        ModelAndView modelAndView = new ModelAndView("userDetail");
+        User user = userService.findById(userId);
+        AgentMaterial agentMaterial = agentMaterialService.findByAgentId(userId);
         modelAndView.addObject("user",user);
         modelAndView.addObject("agentMaterial",agentMaterial);
         return modelAndView;

@@ -10,6 +10,9 @@
             <li>
                 <a href="mgt/user/agentIndex"><i class="fa fa-tachometer fa-fw"></i>经济人列表</a>
             </li>
+            <li>
+                <a href="mgt/user/userIndex"><i class="fa fa-tachometer fa-fw"></i>用户列表</a>
+            </li>
         </ul>
     </div>
     <!-- /.sidebar-collapse -->

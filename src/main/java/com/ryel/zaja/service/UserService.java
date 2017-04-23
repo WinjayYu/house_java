@@ -34,7 +34,7 @@ public interface UserService extends ICommonService<User>{
 
 
 
-    Page<User> findByPage(String name, int pageNum, int pageSize);
+    Page<User> findByPage(int pageNum, int pageSize, String name);
 
     Page<User> mgtPageAgent(int pageNum, int pageSize,String name);
 
