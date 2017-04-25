@@ -707,7 +707,7 @@ public class AgentApi {
      * 发布房源
      */
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
-    public String publishhouse(String imgs, Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
+    public String publishhouse(MultipartFile[] imgs, Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
                                String features) {
         try {
@@ -757,22 +757,25 @@ public class AgentApi {
             house.setPublishTime(new Date());
             house.setLastModifiedTime(new Date());
             house.setYear(new SimpleDateFormat("yyyy").format(new Date()));
-            house.setImgs(imgs);
-            if (sellhouseId != null) {
-                house.setType("10");
-            } else {
-                house.setType("20");
-            }
-
-            //保存房屋标签数据
-            String[] tagList= tags.split("\\|");
-            if (tagList.length != 1){
-                house.setTags(tags);
-            }
-
 
             houseService.create(house);
 
+            // 把图片更新进去
+            Integer houseId = house.getId();
+            List<String> imagePathList = new ArrayList<String>();
+            if(null != imgs){
+                for(int i=0; i<imgs.length; i++){
+                    String path = bizUploadFile.uploadHouseImageToLocal(imgs[i], houseId);
+                    if (StringUtils.isNotBlank(path)) {
+                        imagePathList.add(path);
+                    }
+                    if (0 == i) {
+                        house.setCover(path);
+                    }
+                }
+            }
+            house.setImgs(JsonUtil.obj2Json(imagePathList));
+            houseService.update(house);
             return JsonUtil.obj2ApiJson(Result.success().msg("").data(new HashMap<>()));
         } catch (BizException e) {
             logger.error(e.getMessage(), e);
@@ -848,7 +851,7 @@ public class AgentApi {
     @RequestMapping(value = "modifyhead")
     public Result modifyhead(Integer agentId, @RequestParam(required = true) MultipartFile imgs) {
         try {
-            String path = bizUploadFile.uploadUserImageToQiniu(imgs, agentId);
+            String path = bizUploadFile.uploadUserImageToLocal(imgs, agentId);
             if (StringUtils.isNotBlank(path)) {
                 Map<String, String> dataMap = new HashMap<>();
                 dataMap.put("remotePath", path);
@@ -1154,37 +1157,37 @@ public class AgentApi {
      * @param content
      * @return
      */
-    @RequestMapping(value = "feedback", method = RequestMethod.POST)
-    public Result feedback(Integer agentId,
-                           String content,
-                           @RequestParam(value = "imgs", required = false) MultipartFile[] imgs){
-
-        try{
-            List<String> imagePathList = new ArrayList<String>();
-            if (null != imgs){
-                for(MultipartFile img: imgs){
-                    String path = bizUploadFile.uploadFeedbackImageToQiniu(img, agentId);
-                    if (StringUtils.isNotBlank(path)) {
-                        imagePathList.add(path);
-                    }
-                }
-            }
-
-            Feedback feedback = new Feedback();
-
-            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
-            feedback.setUser(userService.findById(agentId));
-            feedback.setContent(content);
-
-            feedbackService.create(feedback);
-
-
-            return Result.success().msg("").data(new HashMap<>());
-        }catch (Exception e){
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
+//    @RequestMapping(value = "feedback", method = RequestMethod.POST)
+//    public Result feedback(Integer agentId,
+//                           String content,
+//                           @RequestParam(value = "imgs", required = false) MultipartFile[] imgs){
+//
+//        try{
+//            List<String> imagePathList = new ArrayList<String>();
+//            if (null != imgs){
+//                for(MultipartFile img: imgs){
+//                    String path = bizUploadFile.uploadFeedbackImageToQiniu(img, agentId);
+//                    if (StringUtils.isNotBlank(path)) {
+//                        imagePathList.add(path);
+//                    }
+//                }
+//            }
+//
+//            Feedback feedback = new Feedback();
+//
+//            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
+//            feedback.setUser(userService.findById(agentId));
+//            feedback.setContent(content);
+//
+//            feedbackService.create(feedback);
+//
+//
+//            return Result.success().msg("").data(new HashMap<>());
+//        }catch (Exception e){
+//            logger.error(e.getMessage(), e);
+//            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+//        }
+//    }
 
     /**
      * 经纪人确认接单,状态值从"10"变成"20"
@@ -1304,7 +1307,7 @@ public class AgentApi {
             }
             for(MultipartFile img: imgs){
                 ImgWall imgWall = new ImgWall();
-                String path = bizUploadFile.uploadUserImageToQiniu(img, agentId);
+                String path = bizUploadFile.uploadUserImageToLocal(img, agentId);
                 imgWall.setUserId(agentId);
                 imgWall.setImg(path);
                 imgWall.setAddTime(new Date());

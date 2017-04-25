@@ -228,17 +228,17 @@ public class UserApi {
 
 
             User user = userService.findById(userId);
-            if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){
-                String head = user.getHead();
-                if(-1 != head.indexOf("user")) {
-                    String filename = head.substring(head.indexOf("user"));
-                    qiNiuService.deleteOneFile(filename);
-                }
-            }
+//            if(null != user.getHead() && StringUtils.isNotBlank(user.getHead())){
+//                String head = user.getHead();
+//                if(-1 != head.indexOf("user")) {
+//                    String filename = head.substring(head.indexOf("user"));
+//                    qiNiuService.deleteOneFile(filename);
+//                }
+//            }
 
         try {
 
-            String path = bizUploadFile.uploadUserImageToQiniu(image, userId);
+            String path = bizUploadFile.uploadUserImageToLocal(image, userId);
             user.setId(userId);
             user.setHead(path);
             userService.update(user);
@@ -547,56 +547,56 @@ public class UserApi {
      * @param image4
      * @return
      */
-    @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
-    public Result feedback(Integer userId,
-                           String content,
-                           @RequestParam(required = false) MultipartFile image1,
-                           @RequestParam(required = false) MultipartFile image2,
-                           @RequestParam(required = false) MultipartFile image3,
-                           @RequestParam(required = false) MultipartFile image4){
-
-        try{
-
-            List<String> imagePathList = new ArrayList<String>();
-            if (image1 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image2 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image3 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-            if (image4 != null) {
-                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
-                if (StringUtils.isNotBlank(path)) {
-                    imagePathList.add(path);
-                }
-            }
-
-            Feedback feedback = new Feedback();
-
-            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
-            feedback.setUser(userService.findById(userId));
-            feedback.setContent(content);
-
-            feedbackService.create(feedback);
-
-            return Result.success().msg("").data(new HashMap<>());
-        }catch (Exception e){
-            logger.error(e.getMessage(), e);
-            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
-        }
-    }
+//    @RequestMapping(value = "/user/feedback", method = RequestMethod.POST)
+//    public Result feedback(Integer userId,
+//                           String content,
+//                           @RequestParam(required = false) MultipartFile image1,
+//                           @RequestParam(required = false) MultipartFile image2,
+//                           @RequestParam(required = false) MultipartFile image3,
+//                           @RequestParam(required = false) MultipartFile image4){
+//
+//        try{
+//
+//            List<String> imagePathList = new ArrayList<String>();
+//            if (image1 != null) {
+//                String path = bizUploadFile.uploadFeedbackImageToQiniu(image1, userId);
+//                if (StringUtils.isNotBlank(path)) {
+//                    imagePathList.add(path);
+//                }
+//            }
+//            if (image2 != null) {
+//                String path = bizUploadFile.uploadFeedbackImageToQiniu(image2, userId);
+//                if (StringUtils.isNotBlank(path)) {
+//                    imagePathList.add(path);
+//                }
+//            }
+//            if (image3 != null) {
+//                String path = bizUploadFile.uploadFeedbackImageToQiniu(image3, userId);
+//                if (StringUtils.isNotBlank(path)) {
+//                    imagePathList.add(path);
+//                }
+//            }
+//            if (image4 != null) {
+//                String path = bizUploadFile.uploadFeedbackImageToQiniu(image4, userId);
+//                if (StringUtils.isNotBlank(path)) {
+//                    imagePathList.add(path);
+//                }
+//            }
+//
+//            Feedback feedback = new Feedback();
+//
+//            feedback.setImgs(JsonUtil.obj2Json(imagePathList));
+//            feedback.setUser(userService.findById(userId));
+//            feedback.setContent(content);
+//
+//            feedbackService.create(feedback);
+//
+//            return Result.success().msg("").data(new HashMap<>());
+//        }catch (Exception e){
+//            logger.error(e.getMessage(), e);
+//            return Result.error().msg(Error_code.ERROR_CODE_0001).data(new HashMap<>());
+//        }
+//    }
 
     /**
      * 创建评论
