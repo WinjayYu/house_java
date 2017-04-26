@@ -40,7 +40,7 @@
                 <spring.dataSource.password>Mine,2017</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/house</doc.base.url>
                 <pro.upload.path>/usr/local/tomcat8.5/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>https://ylili.cn:8080/files/upload/</pro.upload.url>
+                <pro.upload.url>http://ylili.cn:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>
 
@@ -53,7 +53,7 @@
                 <spring.dataSource.password>Mine,2017</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/house</doc.base.url>
                 <pro.upload.path>/usr/local/tomcat8.5/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>https://ylili.cn/files/upload/</pro.upload.url>
+                <pro.upload.url>http://ylili.cn/files/upload/</pro.upload.url>
             </properties>
         </profile>
 

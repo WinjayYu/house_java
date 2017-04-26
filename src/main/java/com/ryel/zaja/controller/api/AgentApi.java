@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -707,7 +709,12 @@ public class AgentApi {
      * 发布房源
      */
     @RequestMapping(value = "publishhouse", method = RequestMethod.POST)
-    public String publishhouse(MultipartFile[] imgs, Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, Community community,
+    public String publishhouse(@RequestParam(value = "img1", required = false)MultipartFile img1,
+                               @RequestParam(value = "img2", required = false)MultipartFile img2,
+                               @RequestParam(value = "img3", required = false)MultipartFile img3,
+                               @RequestParam(value = "img4", required = false)MultipartFile img4,
+                               @RequestParam(value = "img5", required = false)MultipartFile img5,
+                               Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, String uid,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
                                String features) {
         try {
@@ -737,6 +744,7 @@ public class AgentApi {
 //                house.setSellHouse(sellHouse);
 //            }
 
+            Community community = communityService.findByUid(uid);
             house.setCity(community.getCity());
             house.setViewNum(0);
             house.setPrice(price);
@@ -763,15 +771,35 @@ public class AgentApi {
             // 把图片更新进去
             Integer houseId = house.getId();
             List<String> imagePathList = new ArrayList<String>();
-            if(null != imgs){
-                for(int i=0; i<imgs.length; i++){
-                    String path = bizUploadFile.uploadHouseImageToLocal(imgs[i], houseId);
-                    if (StringUtils.isNotBlank(path)) {
-                        imagePathList.add(path);
-                    }
-                    if (0 == i) {
-                        house.setCover(path);
-                    }
+            if (img1 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(img1, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+                house.setCover(path);
+            }
+            if (img2 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(img2, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (img3 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(img3, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (img4 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(img5, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
+                }
+            }
+            if (img5 != null) {
+                String path = bizUploadFile.uploadHouseImageToLocal(img5, houseId);
+                if (StringUtils.isNotBlank(path)) {
+                    imagePathList.add(path);
                 }
             }
             house.setImgs(JsonUtil.obj2Json(imagePathList));
