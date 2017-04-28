@@ -716,7 +716,7 @@ public class AgentApi {
                                @RequestParam(value = "img5", required = false)MultipartFile img5,
                                Integer agentId, Integer sellhouseId, String title, BigDecimal price, String tags, String uid,
                                String layout, BigDecimal area, String floor, String renovation, String orientation, String purpose,
-                               String features) {
+                               String feature) {
         try {
             // 参数校验
 //            if (agentId == null || community == null) {
@@ -725,10 +725,10 @@ public class AgentApi {
 //            // 小区校验
 //            Community origComm = communityService.createOrUpdateByUid(community);
 //            // 用户校验
-//            User agent = userService.findById(agentId);
-//            if (agent == null) {
-//                throw new BizException("查询到用户为空userId:" + agentId);
-//            }
+            User agent = userService.findById(agentId);
+            if (agent == null) {
+                throw new BizException("查询到用户为空userId:" + agentId);
+            }
             House house = new House();
 //            // 判断sellhouseId是否存在
 //            if (sellhouseId != null) {
@@ -749,12 +749,12 @@ public class AgentApi {
             house.setViewNum(0);
             house.setPrice(price);
             house.setCommission(price.multiply(BigDecimal.valueOf(250)));
-//            house.setAgent(agent);
+            house.setAgent(agent);
             house.setCommunity(community);
             house.setStatus(HouseStatus.SAVED.getCode());
             house.setAddTime(new Date());
             house.setArea(area);
-            house.setFeature(features);
+            house.setFeature(feature);
             house.setFloor(floor);
             house.setRenovation(renovation);
             house.setOrientation(orientation);

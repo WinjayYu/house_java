@@ -52,8 +52,8 @@
                 <spring.dataSource.username>root</spring.dataSource.username>
                 <spring.dataSource.password>Mine,2017</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/house</doc.base.url>
-                <pro.upload.path>/usr/local/tomcat8.5/webapps/files/upload/</pro.upload.path>
-                <pro.upload.url>http://ylili.cn/files/upload/</pro.upload.url>
+                <pro.upload.path>/usr/local/tomcat/webapps/files/upload/</pro.upload.path>
+                <pro.upload.url>http://ylili.cn:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>
 
@@ -66,6 +66,19 @@
                 <spring.dataSource.password>helloworld</spring.dataSource.password>
                 <doc.base.url>http://localhost:8080/zaja</doc.base.url>
                 <pro.upload.path>D://tomcat8.5//webapps//files//upload/</pro.upload.path>
+                <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
+            </properties>
+        </profile>
+
+
+        <profile>
+            <id>workroom</id>
+            <properties>
+                <spring.dataSource.url>jdbc:mysql://127.0.0.1:3306/house?characterEncoding=utf-8</spring.dataSource.url>
+                <spring.dataSource.username>root</spring.dataSource.username>
+                <spring.dataSource.password>helloworld</spring.dataSource.password>
+                <doc.base.url>http://localhost:8080/zaja</doc.base.url>
+                <pro.upload.path>D://tomcat9.0//webapps//files//upload/</pro.upload.path>
                 <pro.upload.url>http://localhost:8080/files/upload/</pro.upload.url>
             </properties>
         </profile>
